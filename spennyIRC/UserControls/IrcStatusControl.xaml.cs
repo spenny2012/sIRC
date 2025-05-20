@@ -1,0 +1,71 @@
+﻿using spennyIRC.ViewModels;
+using System.Windows.Controls;
+using System.Windows.Documents;
+
+namespace spennyIRC;
+
+/// <summary>
+/// Interaction logic for IrcStatusControl.xaml
+/// </summary>
+public partial class IrcStatusControl : UserControl
+{
+    private Paragraph paragraph;
+    private ServerViewModel _vm;
+
+    public IrcStatusControl()
+    {
+        InitializeComponent();
+        InitializeChatDisplay();
+        PrintIntro();
+    }
+
+    private void PrintIntro()
+    {
+
+    }
+
+    private void InitializeChatDisplay()
+    {
+        paragraph = new Paragraph();
+        ChatDisplay.Document.Blocks.Clear();
+        ChatDisplay.Document.Blocks.Add(paragraph);
+    }
+
+    private void RegisterEcho()
+    {
+        _vm.Session.Session.EchoService.DoEcho += (window, txt) =>
+        {
+            if (window == _vm.Name || window == "All")
+            {
+                WriteLine(txt);
+            }
+        };
+    }
+
+    public void WriteLine(string text)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            paragraph.Inlines.Add(new Run(text + Environment.NewLine));
+            ChatDisplay.ScrollToEnd();
+        });
+    }
+
+    private void UserControl_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+    {
+        if (DataContext == null)
+        {
+            // Unbind
+
+            return;
+        }
+
+        _vm = (ServerViewModel)DataContext;
+
+        RegisterEcho();
+    }
+
+    private void UserControl_LayoutUpdated(object sender, EventArgs e)
+    {
+    }
+}

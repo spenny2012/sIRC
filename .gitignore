@@ -1,0 +1,11 @@
+spennyIRC/bin/
+spennyIRC/obj/
+spennyIRC/.vs/
+spennyIRC.Core/bin/
+spennyIRC.Core/obj/
+spennyIRC.Scripting/bin/
+spennyIRC.Scripting/obj/
+spennyIRC.Tests/bin/
+spennyIRC.Tests/obj/
+spennyIRC.ViewModels/bin/
+spennyIRC.ViewModels/obj/

@@ -1,0 +1,38 @@
+﻿using spennyIRC.UserControls;
+using spennyIRC.ViewModels;
+using System.Windows.Controls;
+
+namespace spennyIRC;
+
+public static class IrcContentControlCache
+{
+    public static readonly Dictionary<IChatWindow, UserControl> Cache = [];
+
+    public static UserControl AddControlAndKey(IChatWindow chatWindow)
+    {
+        UserControl ctrl = CreateControl(chatWindow);
+        Cache[chatWindow] = ctrl;
+        return ctrl;
+    }
+
+    public static void RemoveControlAndKey(IChatWindow chatWindow)
+    {
+        if (Cache.TryGetValue(chatWindow, out _))
+            Cache.Remove(chatWindow);
+    }
+
+    private static UserControl CreateControl(IChatWindow CacheKey)
+    {
+        UserControl content = CacheKey.GetType().Name switch
+        {
+            "ChannelViewModel" => new IrcChannelControl(),
+            "QueryViewModel" => new IrcQueryControl(),
+            "ServerViewModel" => new IrcStatusControl(),
+            _ => throw new Exception("Invalid object type"),
+        };
+
+        content.DataContext = CacheKey;
+
+        return content;
+    }
+}

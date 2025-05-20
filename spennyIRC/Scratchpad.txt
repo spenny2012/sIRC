@@ -1,0 +1,19 @@
+﻿1) A script has:
+    * A filename/location
+    * Events
+    * Aliases (to keep track of and remove from global aliases when script is unloaded)
+    * Popups
+
+2) The ScriptManager has:
+    * Scripts
+    * Interpreter
+    * Aliases
+    * Variables
+    * Unload/Load(Script)
+
+3) A Variable has:
+    * A name
+    * A value
+    * A scope (global, temp, etc.)
+    * A reference to the script it belongs to
+

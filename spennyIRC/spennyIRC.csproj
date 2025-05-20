@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <PackageIcon></PackageIcon>
+    <ApplicationIcon>Images\sIRC.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Images\blue1.bmp" />
+    <None Remove="Images\blue1.png" />
+    <None Remove="Images\sIRC logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Dirkster.AvalonDock" Version="4.72.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\spennyIRC.Core\spennyIRC.Core.csproj" />
+    <ProjectReference Include="..\spennyIRC.Scripting\spennyIRC.Scripting.csproj" />
+    <ProjectReference Include="..\spennyIRC.ViewModels\spennyIRC.ViewModels.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Images\blue1.bmp" />
+    <Content Include="Images\sIRC.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\blue1.png" />
+    <Resource Include="Images\sIRC logo.png" />
+  </ItemGroup>
+
+</Project>

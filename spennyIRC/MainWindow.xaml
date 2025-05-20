@@ -1,0 +1,32 @@
+﻿<Window x:Class="spennyIRC.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:spennyIRC"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResizeWithGrip"
+        Title="{Binding Title}" Height="700" Width="1240">
+    <Grid>
+        <DockPanel>
+            <ToolBar DockPanel.Dock="Top">
+                <!--<Button Content="Settings" />
+                <Separator />-->
+                <Button Content="Scripts" />
+                <Button Content="Aliases" />
+                <Button Content="Variables" />
+            </ToolBar>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <local:MainIrcWindowControl DataContext="{Binding }" Grid.Row="0" />
+                <StatusBar Grid.Row="1">
+                    <StatusBarItem Content="Status: "/>
+                </StatusBar>
+            </Grid>
+        </DockPanel>        
+    </Grid>
+</Window>
