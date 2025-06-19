@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 namespace spennyIRC.Core.IRC;
 
+//TODO: 2) Add IIrcSession
 public class IrcClientManager : IIrcClientManager, IDisposable
 {
     private readonly IrcReceivedContextFactory _ctxFactory = new();

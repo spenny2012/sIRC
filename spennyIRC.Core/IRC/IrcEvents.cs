@@ -1,5 +1,6 @@
 ﻿namespace spennyIRC.Core.IRC;
 
+// TODO: 1) Add IIrcSession
 public class IrcEvents : IIrcEvents
 {
     public Dictionary<string, List<Func<IIrcReceivedContext, Task>>> EventSubscriptions { get; set; } = [];

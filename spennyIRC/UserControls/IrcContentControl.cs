@@ -4,7 +4,6 @@ using System.Windows.Controls;
 
 namespace spennyIRC.UserControls;
 
-// TODO: add ability to create control in the background without needing to be active window
 public class IrcContentControl : ContentControl
 {
     public static readonly DependencyProperty CacheKeyProperty =
