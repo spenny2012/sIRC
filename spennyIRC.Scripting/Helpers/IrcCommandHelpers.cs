@@ -45,9 +45,9 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync($"JOIN {parameters}");
         }
 
-        public static async Task RejoinAsync(string parameters, IIrcSession session) 
+        public static async Task RejoinAsync(string parameters, IIrcSession session)
         {
-            if (!IsConnected(session)) return; 
+            if (!IsConnected(session)) return;
             session.EchoService.Echo(session.ActiveWindow, $"Rejoining {session.ActiveWindow}...");
             await session.Client.SendMessageAsync($"PART {session.ActiveWindow}\r\nJOIN {session.ActiveWindow}");
         }
@@ -56,7 +56,7 @@ namespace spennyIRC.Scripting.Helpers
         {
             if (!IsConnected(session)) return;
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            string partMsg = parameters.FromToken(1);
+            string partMsg = parameters.GetTokenFrom(1);
             await session.Client.SendMessageAsync($"PART {paramParts[0]} :{partMsg}");
         }
 
@@ -93,7 +93,7 @@ namespace spennyIRC.Scripting.Helpers
         {
             if (!IsConnected(session)) return;
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            string msg = parameters.FromToken(1);
+            string msg = parameters.GetTokenFrom(1);
 
             await session.Client.SendMessageAsync($"PRIVMSG {paramParts[0]} :{msg}");
             session.EchoService.Echo(session.ActiveWindow, $"*{paramParts[0]}* {msg}");
@@ -117,7 +117,7 @@ namespace spennyIRC.Scripting.Helpers
         {
             if (!IsConnected(session)) return;
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            string msg = parameters.FromToken(1);
+            string msg = parameters.GetTokenFrom(1);
 
             await session.Client.SendMessageAsync($"NOTICE {paramParts[0]} :{msg}");
             session.EchoService.Echo(session.ActiveWindow, $"-{paramParts[0]}- {msg}");
@@ -129,7 +129,7 @@ namespace spennyIRC.Scripting.Helpers
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (paramParts.Length >= 2)
             {
-                await session.Client.SendMessageAsync($"KICK {paramParts[0]} {paramParts[1]} :{parameters.FromToken(2)}");
+                await session.Client.SendMessageAsync($"KICK {paramParts[0]} {paramParts[1]} :{parameters.GetTokenFrom(2)}");
             }
             else if (paramParts.Length == 1)
             {
@@ -163,7 +163,7 @@ namespace spennyIRC.Scripting.Helpers
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (paramParts.Length >= 1)
             {
-                await session.Client.SendMessageAsync($"TOPIC {paramParts[0]} :{parameters.FromToken(1)}");
+                await session.Client.SendMessageAsync($"TOPIC {paramParts[0]} :{parameters.GetTokenFrom(1)}");
             }
         }
 
@@ -182,7 +182,7 @@ namespace spennyIRC.Scripting.Helpers
 
             if (paramParts.Length > 2)
             {
-                string commandParams = parameters.FromToken(2);
+                string commandParams = parameters.GetTokenFrom(2);
                 ctcpMessage = $"\u0001{command} {commandParams}\u0001";
             }
             else
@@ -212,6 +212,10 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync($"WHOIS {parameters}");
         }
 
+        public static async Task ClearAsync(string parameters, IIrcSession session)
+        {
+            // TODO: add pub sub
+        }
 
         public static async Task WhoAsync(string parameters, IIrcSession session)
         {
@@ -221,7 +225,7 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task IalLookupAsync(string parameters, IIrcSession session)
         {
             var ial = session.Ial;
-           
+
         }
 
         public static async Task GetSessionInfoAsync(string parameters, IIrcSession session)

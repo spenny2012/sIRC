@@ -9,7 +9,7 @@ public class MiscTests
     public void TestMethod1()
     {
         ExtractedCommandInfo extractedInfo = CommandHelpers.ExtractCommandAndParams("/msg test HELLO");
-        string fromToken = "/msg test HELLO".FromToken(2);
+        string fromToken = "/msg test HELLO".GetTokenFrom(2);
 
     }
 }

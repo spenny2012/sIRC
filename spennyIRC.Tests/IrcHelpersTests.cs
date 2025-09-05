@@ -95,7 +95,7 @@ public sealed class IrcHelpersTests
         string[] testLines = testData.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
         foreach (string line in testLines)
         {
-            string trailing = line.ExtractTrailingFromRaw(2);
+            string trailing = line.ExtractTrailing(2);
         }
     }
 

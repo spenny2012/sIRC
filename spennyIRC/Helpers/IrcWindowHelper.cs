@@ -39,7 +39,9 @@ public static class IrcWindowHelper
             bitmap.BeginInit();
             bitmap.StreamSource = resourceStream.Stream;
             bitmap.EndInit();
+
             ImageBrush backgroundBrush = new(bitmap);
+
             richTextBox.Background = backgroundBrush;
         }
     }

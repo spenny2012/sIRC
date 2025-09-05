@@ -5,8 +5,7 @@ namespace spennyIRC.Scripting;
 
 public class IrcCommands : IIrcCommands
 {
-    public Dictionary<string, IIrcCommand> Commands { get; set; } =
-        new Dictionary<string, IIrcCommand>(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, IIrcCommand> Commands { get; private set; } = new (StringComparer.OrdinalIgnoreCase);
 
     public bool AddCommand(string name, IIrcCommand command)
     {
@@ -22,7 +21,7 @@ public class IrcCommands : IIrcCommands
     {
         if (Commands.TryGetValue(name, out IIrcCommand? foundCommand))
         {
-            await foundCommand.Command.Invoke(parameters, session);
+            await foundCommand.Command.Invoke(parameters!, session);
         }
     }
 }

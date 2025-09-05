@@ -30,4 +30,4 @@ public static class CommandHelpers
     }
 }
 
-public record struct ExtractedCommandInfo(string ParsedCmd, string? CmdParameters);
+public readonly record struct ExtractedCommandInfo(string ParsedCmd, string? CmdParameters);

@@ -4,7 +4,7 @@ namespace spennyIRC.Core.IRC;
 //TODO: 2) Add IIrcSession
 public class IrcClientManager : IIrcClientManager, IDisposable
 {
-    private readonly IrcReceivedContextFactory _ctxFactory = new();
+    private static readonly IrcReceivedContextFactory _ctxFactory = new();
     private readonly IIrcLocalUser _user;
     private readonly IIrcClient _ircClient;
     private readonly IIrcEvents _ircClientEvents;

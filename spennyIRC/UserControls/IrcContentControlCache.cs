@@ -32,7 +32,6 @@ public static class IrcContentControlCache
         };
 
         content.DataContext = CacheKey;
-
         return content;
     }
 }

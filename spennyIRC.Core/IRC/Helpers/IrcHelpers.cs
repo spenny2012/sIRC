@@ -15,7 +15,7 @@ public static class IrcHelpers
         return index == -1 ? [] : span[(index + 1)..];
     }
 
-    public static string FromToken(this string line, int tokenIndex, char delimiter = ' ')
+    public static string GetTokenFrom(this string line, int tokenIndex, char delimiter = ' ')
     {
         ReadOnlySpan<char> span = line.AsSpan();
         int currentIndex = 0;
@@ -35,7 +35,7 @@ public static class IrcHelpers
         return span[currentIndex..].ToString();
     }
 
-    public static string ExtractTrailingFromRaw(this string line, int startIndex) // TODO: make this less weird
+    public static string ExtractTrailing(this string line, int startIndex) // TODO: make this less weird
     {
         ReadOnlySpan<char> span = line.AsSpan();
         int currentIndex = 0;

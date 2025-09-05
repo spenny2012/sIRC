@@ -41,7 +41,7 @@ public class IrcReceivedContextFactory
             return ctx;
         }
 
-        string trailing = ctx.Trailing = line.ExtractTrailingFromRaw(2);
+        string trailing = ctx.Trailing = line.ExtractTrailing(2);
 
         if (int.TryParse(ctx.Event, out _))
             return ctx;
