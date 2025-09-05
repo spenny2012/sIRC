@@ -1,15 +1,11 @@
-﻿using spennyIRC.Core;
-using spennyIRC.Core.IRC;
-using spennyIRC.Scripting.Helpers;
-using System.Reflection.Metadata.Ecma335;
+﻿using spennyIRC.Scripting.Helpers;
 
 namespace spennyIRC.Scripting
 {
-    public class IrcCommandsBinder(IIrcCommands commands) : IIrcRuntimeBinder
+    public class IrcCommandsBinder(IIrcCommands commands) : IrcCommandsBinderBase(commands)
     {
         public void Bind()
         {
-            // Regular commands
             AddCommand("server", IrcCommandHelpers.ConnectServerAsync);
             AddCommand("voice", IrcCommandHelpers.VoiceAsync);
             AddCommand("join", IrcCommandHelpers.JoinAsync);
@@ -36,15 +32,6 @@ namespace spennyIRC.Scripting
             AddCommand("clear", IrcCommandHelpers.ClearAsync);
             AddCommand("session", IrcCommandHelpers.GetSessionInfoAsync);
             AddCommand("resetinfo", IrcCommandHelpers.ResetInfoAsync);
-        }
-
-        private void AddCommand(string name, Func<string, IIrcSession, Task> func)
-        {
-            commands.AddCommand(name, new IrcCommand
-            {
-                Name = name,
-                Command = func,
-            });
         }
     }
 }

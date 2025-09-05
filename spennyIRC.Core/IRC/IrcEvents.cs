@@ -7,8 +7,7 @@ public class IrcEvents : IIrcEvents
 
     public async Task<bool> TryExecute(string ircEvent, IIrcReceivedContext ctx)
     {
-        if (string.IsNullOrEmpty(ircEvent))
-            throw new ArgumentNullException(nameof(ircEvent));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ircEvent, nameof(ircEvent));
 
         if (EventSubscriptions.TryGetValue(ircEvent, out List<Func<IIrcReceivedContext, Task>>? eventList))
         {
@@ -24,8 +23,7 @@ public class IrcEvents : IIrcEvents
 
     public void AddEvent(string ircEvent, Func<IIrcReceivedContext, Task> evt)
     {
-        if (string.IsNullOrEmpty(ircEvent))
-            throw new ArgumentNullException(nameof(ircEvent));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ircEvent, nameof(ircEvent));
 
         ArgumentNullException.ThrowIfNull(evt);
 

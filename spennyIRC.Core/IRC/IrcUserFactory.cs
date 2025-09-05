@@ -22,16 +22,15 @@ public class IrcUserFactory
         };
         return ircUser;
     }
-
-    //public IIrcUser CreateUser(string nick, string ident, string domain)
-    //{
-    //    IrcUser ircUser = new()
-    //    {
-    //        Nick = nick,
-    //        Ident = ident,
-    //        Domain = domain
-    //    };
-    //    return ircUser;
-    //}
-
 }
+
+//public IIrcUser CreateUser(string nick, string ident, string domain)
+//{
+//    IrcUser ircUser = new()
+//    {
+//        Nick = nick,
+//        Ident = ident,
+//        Domain = domain
+//    };
+//    return ircUser;
+//}

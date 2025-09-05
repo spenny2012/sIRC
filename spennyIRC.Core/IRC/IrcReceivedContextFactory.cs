@@ -2,16 +2,12 @@
 
 namespace spennyIRC.Core.IRC;
 
-public class IrcReceivedContextFactory
+public static class IrcReceivedContextFactory
 {
     private const char CTCP_CHAR = '\u0001';
     private const string DISCONNECT = "DISCONNECT";
 
-    public IrcReceivedContextFactory()
-    {
-    }
-
-    public IIrcReceivedContext CreateDisconnect(IIrcClient client, string line)
+    public static IIrcReceivedContext CreateDisconnect(IIrcClient client, string line)
     {
         IrcReceivedContext ctx = new()
         {
@@ -24,7 +20,7 @@ public class IrcReceivedContextFactory
         return ctx;
     }
 
-    public IIrcReceivedContext Create(IIrcClient client, string line, string[] lineParts)
+    public static IIrcReceivedContext Create(IIrcClient client, string line, string[] lineParts)
     {
         IrcReceivedContext ctx = new()
         {

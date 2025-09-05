@@ -4,7 +4,6 @@ namespace spennyIRC.Core.IRC;
 //TODO: 2) Add IIrcSession
 public class IrcClientManager : IIrcClientManager, IDisposable
 {
-    private static readonly IrcReceivedContextFactory _ctxFactory = new();
     private readonly IIrcLocalUser _user;
     private readonly IIrcClient _ircClient;
     private readonly IIrcEvents _ircClientEvents;
@@ -29,7 +28,7 @@ public class IrcClientManager : IIrcClientManager, IDisposable
 
     private async Task OnDisconnected(string message)
     {
-        IIrcReceivedContext ircContext = _ctxFactory.CreateDisconnect(_ircClient, message);
+        IIrcReceivedContext ircContext = IrcReceivedContextFactory.CreateDisconnect(_ircClient, message);
 
         await _ircClientEvents.TryExecute(ircContext.Event, ircContext);
     }
@@ -48,7 +47,7 @@ public class IrcClientManager : IIrcClientManager, IDisposable
             return;
         }
 
-        IIrcReceivedContext ircContext = _ctxFactory.Create(_ircClient, message, lineParts);
+        IIrcReceivedContext ircContext = IrcReceivedContextFactory.Create(_ircClient, message, lineParts);
 
         await _ircClientEvents.TryExecute(ircContext.Event, ircContext);
     }
