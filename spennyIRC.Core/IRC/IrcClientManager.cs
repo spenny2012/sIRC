@@ -14,8 +14,8 @@ public class IrcClientManager : IIrcClientManager, IDisposable
         _user = user;
         _ircClient = client;
         _ircClientEvents = events;
-        _ircClient.OnMessageReceived += OnMessageReceived;
-        _ircClient.OnDisconnected += OnDisconnected;
+        _ircClient.OnDataReceivedHandler += OnMessageReceived;
+        _ircClient.OnDisconnectedHandler += OnDisconnected;
     }
 
     public async Task ConnectAsync(string server, string port)

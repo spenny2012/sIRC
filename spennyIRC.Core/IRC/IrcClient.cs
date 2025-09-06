@@ -1,150 +1,201 @@
 using System.Diagnostics;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace spennyIRC.Core.IRC;
-
-public class IrcClient : IIrcClient
+namespace spennyIRC.Core.IRC
 {
-    private TcpClient? _tcpClient;
-    private Stream? _networkStream;
-    private bool _isDisposed;
-    private CancellationTokenSource? _cts;
-    private readonly object _connectionLock = new();
-
-    public Func<string, Task>? OnMessageReceived { get; set; }
-    public Func<string, Task>? OnDisconnected { get; set; }
-
-    public async Task ConnectAsync(string server, string port)
+    public class IrcClient : IIrcClient, IDisposable
     {
-        ObjectDisposedException.ThrowIf(_isDisposed, this);
+        private readonly SemaphoreSlim _connectionSemaphore = new(1, 1);
 
-        lock (_connectionLock)
+        private TcpClient? _tcpClient;
+        private Stream? _networkStream;
+        private bool _isDisposed;
+        private CancellationTokenSource? _cts;
+
+        public Func<string, Task>? OnDataReceivedHandler { get; set; }
+        public Func<string, Task>? OnDisconnectedHandler { get; set; }
+
+        public async Task ConnectAsync(string server, string port)
         {
-            if (_tcpClient != null && _tcpClient.Connected)
-                throw new InvalidOperationException("Already connected to a server.");
-        }
+            ObjectDisposedException.ThrowIf(_isDisposed, this);
 
-        bool useSsl = port.StartsWith('+');
-        int actualPort = useSsl ? int.Parse(port.AsSpan(1)) : int.Parse(port);
-
-        Disconnect();
-
-        _tcpClient = new TcpClient();
-        try
-        {
-            await _tcpClient.ConnectAsync(server, actualPort);
-            _networkStream = _tcpClient.GetStream();
-
-            if (useSsl)
+            await _connectionSemaphore.WaitAsync();
+            try
             {
-                SslStream sslStream = new(_networkStream, false, ValidateServerCertificate, null);
+                if (_tcpClient != null && _tcpClient.Connected)
+                    throw new InvalidOperationException("Already connected to a server.");
+
+                bool useSsl = port.StartsWith('+');
+                var portSpan = useSsl ? port[1..] : port;
+                if (!int.TryParse(portSpan, out int actualPort))
+                    throw new ArgumentException("Invalid port format.", nameof(port));
+
+                await DisconnectInternalAsync();
+
+                _tcpClient = new TcpClient();
                 try
                 {
-                    await sslStream.AuthenticateAsClientAsync(server);
-                    _networkStream = sslStream;
+                    await _tcpClient.ConnectAsync(server, actualPort);
+                    _networkStream = _tcpClient.GetStream();
+
+                    if (useSsl)
+                    {
+                        SslStream sslStream = new(_networkStream, false, ValidateServerCertificate, null);
+                        try
+                        {
+                            await sslStream.AuthenticateAsClientAsync(server);
+                            _networkStream = sslStream;
+                        }
+                        catch
+                        {
+                            await sslStream.DisposeAsync();
+                            throw;
+                        }
+                    }
                 }
                 catch
                 {
-                    await sslStream.DisposeAsync();
+                    _tcpClient?.Dispose();
+                    _tcpClient = null;
+                    _networkStream?.Dispose();
+                    _networkStream = null;
                     throw;
                 }
+
+                _cts = new CancellationTokenSource();
+                _ = Task.Run(() => StartReceivingMessagesAsync(_cts.Token), _cts.Token);
+            }
+            finally
+            {
+                _connectionSemaphore.Release();
             }
         }
-        catch
+
+        public async Task SendMessageAsync(string message)
         {
-            _tcpClient.Dispose();
-            throw;
+            ObjectDisposedException.ThrowIf(_isDisposed, this);
+
+            await _connectionSemaphore.WaitAsync();
+            try
+            {
+                if (_networkStream == null)
+                    throw new InvalidOperationException("Not connected to the server.");
+
+                byte[] messageBytes = Encoding.UTF8.GetBytes(message + "\r\n");
+                await _networkStream.WriteAsync(messageBytes);
+            }
+            finally
+            {
+                _connectionSemaphore.Release();
+            }
         }
 
-        _cts = new CancellationTokenSource();
-        _ = Task.Run(() => StartReceivingMessagesAsync(_cts.Token), _cts.Token);
-    }
-
-    public async Task SendMessageAsync(string message)
-    {
-        ObjectDisposedException.ThrowIf(_isDisposed, this);
-
-        if (_networkStream == null)
-            throw new InvalidOperationException("Not connected to the server.");
-
-        byte[] messageBytes = Encoding.UTF8.GetBytes(message + "\r\n");
-        await _networkStream.WriteAsync(messageBytes);
-    }
-
-    private async Task StartReceivingMessagesAsync(CancellationToken cancellationToken)
-    {
-        ObjectDisposedException.ThrowIf(_isDisposed, this);
-
-        if (_networkStream == null)
-            throw new InvalidOperationException("Not connected to the server.");
-
-        using (StreamReader reader = new(_networkStream, Encoding.UTF8, false, 2048, leaveOpen: true))
+        private async Task StartReceivingMessagesAsync(CancellationToken cancellationToken)
         {
-            while (_tcpClient != null && _tcpClient.Connected && !_isDisposed && !cancellationToken.IsCancellationRequested)
+            if (_networkStream == null)
+                return;
+
+            using (StreamReader reader = new(_networkStream, Encoding.UTF8, false, 2048, leaveOpen: true))
+            {
+                while (_tcpClient != null && _tcpClient.Connected && !_isDisposed && !cancellationToken.IsCancellationRequested)
+                {
+                    try
+                    {
+                        string? line = await reader.ReadLineAsync(cancellationToken);
+                        if (line == null)
+                            break;
+
+                        if (OnDataReceivedHandler != null)
+                            _ = OnDataReceivedHandler(line);  // Fire-and-forget to avoid blocking the loop
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine($"Error receiving message: {e.Message}");
+                        break;
+                    }
+                }
+            }
+
+            try
+            {
+                if (OnDisconnectedHandler != null)
+                    await OnDisconnectedHandler("Disconnected from the server.");
+            }
+            finally
+            {
+                await DisconnectInternalAsync();
+            }
+        }
+
+        public async Task DisconnectAsync()
+        {
+            await _connectionSemaphore.WaitAsync();
+            try
+            {
+                await DisconnectInternalAsync();
+            }
+            finally
+            {
+                _connectionSemaphore.Release();
+            }
+        }
+
+        public async Task DisconnectInternalAsync()
+        {
+            _cts?.Cancel();
+            if (_networkStream != null)
             {
                 try
                 {
-                    string? line = await reader.ReadLineAsync(cancellationToken) ?? throw new Exception("Connection closed by the server");
-
-                    if (OnMessageReceived != null)
-                        await OnMessageReceived(line);
+                    await _networkStream.DisposeAsync();
                 }
-                catch (Exception e)
-                {
-                    Debug.WriteLine($"Error receiving message: {e.Message}");
-                    break;
-                }
+                catch { }  // Ignore disposal errors
             }
-        }
-
-        if (OnDisconnected != null)
-            await OnDisconnected("Disconnected from the server.");
-
-        Disconnect();
-    }
-
-    public void Disconnect()
-    {
-        lock (_connectionLock)
-        {
-            _cts?.Cancel();
-            _networkStream?.Dispose();
             _tcpClient?.Dispose();
 
             _tcpClient = null;
             _networkStream = null;
             _cts = null;
         }
-    }
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_isDisposed)
+        public void Dispose()
         {
-            if (disposing)
-            {
-                Disconnect();
-                _cts?.Dispose();
-            }
-            _isDisposed = true;
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
-    }
 
-    private static bool ValidateServerCertificate(
-        object sender,
-        System.Security.Cryptography.X509Certificates.X509Certificate? certificate,
-        System.Security.Cryptography.X509Certificates.X509Chain? chain,
-        SslPolicyErrors sslPolicyErrors)
-    {
-        // TODO: trigger prompt user
-        return true;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _connectionSemaphore.Wait();
+                    try
+                    {
+                        DisconnectInternalAsync().GetAwaiter().GetResult();  
+                        _cts?.Dispose();
+                    }
+                    finally
+                    {
+                        _connectionSemaphore.Release();
+                    }
+                }
+                _isDisposed = true;
+            }
+        }
+
+        private static bool ValidateServerCertificate(
+            object sender,
+            X509Certificate? certificate,
+            X509Chain? chain,
+            SslPolicyErrors sslPolicyErrors)
+        {
+            // TODO: trigger prompt user
+            return true;
+        }
     }
 }

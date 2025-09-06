@@ -2,10 +2,9 @@
 
 public interface IIrcClient : IDisposable
 {
-    Func<string, Task>? OnMessageReceived { get; set; }
-    Func<string, Task>? OnDisconnected { get; set; }
-
+    Func<string, Task>? OnDataReceivedHandler { get; set; }
+    Func<string, Task>? OnDisconnectedHandler { get; set; }
     Task ConnectAsync(string server, string port);
-    void Disconnect();
+    Task DisconnectAsync();
     Task SendMessageAsync(string message);
 }
