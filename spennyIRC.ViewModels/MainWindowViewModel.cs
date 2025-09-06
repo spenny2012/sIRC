@@ -12,7 +12,12 @@ public class MainWindowViewModel : ViewModelBase
 {
     private readonly IServiceProvider _svc;
     private readonly Dictionary<IIrcSession, IServiceScope> _scopes = [];
+#if DEBUG
+    private string _title = "sIRC (debuging)";
+
+#else
     private string _title = "sIRC";
+#endif
     private ICommand _addServerCommand;
     private IChatWindow _activeContent;
     private ObservableCollection<ServerViewModel> _servers = [];
@@ -46,7 +51,7 @@ public class MainWindowViewModel : ViewModelBase
     }
 
     public ICommand AddServerCommand => _addServerCommand ??= new RelayCommand((s) => AddServer(), (o) => true);
-    public ICommand CloseServerCommand => _addServerCommand ??= new RelayCommand((s) => AddServer(), (o) => true);
+    //public ICommand CloseServerCommand => _addServerCommand ??= new RelayCommand((s) => CloseServer(), (o) => true);
 
     public void AddServer()
     {
@@ -54,32 +59,35 @@ public class MainWindowViewModel : ViewModelBase
         IIrcSession newSession = scope.ServiceProvider.GetRequiredService<IIrcSession>();
         IIrcCommands commands = _svc.GetRequiredService<IIrcCommands>();
         IIrcEvents events = newSession.Events;
+
         ServerViewModel serverVm = new(newSession, commands);
+
         List<IIrcRuntimeBinder> eventsToBind =
         [
-                new ClientRuntimeBinder(events, newSession.Server, newSession.LocalUser),
-                new IalRuntimeBinder(events, newSession.Ial),
-                new ViewModelRuntimeBinder(newSession)
+            new ClientRuntimeBinder(events, newSession.Server, newSession.LocalUser),
+            new IalRuntimeBinder(events, newSession.Ial),
+            new ViewModelRuntimeBinder(newSession)
         ];
 
         foreach (var evt in eventsToBind)
             evt.Bind();
 
         Servers.Add(serverVm);
-        IServiceProvider sp = scope.ServiceProvider;
+
+        IServiceProvider sp = scope.ServiceProvider; // Apply scope to IIrcSession
         IIrcSession ircSession = sp.GetRequiredService<IIrcSession>();
+
         _scopes.Add(ircSession, scope);
 
         ActiveContent = serverVm;
     }
 
 
-    public void CloseServer(IIrcSession server)
-    {
-        ServerViewModel svm = Servers.Single(x => x.Session == server);
-        Servers.Remove(svm);
-        _scopes.Remove(server);
-    }
-
+    //public void CloseServer()
+    //{
+    //    ServerViewModel svm = Servers.Single(x => x.Session == server);
+    //    Servers.Remove(svm);
+    //    _scopes.Remove(server);
+    //}
 }
 

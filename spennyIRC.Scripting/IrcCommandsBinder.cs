@@ -29,7 +29,6 @@ namespace spennyIRC.Scripting
             AddCommand("list", IrcCommandHelpers.ListAsync);
             AddCommand("whois", IrcCommandHelpers.WhoisAsync);
             AddCommand("who", IrcCommandHelpers.WhoAsync);
-            AddCommand("clear", IrcCommandHelpers.ClearAsync);
             AddCommand("session", IrcCommandHelpers.GetSessionInfoAsync);
             AddCommand("resetinfo", IrcCommandHelpers.ResetInfoAsync);
         }

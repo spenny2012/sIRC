@@ -7,20 +7,20 @@ namespace spennyIRC.Scripting.Helpers
     public static class IrcCommandHelpers
     {
         const int DEFAULT_IRC_PORT = 6697;
-        public static async Task ConnectServerAsync(string parameters, IIrcSession session)
+        public static async Task ConnectServerAsync(string serverInfo, IIrcSession session)
         {
             try
             {
-                ArgumentException.ThrowIfNullOrWhiteSpace(parameters);
+                ArgumentException.ThrowIfNullOrWhiteSpace(serverInfo);
 
                 if (session.Server.Connected)
                 {
                     await session.ClientManager.QuitAsync();
                 }
 
-                session.EchoService.Echo("Status", $"*** Connecting to {parameters}...");
+                session.EchoService.Echo("Status", $"*** Connecting to {serverInfo}...");
 
-                string[]? paramsParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                string[]? paramsParts = serverInfo.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 if (paramsParts == null || paramsParts.Length < 2)
                 {
                     await session.ClientManager.ConnectAsync(paramsParts![0], DEFAULT_IRC_PORT, true);
@@ -224,11 +224,6 @@ namespace spennyIRC.Scripting.Helpers
         {
             if (!IsConnected(session)) return;
             await session.Client.SendMessageAsync($"WHOIS {parameters}");
-        }
-
-        public static async Task ClearAsync(string parameters, IIrcSession session)
-        {
-            // TODO: add pub sub
         }
 
         public static async Task WhoAsync(string parameters, IIrcSession session)

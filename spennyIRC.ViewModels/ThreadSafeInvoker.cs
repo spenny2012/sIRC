@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.CodeDom;
+using System.Diagnostics;
 using System.Windows.Threading;
 namespace spennyIRC.ViewModels;
 
@@ -12,8 +13,7 @@ public static class ThreadSafeInvoker
     /// <returns>True if the action was executed; false if it couldn't be executed</returns>
     public static bool InvokeIfNecessary(Action action, DispatcherPriority priority = DispatcherPriority.Normal)
     {
-        if (action == null)
-            return false;
+        ArgumentNullException.ThrowIfNull(nameof(action));
 
         try
         {
@@ -48,8 +48,7 @@ public static class ThreadSafeInvoker
     /// <returns>True if the action was queued; false if it couldn't be queued</returns>
     public static bool BeginInvokeIfNecessary(Action action, DispatcherPriority priority = DispatcherPriority.Normal)
     {
-        if (action == null)
-            return false;
+        ArgumentNullException.ThrowIfNull(nameof(action));
 
         try
         {
