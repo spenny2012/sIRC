@@ -1,5 +1,4 @@
-﻿using spennyIRC.Core.IRC;
-using spennyIRC.Scripting;
+﻿using spennyIRC.Scripting;
 
 namespace spennyIRC.ViewModels
 {
@@ -10,15 +9,6 @@ namespace spennyIRC.ViewModels
             // UI commands
             //AddCommand("list", ViewModelCommandHelpers.ListAsync);
             AddCommand("clear", ViewModelCommandHelpers.ClearAsync);
-        }
-    }
-
-    public class ViewModelCommandHelpers
-    {
-        public static Task ClearAsync(string arg1, IIrcSession session)
-        {
-            //WeakReferenceMessenger.Default.Send(new ChannelAddMessage(session));
-            return Task.CompletedTask;
         }
     }
 }
