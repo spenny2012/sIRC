@@ -56,7 +56,6 @@ public class IrcClientManager : IIrcClientManager, IDisposable
         }
 
         IIrcReceivedContext ircContext = IrcReceivedContextFactory.Create(_ircClient, message, lineParts);
-
         await _ircClientEvents.TryExecute(ircContext.Event, ircContext);
     }
 
