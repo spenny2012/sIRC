@@ -6,19 +6,28 @@ namespace spennyIRC.Scripting.Helpers
 {
     public static class IrcCommandHelpers
     {
+        const int DEFAULT_IRC_PORT = 6697;
         public static async Task ConnectServerAsync(string parameters, IIrcSession session)
         {
             try
             {
+                ArgumentException.ThrowIfNullOrWhiteSpace(parameters);
+
                 session.EchoService.Echo("Status", $"*** Connecting to {parameters}...");
+
                 string[]? paramsParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 if (paramsParts == null || paramsParts.Length < 2)
                 {
-                    await session.ClientManager.ConnectAsync(paramsParts[0], "6667");
+                    await session.ClientManager.ConnectAsync(paramsParts![0], DEFAULT_IRC_PORT, true);
+                    return;
                 }
-                else
+
+                string specifiedPort = paramsParts[1];
+                bool useSsl = specifiedPort.StartsWith('+');
+                if (int.TryParse(useSsl ? specifiedPort[1..] : specifiedPort, out int newPort))
                 {
-                    await session.ClientManager.ConnectAsync(paramsParts[0], paramsParts[1]);
+                    await session.ClientManager.ConnectAsync(paramsParts[0], newPort, useSsl);
+                    return;
                 }
             }
             catch (Exception e)
@@ -224,7 +233,7 @@ namespace spennyIRC.Scripting.Helpers
         }
         public static async Task IalLookupAsync(string parameters, IIrcSession session)
         {
-            var ial = session.Ial;
+            IIrcInternalAddressList ial = session.Ial;
 
         }
 

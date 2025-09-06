@@ -18,10 +18,11 @@ public class IrcClientManager : IIrcClientManager, IDisposable
         _ircClient.OnDisconnectedHandler += OnDisconnected;
     }
 
-    public async Task ConnectAsync(string server, string port)
+    public async Task ConnectAsync(string server, int port, bool useSsl = false)
     {
         ObjectDisposedException.ThrowIf(isDisposed, this);
-        await _ircClient.ConnectAsync(server, port);
+
+        await _ircClient.ConnectAsync(server, port, useSsl);
         await _ircClient.SendMessageAsync($"NICK {_user.Nick}");
         await _ircClient.SendMessageAsync($"USER {_user.Ident} YourHost YourServer :{_user.Realname}");
     }
@@ -29,7 +30,6 @@ public class IrcClientManager : IIrcClientManager, IDisposable
     private async Task OnDisconnected(string message)
     {
         IIrcReceivedContext ircContext = IrcReceivedContextFactory.CreateDisconnect(_ircClient, message);
-
         await _ircClientEvents.TryExecute(ircContext.Event, ircContext);
     }
 
