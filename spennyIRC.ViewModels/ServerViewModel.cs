@@ -35,7 +35,7 @@ public class ServerViewModel : WindowViewModelBase
 
     public void CloseWindow(string name)
     {
-        var window = FindWindowByName(_channels, name);
+        IChatWindow? window = FindWindowByName(_channels, name);
         if (window == null) return;
 
         Channels.Remove(window);

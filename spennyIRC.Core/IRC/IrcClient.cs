@@ -39,7 +39,7 @@ public class IrcClient : IIrcClient
             _tcpClient = new TcpClient();
 
             // Connect with cancellation support
-            using (var connectCts = CancellationTokenSource.CreateLinkedTokenSource(_connectionCts.Token))
+            using (CancellationTokenSource connectCts = CancellationTokenSource.CreateLinkedTokenSource(_connectionCts.Token))
             {
                 connectCts.CancelAfter(TimeSpan.FromSeconds(60));
 #if DEBUG
@@ -55,7 +55,7 @@ public class IrcClient : IIrcClient
             // Check if we were cancelled during connection
             _connectionCts.Token.ThrowIfCancellationRequested();
 
-            var networkStream = _tcpClient.GetStream();
+            NetworkStream networkStream = _tcpClient.GetStream();
 
             // Set up the stream (SSL or regular)
             if (useSsl)
@@ -63,7 +63,7 @@ public class IrcClient : IIrcClient
 #if DEBUG
                 Debug.WriteLine($"ConnectAsync: Setting up SSL stream...");
 #endif
-                var sslStream = new SslStream(networkStream, false, ValidateServerCertificate, null);
+                SslStream sslStream = new(networkStream, false, ValidateServerCertificate, null);
                 await sslStream.AuthenticateAsClientAsync(server).ConfigureAwait(false);
                 _stream = sslStream;
 #if DEBUG
@@ -162,7 +162,7 @@ public class IrcClient : IIrcClient
         await _sendSemaphore.WaitAsync().ConfigureAwait(false);
         try
         {
-            var messageBytes = Encoding.UTF8.GetBytes(message + "\r\n");
+            byte[] messageBytes = Encoding.UTF8.GetBytes(message + "\r\n");
 #if DEBUG
             Debug.WriteLine($">> {message.TrimEnd()}");
 #endif

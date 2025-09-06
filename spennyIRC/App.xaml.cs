@@ -36,7 +36,7 @@ public partial class App : Application
 #if DEBUG
         Trace.Listeners.Add(new TextWriterTraceListener($"debug_{DateTime.Now:yyyy-MM-dd}.txt"));
         Trace.AutoFlush = true;
-        Trace.WriteLine($"[{DateTime.Now.ToLocalTime()}] sIRC started..");
+        Trace.WriteLine($"\r\n[{DateTime.Now.ToLocalTime()}] sIRC started..");
 #endif
 
         ServiceCollection serviceCollection = new();
@@ -66,11 +66,10 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         MainWindow mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-        mainWindow.Show();
+        mainWindow.ShowDialog();
 #if DEBUG
-        Debug.WriteLine("");
+        Debug.WriteLine("Closing Application");
 #endif
-        //base.OnStartup(e);
     }
 
     private void ConfigureServices(IServiceCollection services)

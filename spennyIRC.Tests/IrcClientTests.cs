@@ -10,11 +10,11 @@ public class IrcClientTests
     [TestMethod]
     public void TestConnection()
     {
-        var nick = "s" + MiscHelpers.GenerateRandomString(7);
-        var ident = MiscHelpers.GenerateRandomString(4);
-        var realName = MiscHelpers.GenerateRandomString(4);
+        string nick = "s" + MiscHelpers.GenerateRandomString(7);
+        string ident = MiscHelpers.GenerateRandomString(4);
+        string realName = MiscHelpers.GenerateRandomString(4);
 
-        var ircClient = new IrcClient();
+        IrcClient ircClient = new();
 
         ircClient.ConnectAsync("irc.libera.chat", 6697, true).GetAwaiter().GetResult();
 

@@ -68,7 +68,7 @@ public class MainWindowViewModel : ViewModelBase
             new ViewModelRuntimeBinder(newSession)
         ];
 
-        foreach (var evt in eventsToBind)
+        foreach (IIrcRuntimeBinder evt in eventsToBind)
             evt.Bind();
 
         Servers.Add(serverVm);
