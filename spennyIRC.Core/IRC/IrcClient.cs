@@ -233,14 +233,14 @@ public class IrcClient : IIrcClient
         Debug.WriteLine($"ReadLoopAsync: Exiting, cancellation requested: {cancellationToken.IsCancellationRequested}");
 #endif
 
-        // Notify disconnection
-        if (OnDisconnectedHandler != null && !cancellationToken.IsCancellationRequested)
+        // Notify disconnection (always, matching old code behavior)
+        if (OnDisconnectedHandler != null)
         {
             _ = Task.Run(async () =>
             {
                 try
                 {
-                    await OnDisconnectedHandler("Connection lost").ConfigureAwait(false);
+                    await OnDisconnectedHandler("Disconnected from the server.").ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
