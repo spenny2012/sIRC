@@ -1,5 +1,4 @@
-﻿using System.CodeDom;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Windows.Threading;
 namespace spennyIRC.ViewModels;
 

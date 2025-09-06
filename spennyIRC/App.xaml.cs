@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using spennyIRC.Core;
 using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
 using spennyIRC.Scripting;
 using spennyIRC.ViewModels;
+using System.Diagnostics;
 using System.Windows;
 // TODO: 1-
 /* How should scripts deal with different server instances?
@@ -33,6 +33,12 @@ public partial class App : Application
 
     public App()
     {
+#if DEBUG
+        Trace.Listeners.Add(new TextWriterTraceListener($"debug_{DateTime.Now:yyyy-MM-dd}.txt"));
+        Trace.AutoFlush = true;
+        Trace.WriteLine($"[{DateTime.Now.ToLocalTime()}] sIRC started..");
+#endif
+
         ServiceCollection serviceCollection = new();
         ConfigureServices(serviceCollection);
 
@@ -44,6 +50,7 @@ public partial class App : Application
 
         DispatcherUnhandledException += App_DispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
     }
 
     private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -60,8 +67,10 @@ public partial class App : Application
     {
         MainWindow mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.Show();
-
-        base.OnStartup(e);
+#if DEBUG
+        Debug.WriteLine("");
+#endif
+        //base.OnStartup(e);
     }
 
     private void ConfigureServices(IServiceCollection services)
@@ -87,26 +96,5 @@ public partial class App : Application
         services.AddScoped<IIrcServer, IrcServerInfo>();
         services.AddScoped<IIrcClientManager, IrcClientManager>();
         services.AddScoped<IEchoService, EchoService>();
-        //services.AddTransient<ISpennyIrcInstance, SpennyIrcInstance>(x =>
-        //{
-        //    IServiceScope scope = _serviceProvider.CreateScope();
-        //    IServiceProvider sp = scope.ServiceProvider;
-        //    IIrcSession ircSession = sp.GetRequiredService<IIrcSession>();
-        //    IIrcCommands ircCommands = x.GetRequiredService<IIrcCommands>();
-        //    IIrcEvents events = ircSession.Events;
-        //    SpennyIrcInstance spennyIrcSession = new(ircSession, ircCommands, scope);
-
-        //    List<IIrcRuntimeBinder> eventsToBind =
-        //    [
-        //        new ClientRuntimeBinder(events, ircSession.Server, ircSession.LocalUser),
-        //        new IalRuntimeBinder(events, ircSession.Ial),
-        //        new ViewModelRuntimeBinder(spennyIrcSession)
-        //    ];
-
-        //    foreach (IIrcRuntimeBinder evt in eventsToBind)
-        //        evt.Bind();
-
-        //    return spennyIrcSession;
-        //});
     }
 }

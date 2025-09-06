@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+
 namespace spennyIRC.Core.IRC;
 
 //TODO: 2) Add IIrcSession
@@ -23,8 +24,11 @@ public class IrcClientManager : IIrcClientManager, IDisposable
         ObjectDisposedException.ThrowIf(isDisposed, this);
 
         await _ircClient.ConnectAsync(server, port, useSsl);
+
+        await Task.Delay(TimeSpan.FromSeconds(1));
+
         await _ircClient.SendMessageAsync($"NICK {_user.Nick}");
-        await _ircClient.SendMessageAsync($"USER {_user.Ident} YourHost YourServer :{_user.Realname}");
+        await _ircClient.SendMessageAsync($"USER {_user.Ident} * * :{_user.Realname}");
     }
 
     public async Task QuitAsync(string quitMsg = "FARTS")
@@ -43,9 +47,6 @@ public class IrcClientManager : IIrcClientManager, IDisposable
 
     private async Task OnMessageReceived(string message)
     {
-#if DEBUG
-        Debug.WriteLine(message);
-#endif
         string[] lineParts = message.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
         /* Handle ping */

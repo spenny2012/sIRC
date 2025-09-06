@@ -14,9 +14,7 @@ namespace spennyIRC.Scripting.Helpers
                 ArgumentException.ThrowIfNullOrWhiteSpace(serverInfo);
 
                 if (session.Server.Connected)
-                {
                     await session.ClientManager.QuitAsync();
-                }
 
                 session.EchoService.Echo("Status", $"*** Connecting to {serverInfo}...");
 
@@ -49,6 +47,7 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task VoiceAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             await session.Client.SendMessageAsync($"MODE {paramParts[0]} +v {paramParts[1]}");
         }
@@ -56,12 +55,14 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task JoinAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             await session.Client.SendMessageAsync($"JOIN {parameters}");
         }
 
         public static async Task RejoinAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             session.EchoService.Echo(session.ActiveWindow, $"Rejoining {session.ActiveWindow}...");
             await session.Client.SendMessageAsync($"PART {session.ActiveWindow}\r\nJOIN {session.ActiveWindow}");
         }
@@ -69,6 +70,7 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task PartAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             string partMsg = parameters.GetTokenFrom(1);
             await session.Client.SendMessageAsync($"PART {paramParts[0]} :{partMsg}");
@@ -89,12 +91,14 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task QuitAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             await session.Client.SendMessageAsync($"QUIT :{parameters}");
         }
 
         public static async Task RawAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             await session.Client.SendMessageAsync(parameters);
         }
 
@@ -106,6 +110,7 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task MsgAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             string msg = parameters.GetTokenFrom(1);
 
@@ -116,6 +121,7 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task SayAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             await session.Client.SendMessageAsync($"PRIVMSG {session.ActiveWindow} :{parameters}");
             session.EchoService.Echo(session.ActiveWindow, $"[{session.LocalUser.Nick}] {parameters}");
         }
@@ -123,6 +129,7 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task MeAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             await session.Client.SendMessageAsync($"PRIVMSG {session.ActiveWindow} :\u0001ACTION {parameters}");
             session.EchoService.Echo(session.ActiveWindow, $"* {session.LocalUser.Nick} {parameters}");
         }
@@ -130,6 +137,7 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task NoticeAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             string msg = parameters.GetTokenFrom(1);
 
@@ -140,6 +148,7 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task KickAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (paramParts.Length >= 2)
             {
@@ -154,6 +163,7 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task BanAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (paramParts.Length >= 1)
             {
@@ -164,6 +174,7 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task UnbanAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (paramParts.Length >= 1)
             {
@@ -174,6 +185,7 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task TopicAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (paramParts.Length >= 1)
             {
@@ -184,6 +196,7 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task CtcpAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (paramParts.Length < 2)
             {
@@ -211,24 +224,28 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task NamesAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             await session.Client.SendMessageAsync($"NAMES {parameters}");
         }
 
         public static async Task ListAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             await session.Client.SendMessageAsync($"LIST {parameters}");
         }
 
         public static async Task WhoisAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             await session.Client.SendMessageAsync($"WHOIS {parameters}");
         }
 
         public static async Task WhoAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
+
             await session.Client.SendMessageAsync($"WHO {parameters}");
         }
         public static async Task IalLookupAsync(string parameters, IIrcSession session)
@@ -240,8 +257,10 @@ namespace spennyIRC.Scripting.Helpers
         public static async Task GetSessionInfoAsync(string parameters, IIrcSession session)
         {
             session.EchoService.Echo(session.ActiveWindow, "-");
+
             PrintClassProperties(session.LocalUser, session);
             PrintClassProperties(session.Server, session);
+
             session.EchoService.Echo(session.ActiveWindow, "-");
         }
 
@@ -251,7 +270,9 @@ namespace spennyIRC.Scripting.Helpers
             session.LocalUser.Nick2 = "s" + MiscHelpers.GenerateRandomString(7);
             session.LocalUser.Ident = MiscHelpers.GenerateRandomString(5);
             session.LocalUser.Realname = MiscHelpers.GenerateRandomString(10);
+
             session.EchoService.Echo(session.ActiveWindow, $"Reset user info:\r\n Nick: {session.LocalUser.Nick}\r\n Ident: {session.LocalUser.Ident}\r\n Real Name: {session.LocalUser.Realname}");
+ 
             return Task.CompletedTask;
         }
 

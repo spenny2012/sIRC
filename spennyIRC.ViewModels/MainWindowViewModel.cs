@@ -3,7 +3,6 @@ using spennyIRC.Core;
 using spennyIRC.Core.IRC;
 using spennyIRC.Scripting;
 using System.Collections.ObjectModel;
-using System.Threading.Channels;
 using System.Windows.Input;
 
 namespace spennyIRC.ViewModels;
@@ -73,21 +72,15 @@ public class MainWindowViewModel : ViewModelBase
             evt.Bind();
 
         Servers.Add(serverVm);
-
-        IServiceProvider sp = scope.ServiceProvider; // Apply scope to IIrcSession
-        IIrcSession ircSession = sp.GetRequiredService<IIrcSession>();
-
-        _scopes.Add(ircSession, scope);
+        _scopes.Add(newSession, scope);
 
         ActiveContent = serverVm;
     }
 
-
-    //public void CloseServer()
-    //{
-    //    ServerViewModel svm = Servers.Single(x => x.Session == server);
-    //    Servers.Remove(svm);
-    //    _scopes.Remove(server);
-    //}
+    public void CloseWindow()
+    {
+        //Servers.Remove(ActiveContent.Session);
+        //_scopes.Add(newSession, scope);
+    }
 }
 
