@@ -3,6 +3,7 @@ using spennyIRC.Core;
 using spennyIRC.Core.IRC;
 using spennyIRC.Scripting;
 using System.Collections.ObjectModel;
+using System.Threading.Channels;
 using System.Windows.Input;
 
 namespace spennyIRC.ViewModels;
@@ -10,6 +11,7 @@ namespace spennyIRC.ViewModels;
 public class MainWindowViewModel : ViewModelBase
 {
     private readonly IServiceProvider _svc;
+    private readonly Dictionary<IIrcSession, IServiceScope> _scopes = [];
     private string _title = "sIRC";
     private ICommand _addServerCommand;
     private IChatWindow _activeContent;
@@ -44,10 +46,12 @@ public class MainWindowViewModel : ViewModelBase
     }
 
     public ICommand AddServerCommand => _addServerCommand ??= new RelayCommand((s) => AddServer(), (o) => true);
+    public ICommand CloseServerCommand => _addServerCommand ??= new RelayCommand((s) => AddServer(), (o) => true);
 
     public void AddServer()
     {
-        IIrcSession newSession = _svc.GetRequiredService<IIrcSession>();
+        IServiceScope scope = _svc.CreateScope();
+        IIrcSession newSession = scope.ServiceProvider.GetRequiredService<IIrcSession>();
         IIrcCommands commands = _svc.GetRequiredService<IIrcCommands>();
         IIrcEvents events = newSession.Events;
         ServerViewModel serverVm = new(newSession, commands);
@@ -62,8 +66,20 @@ public class MainWindowViewModel : ViewModelBase
             evt.Bind();
 
         Servers.Add(serverVm);
-        
+        IServiceProvider sp = scope.ServiceProvider;
+        IIrcSession ircSession = sp.GetRequiredService<IIrcSession>();
+        _scopes.Add(ircSession, scope);
+
         ActiveContent = serverVm;
     }
+
+
+    public void CloseServer(IIrcSession server)
+    {
+        ServerViewModel svm = Servers.Single(x => x.Session == server);
+        Servers.Remove(svm);
+        _scopes.Remove(server);
+    }
+
 }
 

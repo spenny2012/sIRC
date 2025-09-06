@@ -15,6 +15,7 @@ public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
     private string _name = string.Empty;
     private string _caption = string.Empty;
     private ICommand? _executeCommand;
+    private bool _disposed;
 
     public WindowViewModelBase(IIrcSession session, IIrcCommands commands)
     {
@@ -52,6 +53,15 @@ public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
     }
 
     public ICommand ExecuteCommand => _executeCommand ??= new RelayCommand(async (s) => { await DoExecuteCommand(); }, (o) => true);
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+
+        // Unsubscribe from events, dispose of timers, etc.
+        _disposed = true;
+        GC.SuppressFinalize(this);
+    }
 
     private async Task DoExecuteCommand()
     {

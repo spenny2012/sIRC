@@ -27,6 +27,14 @@ public class IrcClientManager : IIrcClientManager, IDisposable
         await _ircClient.SendMessageAsync($"USER {_user.Ident} YourHost YourServer :{_user.Realname}");
     }
 
+    public async Task QuitAsync(string quitMsg = "FARTS")
+    {
+        ObjectDisposedException.ThrowIf(isDisposed, this);
+
+        await _ircClient.SendMessageAsync($"QUIT :{quitMsg}");
+        await _ircClient.DisconnectAsync();
+    }
+
     private async Task OnDisconnected(string message)
     {
         IIrcReceivedContext ircContext = IrcReceivedContextFactory.CreateDisconnect(_ircClient, message);

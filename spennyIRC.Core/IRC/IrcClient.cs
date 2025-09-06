@@ -152,23 +152,16 @@ namespace spennyIRC.Core.IRC
             }
             finally
             {
-                try
+                if (OnDisconnectedHandler != null)
                 {
-                    if (OnDisconnectedHandler != null)
+                    try
                     {
-                        try
-                        {
-                            await OnDisconnectedHandler("Disconnected from the server.").ConfigureAwait(false);
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine($"Error in OnDisconnectedHandler: {ex.Message}");
-                        }
+                        await OnDisconnectedHandler("Disconnected from the server.").ConfigureAwait(false);
                     }
-                }
-                finally
-                {
-                    await DisconnectInternalAsync().ConfigureAwait(false);
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Error in OnDisconnectedHandler: {ex.Message}");
+                    }
                 }
             }
         }
@@ -191,51 +184,32 @@ namespace spennyIRC.Core.IRC
             CancellationTokenSource? ctsToDispose = _cts;
             _cts = null;
 
+            // Cancel token first
             ctsToDispose?.Cancel();
 
-            // Wait for receive task to complete
+            // Dispose the stream + client right away to break out of ReadAsync
+            if (_networkStream != null)
+            {
+                try { await _networkStream.DisposeAsync().ConfigureAwait(false); }
+                catch { /* ignore */ }
+                finally { _networkStream = null; }
+            }
+
+            _tcpClient?.Dispose();
+            _tcpClient = null;
+
+            // Now wait for the receive loop to observe cancellation / broken socket
             if (_receiveTask != null)
             {
                 try
                 {
                     await _receiveTask.ConfigureAwait(false);
                 }
-                catch (OperationCanceledException)
-                {
-                    // Expected when cancellation token is triggered
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Error waiting for receive task completion: {ex.Message}");
-                }
-                finally
-                {
-                    _receiveTask = null;
-                }
+                catch (OperationCanceledException) { }
+                catch (ObjectDisposedException) { }
+                catch (Exception ex) { Debug.WriteLine($"Error waiting for receive task completion: {ex.Message}"); }
+                finally { _receiveTask = null; }
             }
-
-            if (_networkStream != null)
-            {
-                try
-                {
-                    await _networkStream.DisposeAsync().ConfigureAwait(false);
-                }
-                catch (ObjectDisposedException)
-                {
-                    // Expected if already disposed
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Error disposing network stream: {ex.Message}");
-                }
-                finally
-                {
-                    _networkStream = null;
-                }
-            }
-
-            _tcpClient?.Dispose();
-            _tcpClient = null;
 
             ctsToDispose?.Dispose();
         }

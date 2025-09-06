@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace spennyIRC.ViewModels;
 
-public interface IChatWindow
+public interface IChatWindow : IDisposable
 {
     string Name { get; set; }
     string Caption { get; set; }

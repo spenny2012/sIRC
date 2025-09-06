@@ -8,7 +8,6 @@ using spennyIRC.ViewModels.Messages.LocalUser;
 using spennyIRC.ViewModels.Messages.Server;
 using System.Collections.ObjectModel;
 
-// TODO: add on disconnect event to remove all channels and queries
 // TODO: properly handle the disposing of ServerViewModel and other classes 
 namespace spennyIRC.ViewModels;
 
@@ -16,15 +15,10 @@ public class ServerViewModel : WindowViewModelBase
 {
     private readonly IIrcServer _server;
     private readonly IIrcLocalUser _user;
-    protected readonly IIrcSession _session;
-    private IEchoService _echoSvc;
     private ObservableCollection<IChatWindow> _channels = [];
 
     public ServerViewModel(IIrcSession session, IIrcCommands commands) : base(session, commands)
     {
-        _session = session;
-        _commands = commands;
-        _echoSvc = session.EchoService;
         _server = session.Server;
         _user = session.LocalUser;
         Name = "Status";
@@ -39,12 +33,17 @@ public class ServerViewModel : WindowViewModelBase
         set => SetProperty(ref _channels, value);
     }
 
-    public IEchoService EchoService
+    public void CloseWindow(string name)
     {
-        get => _echoSvc;
-        set => SetProperty(ref _echoSvc, value);
+        var window = FindWindowByName(_channels, name);
+        if (window == null) return;
+
+        Channels.Remove(window);
+
+        window.Dispose();
     }
 
+    #region UI Subscriptions
     private void RegisterUISubscriptions() // TODO: Reconsider threadsafe invoker
     {
         WeakReferenceMessenger.Default.Register<ChannelJoinMessage>(this, (r, m) =>
@@ -132,7 +131,7 @@ public class ServerViewModel : WindowViewModelBase
                     if (channel is ChannelViewModel cvm)
                         cvm.NickList.Clear();
                 }
-                Caption = "(No Network)"; 
+                Caption = "(No Network)";
             });
         });
 
@@ -211,7 +210,7 @@ public class ServerViewModel : WindowViewModelBase
 
             for (int i = 0; i < Channels.Count; i++)
             {
-                IChatWindow channel = Channels[i]; 
+                IChatWindow channel = Channels[i];
                 if (channel is ChannelViewModel cvm)
                 {
                     ThreadSafeInvoker.InvokeIfNecessary(() =>
@@ -228,19 +227,27 @@ public class ServerViewModel : WindowViewModelBase
                 }
             }
         });
-    }
+    } 
+    #endregion
 
+    #region Helper
     private static bool FindWindowByName<T>(ObservableCollection<IChatWindow> windows, string name, out T value)
         where T : IChatWindow
     {
+        value = default!;
         if (windows.FirstOrDefault(c => c.Name == name) is T channel)
         {
             value = channel;
             return true;
         }
-        value = default!;
         return false;
     }
+
+    private static IChatWindow? FindWindowByName(ObservableCollection<IChatWindow> windows, string name)
+    {
+        return windows.FirstOrDefault(c => c.Name == name);
+    }
+    #endregion
 
     ~ServerViewModel()
     {

@@ -13,6 +13,11 @@ namespace spennyIRC.Scripting.Helpers
             {
                 ArgumentException.ThrowIfNullOrWhiteSpace(parameters);
 
+                if (session.Server.Connected)
+                {
+                    await session.ClientManager.QuitAsync();
+                }
+
                 session.EchoService.Echo("Status", $"*** Connecting to {parameters}...");
 
                 string[]? paramsParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
