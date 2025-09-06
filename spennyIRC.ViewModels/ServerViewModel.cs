@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using spennyIRC.Core.IRC;
+using spennyIRC.Scripting;
 using spennyIRC.ViewModels.Helpers;
 using spennyIRC.ViewModels.Messages;
 using spennyIRC.ViewModels.Messages.Channel;
@@ -15,16 +16,17 @@ public class ServerViewModel : WindowViewModelBase
 {
     private readonly IIrcServer _server;
     private readonly IIrcLocalUser _user;
-    private readonly ISpennyIrcInstance _session;
+    protected readonly IIrcSession _session;
     private IEchoService _echoSvc;
     private ObservableCollection<IChatWindow> _channels = [];
 
-    public ServerViewModel(ISpennyIrcInstance session) : base(session)
+    public ServerViewModel(IIrcSession session, IIrcCommands commands) : base(session, commands)
     {
         _session = session;
-        _echoSvc = session.Session.EchoService;
-        _server = session.Session.Server;
-        _user = session.Session.LocalUser;
+        _commands = commands;
+        _echoSvc = session.EchoService;
+        _server = session.Server;
+        _user = session.LocalUser;
         Name = "Status";
         Caption = "(No Network)";
 
@@ -47,7 +49,7 @@ public class ServerViewModel : WindowViewModelBase
     {
         WeakReferenceMessenger.Default.Register<ChannelJoinMessage>(this, (r, m) =>
         {
-            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel? channel)) return;
+            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) return;
             ThreadSafeInvoker.InvokeIfNecessary(() =>
             {
                 channel.NickList.Add(m.Nick);
@@ -57,7 +59,7 @@ public class ServerViewModel : WindowViewModelBase
 
         WeakReferenceMessenger.Default.Register<ChannelPartMessage>(this, (r, m) =>
         {
-            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel? channel)) return;
+            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) return;
             if (m.Nick == _user.Nick)
             {
                 ThreadSafeInvoker.InvokeIfNecessary(() =>
@@ -67,7 +69,9 @@ public class ServerViewModel : WindowViewModelBase
                 return;
             }
 
-            string foundNick = channel.FindNick(m.Nick);
+            string? foundNick = channel.FindNick(m.Nick);
+
+            if (foundNick == null) return;
 
             ThreadSafeInvoker.InvokeIfNecessary(() =>
             {
@@ -78,7 +82,7 @@ public class ServerViewModel : WindowViewModelBase
         WeakReferenceMessenger.Default.Register<ChannelAddMessage>(this, (r, m) =>
         {
             if (m.Session != _session) return;
-            if (FindWindowByName(Channels, m.Channel, out ChannelViewModel? channel))
+            if (FindWindowByName(Channels, m.Channel, out ChannelViewModel channel))
             {
                 channel.IsSelected = true;
                 return;
@@ -86,7 +90,7 @@ public class ServerViewModel : WindowViewModelBase
 
             ThreadSafeInvoker.InvokeIfNecessary(() =>
             {
-                ChannelViewModel channel = new(_session, m.Channel);
+                ChannelViewModel channel = new(_session, _commands, m.Channel);
                 Channels.Add(channel);
                 Channels.AlphaNumericSort();
                 channel.IsSelected = true;
@@ -95,7 +99,7 @@ public class ServerViewModel : WindowViewModelBase
 
         WeakReferenceMessenger.Default.Register<ChannelAddNicksMessage>(this, (r, m) =>
         {
-            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel? channel)) return;
+            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) return;
             ThreadSafeInvoker.InvokeIfNecessary(() =>
             {
                 for (int i = 0; i < m.Nicks.Length; i++)
@@ -110,7 +114,7 @@ public class ServerViewModel : WindowViewModelBase
 
         WeakReferenceMessenger.Default.Register<ChannelTopicMessage>(this, (r, m) =>
         {
-            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel? channel)) return;
+            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) return;
             ThreadSafeInvoker.InvokeIfNecessary(() =>
             {
                 channel.ChannelTopic = m.Topic;
@@ -141,7 +145,7 @@ public class ServerViewModel : WindowViewModelBase
                 IChatWindow channel = Channels[i]; // TODO: find a better way to do this
                 if (channel is ChannelViewModel cvm)
                 {
-                    string foundNick = cvm.FindNick(m.Nick);
+                    string? foundNick = cvm.FindNick(m.Nick);
 
                     if (foundNick == null) continue;
 
@@ -161,7 +165,7 @@ public class ServerViewModel : WindowViewModelBase
 
         WeakReferenceMessenger.Default.Register<ChannelTopicChangeMessage>(this, (r, m) =>
         {
-            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel? channel)) return;
+            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) return;
             ThreadSafeInvoker.InvokeIfNecessary(() =>
             {
                 channel.ChannelTopic = m.Topic;
@@ -171,11 +175,11 @@ public class ServerViewModel : WindowViewModelBase
         WeakReferenceMessenger.Default.Register<QueryMessage>(this, (r, m) =>
         {
             if (m.Session != _session) return;
-            if (!FindWindowByName(Channels, m.Nick, out QueryViewModel? nickWindow))
+            if (!FindWindowByName(Channels, m.Nick, out QueryViewModel nickWindow))
             {
                 ThreadSafeInvoker.InvokeIfNecessary(() =>
                 {
-                    Channels.Add(new QueryViewModel(_session, m.Nick));
+                    Channels.Add(new QueryViewModel(_session, _commands, m.Nick));
                 });
             }
         });
@@ -192,7 +196,7 @@ public class ServerViewModel : WindowViewModelBase
             if (m.Session != _session) return;
             if (m.KickedNick == _user.Nick)
             {
-                if (FindWindowByName(Channels, m.Channel, out ChannelViewModel? channel))
+                if (FindWindowByName(Channels, m.Channel, out ChannelViewModel channel))
                 {
                     ThreadSafeInvoker.InvokeIfNecessary(() =>
                     {
@@ -226,7 +230,7 @@ public class ServerViewModel : WindowViewModelBase
         });
     }
 
-    private static bool FindWindowByName<T>(ObservableCollection<IChatWindow> windows, string name, out T? value)
+    private static bool FindWindowByName<T>(ObservableCollection<IChatWindow> windows, string name, out T value)
         where T : IChatWindow
     {
         if (windows.FirstOrDefault(c => c.Name == name) is T channel)
@@ -234,7 +238,7 @@ public class ServerViewModel : WindowViewModelBase
             value = channel;
             return true;
         }
-        value = default;
+        value = default!;
         return false;
     }
 

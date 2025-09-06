@@ -1,6 +1,8 @@
-﻿namespace spennyIRC.ViewModels.Messages.Channel;
+﻿using spennyIRC.Core.IRC;
 
-public class ChannelAddNicksMessage(ISpennyIrcInstance server) : MessageBase(server)
+namespace spennyIRC.ViewModels.Messages.Channel;
+
+public class ChannelAddNicksMessage(IIrcSession server) : MessageBase(server)
 {
     public string Channel { get; set; } = string.Empty;
     public string[] Nicks { get; set; }

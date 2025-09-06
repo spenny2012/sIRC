@@ -1,6 +1,8 @@
-﻿namespace spennyIRC.ViewModels.Messages;
+﻿using spennyIRC.Core.IRC;
 
-public abstract class MessageBase(ISpennyIrcInstance session)
+namespace spennyIRC.ViewModels.Messages;
+
+public abstract class MessageBase(IIrcSession session)
 {
-    public ISpennyIrcInstance Session => session;
+    public IIrcSession Session => session;
 }

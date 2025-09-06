@@ -1,16 +1,26 @@
-﻿using spennyIRC.Core.IRC.Helpers;
+﻿using spennyIRC.Core.IRC;
+using spennyIRC.Core.IRC.Helpers;
+using spennyIRC.Scripting;
 using System.Windows.Input;
 
 namespace spennyIRC.ViewModels;
 
 
-public abstract class WindowViewModelBase(ISpennyIrcInstance _session) : ViewModelBase, IChatWindow
+public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
 {
+    protected IIrcSession _session;
+    protected IIrcCommands _commands;
     private bool _isSelected;
     private string _text = string.Empty;
     private string _name = string.Empty;
     private string _caption = string.Empty;
     private ICommand? _executeCommand;
+
+    public WindowViewModelBase(IIrcSession session, IIrcCommands commands)
+    {
+        _session = session;
+        _commands = commands;
+    }
 
     public virtual string Name
     {
@@ -36,10 +46,9 @@ public abstract class WindowViewModelBase(ISpennyIrcInstance _session) : ViewMod
         set => SetProperty(ref _text, value);
     }
 
-    public virtual ISpennyIrcInstance Session
+    public virtual IIrcSession Session
     {
         get => _session;
-        set => SetProperty(ref _session, value);
     }
 
     public ICommand ExecuteCommand => _executeCommand ??= new RelayCommand(async (s) => { await DoExecuteCommand(); }, (o) => true);
@@ -51,7 +60,7 @@ public abstract class WindowViewModelBase(ISpennyIrcInstance _session) : ViewMod
         if (Text[0] != '/')
         {
             if (!Name.Equals("Status"))
-                _session.IrcCommands.ExecuteCommand("say", Text, _session.Session).GetAwaiter().GetResult();
+                _commands.ExecuteCommand("say", Text, _session).GetAwaiter().GetResult();
 
             Text = string.Empty;
             return;
@@ -60,7 +69,7 @@ public abstract class WindowViewModelBase(ISpennyIrcInstance _session) : ViewMod
         ExtractedCommandInfo commandInfo = Text.ExtractCommandAndParams();
         Text = string.Empty;
 
-        await _session.IrcCommands.ExecuteCommand(commandInfo.ParsedCmd, commandInfo.CmdParameters, _session.Session);
+        await _commands.ExecuteCommand(commandInfo.ParsedCmd, commandInfo.CmdParameters, _session);
     }
 }
 

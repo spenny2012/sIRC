@@ -1,4 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using spennyIRC.Core;
+using spennyIRC.Core.IRC;
+using spennyIRC.Scripting;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
@@ -35,7 +38,7 @@ public class MainWindowViewModel : ViewModelBase
         get => _activeContent;
         set
         {
-            value.Session.Session.ActiveWindow = value.Name;
+            value.Session.ActiveWindow = value.Name;
             SetProperty(ref _activeContent, value);
         }
     }
@@ -44,9 +47,22 @@ public class MainWindowViewModel : ViewModelBase
 
     public void AddServer()
     {
-        ISpennyIrcInstance newSession = _svc.GetRequiredService<ISpennyIrcInstance>();
-        ServerViewModel serverVm = new(newSession);
+        IIrcSession newSession = _svc.GetRequiredService<IIrcSession>();
+        IIrcCommands commands = _svc.GetRequiredService<IIrcCommands>();
+        IIrcEvents events = newSession.Events;
+        ServerViewModel serverVm = new(newSession, commands);
+        List<IIrcRuntimeBinder> eventsToBind =
+        [
+                new ClientRuntimeBinder(events, newSession.Server, newSession.LocalUser),
+                new IalRuntimeBinder(events, newSession.Ial),
+                new ViewModelRuntimeBinder(newSession)
+        ];
+
+        foreach (var evt in eventsToBind)
+            evt.Bind();
+
         Servers.Add(serverVm);
+        
         ActiveContent = serverVm;
     }
 }

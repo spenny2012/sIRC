@@ -87,26 +87,26 @@ public partial class App : Application
         services.AddScoped<IIrcServer, IrcServerInfo>();
         services.AddScoped<IIrcClientManager, IrcClientManager>();
         services.AddScoped<IEchoService, EchoService>();
-        services.AddTransient<ISpennyIrcInstance, SpennyIrcInstance>(x =>
-        {
-            IServiceScope scope = _serviceProvider.CreateScope();
-            IServiceProvider sp = scope.ServiceProvider;
-            IIrcSession ircSession = sp.GetRequiredService<IIrcSession>();
-            IIrcCommands ircCommands = x.GetRequiredService<IIrcCommands>();
-            IIrcEvents events = ircSession.Events;
-            SpennyIrcInstance spennyIrcSession = new(ircSession, ircCommands, scope);
+        //services.AddTransient<ISpennyIrcInstance, SpennyIrcInstance>(x =>
+        //{
+        //    IServiceScope scope = _serviceProvider.CreateScope();
+        //    IServiceProvider sp = scope.ServiceProvider;
+        //    IIrcSession ircSession = sp.GetRequiredService<IIrcSession>();
+        //    IIrcCommands ircCommands = x.GetRequiredService<IIrcCommands>();
+        //    IIrcEvents events = ircSession.Events;
+        //    SpennyIrcInstance spennyIrcSession = new(ircSession, ircCommands, scope);
 
-            List<IIrcRuntimeBinder> eventsToBind =
-            [
-                new ClientRuntimeBinder(events, ircSession.Server, ircSession.LocalUser),
-                new IalRuntimeBinder(events, ircSession.Ial),
-                new ViewModelRuntimeBinder(spennyIrcSession)
-            ];
+        //    List<IIrcRuntimeBinder> eventsToBind =
+        //    [
+        //        new ClientRuntimeBinder(events, ircSession.Server, ircSession.LocalUser),
+        //        new IalRuntimeBinder(events, ircSession.Ial),
+        //        new ViewModelRuntimeBinder(spennyIrcSession)
+        //    ];
 
-            foreach (IIrcRuntimeBinder evt in eventsToBind)
-                evt.Bind();
+        //    foreach (IIrcRuntimeBinder evt in eventsToBind)
+        //        evt.Bind();
 
-            return spennyIrcSession;
-        });
+        //    return spennyIrcSession;
+        //});
     }
 }

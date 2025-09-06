@@ -1,6 +1,8 @@
-﻿namespace spennyIRC.ViewModels.Messages.Channel;
+﻿using spennyIRC.Core.IRC;
 
-public class ChannelJoinMessage(ISpennyIrcInstance session) : MessageBase(session)
+namespace spennyIRC.ViewModels.Messages.Channel;
+
+public class ChannelJoinMessage(IIrcSession session) : MessageBase(session)
 {
     public string Nick { get; set; } = string.Empty;
     public string Host { get; set; } = string.Empty;

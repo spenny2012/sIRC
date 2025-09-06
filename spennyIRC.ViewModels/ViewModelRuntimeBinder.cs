@@ -16,19 +16,19 @@ public class ViewModelRuntimeBinder : IIrcRuntimeBinder
     private const string StatusWindow = "Status";
     private const string AllWindows = "All";
 
-    private readonly ISpennyIrcInstance _session;
+    private readonly IIrcSession _session;
     private readonly IIrcLocalUser _user;
     private readonly IEchoService _echoSvc;
     private readonly IIrcEvents _events;
     private readonly IIrcServer _server;
 
-    public ViewModelRuntimeBinder(ISpennyIrcInstance session)
+    public ViewModelRuntimeBinder(IIrcSession session)
     {
         _session = session;
-        _echoSvc = session.Session.EchoService;
-        _user = session.Session.LocalUser;
-        _events = session.Session.Events;
-        _server = session.Session.Server;
+        _echoSvc = session.EchoService;
+        _user = session.LocalUser;
+        _events = session.Events;
+        _server = session.Server;
     }
 
     public void Bind()
@@ -205,14 +205,14 @@ public class ViewModelRuntimeBinder : IIrcRuntimeBinder
         _events.AddEvent(ProtocolNumericConstants.RPL_ISON, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_UNAWAY, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_NOWAWAY, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISUSER, async (ctx) => _echoSvc.Echo(_session.Session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISSERVER, async (ctx) => _echoSvc.Echo(_session.Session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISOPERATOR, async (ctx) => _echoSvc.Echo(_session.Session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
+        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISUSER, async (ctx) => _echoSvc.Echo(_session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
+        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISSERVER, async (ctx) => _echoSvc.Echo(_session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
+        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISOPERATOR, async (ctx) => _echoSvc.Echo(_session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_WHOWASUSER, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_ENDOFWHO, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISIDLE, async (ctx) => _echoSvc.Echo(_session.Session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.RPL_ENDOFWHOIS, async (ctx) => _echoSvc.Echo(_session.Session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISCHANNELS, async (ctx) => _echoSvc.Echo(_session.Session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
+        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISIDLE, async (ctx) => _echoSvc.Echo(_session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
+        _events.AddEvent(ProtocolNumericConstants.RPL_ENDOFWHOIS, async (ctx) => _echoSvc.Echo(_session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
+        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISCHANNELS, async (ctx) => _echoSvc.Echo(_session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_LIST, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_LISTEND, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_CHANNELMODEIS, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));

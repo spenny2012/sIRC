@@ -1,6 +1,8 @@
-﻿namespace spennyIRC.ViewModels.Messages;
+﻿using spennyIRC.Core.IRC;
 
-public class UserQuitMessage(ISpennyIrcInstance session) : MessageBase(session)
+namespace spennyIRC.ViewModels.Messages;
+
+public class UserQuitMessage(IIrcSession session) : MessageBase(session)
 {
     public string Nick { get; set; } = string.Empty;
     public string Host { get; set; } = string.Empty;

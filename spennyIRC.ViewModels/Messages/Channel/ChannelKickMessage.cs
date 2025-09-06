@@ -1,6 +1,8 @@
-﻿namespace spennyIRC.ViewModels.Messages.Channel;
+﻿using spennyIRC.Core.IRC;
 
-public class ChannelKickMessage(ISpennyIrcInstance session) : MessageBase(session)
+namespace spennyIRC.ViewModels.Messages.Channel;
+
+public class ChannelKickMessage(IIrcSession session) : MessageBase(session)
 {
     public string Nick { get; set; } = string.Empty;
     public string KickedNick { get; set; } = string.Empty;

@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using spennyIRC.Core.IRC;
+using System.Windows.Input;
 
 namespace spennyIRC.ViewModels;
 
@@ -8,7 +9,7 @@ public interface IChatWindow
     string Caption { get; set; }
     bool IsSelected { get; set; }
     string Text { get; set; }
-    ISpennyIrcInstance Session { get; set; }
+    IIrcSession Session { get; }
     ICommand ExecuteCommand { get; }
 }
 

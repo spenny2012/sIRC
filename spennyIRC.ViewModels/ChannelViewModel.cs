@@ -1,4 +1,5 @@
 ﻿using spennyIRC.Core.IRC;
+using spennyIRC.Scripting;
 using spennyIRC.ViewModels.Helpers;
 using System.Collections.ObjectModel;
 
@@ -13,9 +14,9 @@ public class ChannelViewModel : WindowViewModelBase
     private IEnumerable<string> _selectedNicks = [];
     private IEchoService _echoSvc;
 
-    public ChannelViewModel(ISpennyIrcInstance session, string channel) : base(session)
+    public ChannelViewModel(IIrcSession session, IIrcCommands commands, string channel) : base(session, commands)
     {
-        _echoSvc = session.Session.EchoService;
+        _echoSvc = session.EchoService;
         Name = channel;
         Channel = Caption = channel;
     }
