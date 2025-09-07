@@ -56,11 +56,17 @@ public partial class App : Application
     private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
         MessageBox.Show("ERROR", e.ExceptionObject.ToString());
+#if DEBUG
+        Debug.WriteLine(e.ExceptionObject.ToString());
+#endif
     }
 
     private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
     {
         MessageBox.Show("ERROR", e.Exception.ToString());
+#if DEBUG
+        Debug.WriteLine(e.Exception.ToString());
+#endif
     }
 
     protected override void OnStartup(StartupEventArgs e)

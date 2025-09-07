@@ -21,9 +21,6 @@ public class IrcClient : IIrcClient
 
     public async Task ConnectAsync(string server, int port, bool useSsl = false)
     {
-#if DEBUG
-        Debug.WriteLine($"ConnectAsync: Starting connection to {server}:{port} (SSL: {useSsl})");
-#endif
         // Clean up any existing connection
         await DisconnectAsync().ConfigureAwait(false);
 
@@ -31,6 +28,10 @@ public class IrcClient : IIrcClient
 
         try
         {
+#if DEBUG
+            Debug.WriteLine($"ConnectAsync: Starting connection to {server}:{port} (SSL: {useSsl})");
+#endif
+
             _tcpClient = new TcpClient();
 
             // Connect with cancellation support

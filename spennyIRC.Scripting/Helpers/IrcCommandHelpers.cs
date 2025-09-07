@@ -1,5 +1,6 @@
 ﻿using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace spennyIRC.Scripting.Helpers
@@ -37,6 +38,7 @@ namespace spennyIRC.Scripting.Helpers
             {
 #if DEBUG
                 session.EchoService.Echo("Status", $"ERROR: {e}");
+                Debug.WriteLine($"ERROR: {e}");
 #endif
 #if RELEASE
                 session.EchoService.Echo("Status", $"ERROR: {e.Message}");
