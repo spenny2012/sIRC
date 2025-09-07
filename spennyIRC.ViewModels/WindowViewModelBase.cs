@@ -84,3 +84,5 @@ public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
 }
 
 
+// features to add:
+// TODO: add /clear support

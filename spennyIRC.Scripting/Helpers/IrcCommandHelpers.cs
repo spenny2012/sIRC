@@ -276,6 +276,13 @@ namespace spennyIRC.Scripting.Helpers
             return Task.CompletedTask;
         }
 
+        public static async Task RandNickAsync(string parameters, IIrcSession session)
+        {
+            if (!IsConnected(session)) return;
+
+            await session.Client.SendMessageAsync($"NICK s{MiscHelpers.GenerateRandomString(8)}");
+        }
+
         public static void PrintClassProperties(object obj, IIrcSession session)
         {
             Type type = obj.GetType();
@@ -297,6 +304,7 @@ namespace spennyIRC.Scripting.Helpers
                 }
             }
         }
+
         public static bool IsConnected(IIrcSession session)
         {
             if (!session.Server.Connected)

@@ -1,5 +1,4 @@
 ﻿using spennyIRC.ViewModels;
-using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Input;
 

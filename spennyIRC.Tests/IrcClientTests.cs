@@ -1,6 +1,4 @@
-using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace spennyIRC.Tests;
 
