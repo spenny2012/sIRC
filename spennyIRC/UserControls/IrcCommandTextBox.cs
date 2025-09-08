@@ -12,8 +12,14 @@ public class IrcCommandTextBox : TextBox
 
     public IrcCommandTextBox()
     {
+        Loaded += IrcCommandTextBox_Loaded;
         PreviewKeyDown += IrcCommandTextBox_PreviewKeyDown;
         _currentHistoryIndex = _history.Count;
+    }
+
+    private void IrcCommandTextBox_Loaded(object sender, System.Windows.RoutedEventArgs e)
+    {
+        Focus();
     }
 
     private void IrcCommandTextBox_PreviewKeyDown(object sender, KeyEventArgs e)

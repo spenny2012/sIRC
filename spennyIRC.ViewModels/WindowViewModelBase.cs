@@ -5,22 +5,16 @@ using System.Windows.Input;
 
 namespace spennyIRC.ViewModels;
 
-public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
+public abstract class WindowViewModelBase(IIrcSession session, IIrcCommands commands) : ViewModelBase, IChatWindow
 {
-    protected IIrcSession _session;
-    protected IIrcCommands _commands;
+    protected IIrcSession _session = session;
+    protected IIrcCommands _commands = commands;
     private bool _isSelected;
     private string _text = string.Empty;
     private string _name = string.Empty;
     private string _caption = string.Empty;
     private ICommand? _executeCommand;
     private bool _disposed;
-
-    public WindowViewModelBase(IIrcSession session, IIrcCommands commands)
-    {
-        _session = session;
-        _commands = commands;
-    }
 
     public virtual string Name
     {
@@ -56,8 +50,9 @@ public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
     public void Dispose()
     {
         if (_disposed) return;
-        // Unsubscribe from events, dispose of timers, etc.
+
         _disposed = true;
+
         GC.SuppressFinalize(this);
     }
 
