@@ -13,4 +13,3 @@ public interface IChatWindow : IDisposable
     ICommand ExecuteCommand { get; }
 }
 
-

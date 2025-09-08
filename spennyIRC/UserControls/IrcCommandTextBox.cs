@@ -12,22 +12,19 @@ public class IrcCommandTextBox : TextBox
 
     public IrcCommandTextBox()
     {
-        KeyDown += IrcCommandTextBox_KeyDown;
+        PreviewKeyDown += IrcCommandTextBox_PreviewKeyDown;
         _currentHistoryIndex = _history.Count;
     }
 
-    private void IrcCommandTextBox_KeyDown(object sender, KeyEventArgs e)
+    private void IrcCommandTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter)
         {
-            // Store the current text before clearing
+            // Store command before execution
             string command = Text;
 
-            // Execute the command
+            // Execute the command (this will clear Text via databinding)
             ((IChatWindow)DataContext).ExecuteCommand.Execute(null);
-
-            // Clear the textbox
-            Text = "";
 
             // Add to history if not empty
             if (!string.IsNullOrWhiteSpace(command))
@@ -39,7 +36,10 @@ public class IrcCommandTextBox : TextBox
                 }
             }
 
+            // Reset history position
             _currentHistoryIndex = _history.Count;
+            _currentText = "";
+
             e.Handled = true;
             return;
         }
@@ -75,10 +75,11 @@ public class IrcCommandTextBox : TextBox
                 Text = _history[_currentHistoryIndex];
                 CaretIndex = Text.Length;
             }
-            else
+            else if (_currentHistoryIndex == _history.Count - 1)
             {
                 _currentHistoryIndex = _history.Count;
                 Text = _currentText;
+                CaretIndex = Text.Length;
             }
 
             e.Handled = true;

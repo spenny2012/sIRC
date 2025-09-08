@@ -37,9 +37,10 @@ public class IrcClient : IIrcClient
             // Connect with cancellation support
             using (CancellationTokenSource connectCts = CancellationTokenSource.CreateLinkedTokenSource(_connectionCts.Token))
             {
-                connectCts.CancelAfter(TimeSpan.FromSeconds(60));
+                const int cancelTime = 60;
+                connectCts.CancelAfter(TimeSpan.FromSeconds(cancelTime));
 #if DEBUG
-                Debug.WriteLine($"ConnectAsync: Attempting TCP connection...");
+                Debug.WriteLine($"ConnectAsync: Attempting TCP connection... Cancelling after ");
 #endif
                 await _tcpClient.ConnectAsync(server, port, connectCts.Token).ConfigureAwait(false);
             }

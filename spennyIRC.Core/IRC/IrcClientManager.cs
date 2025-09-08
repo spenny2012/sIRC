@@ -29,7 +29,7 @@ public class IrcClientManager : IIrcClientManager, IDisposable
         await _ircClient.SendMessageAsync($"USER {_user.Ident} * * :{_user.Realname}");
     }
 
-    public async Task QuitAsync(string quitMsg = "FARTS")
+    public async Task QuitAsync(string quitMsg = "Test")
     {
         ObjectDisposedException.ThrowIf(isDisposed, this);
 

@@ -5,7 +5,6 @@ using System.Windows.Input;
 
 namespace spennyIRC.ViewModels;
 
-
 public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
 {
     protected IIrcSession _session;
@@ -57,7 +56,6 @@ public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
     public void Dispose()
     {
         if (_disposed) return;
-
         // Unsubscribe from events, dispose of timers, etc.
         _disposed = true;
         GC.SuppressFinalize(this);
@@ -71,18 +69,12 @@ public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
         {
             if (!Name.Equals("Status"))
                 _commands.ExecuteCommand("say", Text, _session).GetAwaiter().GetResult();
-
             Text = string.Empty;
             return;
         }
 
         ExtractedCommandInfo commandInfo = Text.ExtractCommandAndParams();
         Text = string.Empty;
-
         await _commands.ExecuteCommand(commandInfo.ParsedCmd, commandInfo.CmdParameters, _session);
     }
 }
-
-
-// features to add:
-// TODO: add /clear support
