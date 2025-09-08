@@ -6,9 +6,9 @@ namespace spennyIRC.UserControls;
 
 public class IrcCommandTextBox : TextBox
 {
-    private readonly List<string> _history = new();
+    private readonly List<string> _history = [];
     private int _currentHistoryIndex = 0;
-    private string _currentText = "";
+    private string _currentText = string.Empty;
 
     public IrcCommandTextBox()
     {
@@ -38,7 +38,7 @@ public class IrcCommandTextBox : TextBox
 
             // Reset history position
             _currentHistoryIndex = _history.Count;
-            _currentText = "";
+            _currentText = string.Empty;
 
             e.Handled = true;
             return;
