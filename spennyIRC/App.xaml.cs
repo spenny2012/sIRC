@@ -91,9 +91,9 @@ public partial class App : Application
             // TODO: replace code belode with fields from settings
             return new IrcLocalUser
             {
-                Nick = "s" + MiscHelpers.GenerateRandomString(7),
+                Nick = "s" + MiscHelpers.GenerateRandomString(6),
                 Nick2 = "YourNick2",
-                Ident = MiscHelpers.GenerateRandomString(3),
+                Ident = MiscHelpers.GenerateRandomString(5),
                 Realname = MiscHelpers.GenerateRandomString(3)
             };
         });

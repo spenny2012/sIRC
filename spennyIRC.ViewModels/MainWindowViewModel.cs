@@ -44,8 +44,11 @@ public class MainWindowViewModel : ViewModelBase
         get => _activeContent;
         set
         {
+            if (value == null) return;
+
             value.Session.ActiveWindow = value.Name;
             SetProperty(ref _activeContent, value);
+
         }
     }
 
