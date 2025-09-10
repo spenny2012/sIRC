@@ -3,8 +3,9 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using spennyIRC.Core.IRC;
 
+
+namespace spennyIRC.Core.IRC;
 public class IrcClient : IIrcClient
 {
     private TcpClient? _tcpClient;

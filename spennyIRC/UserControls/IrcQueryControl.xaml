@@ -16,7 +16,7 @@
                      IsReadOnly="True"
                      Grid.Row="0" 
                      Cursor="Arrow"
-                     VerticalScrollBarVisibility="Auto"
+                     VerticalScrollBarVisibility="Visible"
                      Foreground="White" 
                      FontFamily="Verdana"
                      >

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using spennyIRC.Core;
 using spennyIRC.Core.IRC;
 using spennyIRC.Scripting;
@@ -17,7 +18,7 @@ public class MainWindowViewModel : ViewModelBase
 #else
     private string _title = "sIRC";
 #endif
-    private ICommand _addServerCommand;
+    private IAsyncRelayCommand _addServerCommand;
     private IChatWindow _activeContent;
     private ObservableCollection<ServerViewModel> _servers = [];
 
@@ -52,10 +53,10 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public ICommand AddServerCommand => _addServerCommand ??= new RelayCommand((s) => AddServer(), (o) => true);
+    public IAsyncRelayCommand AddServerCommand => _addServerCommand ??= new AsyncRelayCommand(AddServer);
     //public ICommand CloseServerCommand => _addServerCommand ??= new RelayCommand((s) => CloseServer(), (o) => true);
 
-    public void AddServer()
+    public Task AddServer()
     {
         IServiceScope scope = _svc.CreateScope();
         IIrcSession newSession = scope.ServiceProvider.GetRequiredService<IIrcSession>();
@@ -78,6 +79,8 @@ public class MainWindowViewModel : ViewModelBase
         _scopes.Add(newSession, scope);
 
         ActiveContent = serverVm;
+
+        return Task.CompletedTask;
     }
 
     public void CloseWindow()

@@ -1,3 +1,4 @@
+using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
 
 namespace spennyIRC.Tests;
