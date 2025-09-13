@@ -34,79 +34,87 @@ public class ViewModelRuntimeBinder : IIrcRuntimeBinder
     public void Bind()
     {
         // TODO: add message for disconnect to clear all names from channels
-        _events.AddEvent("DISCONNECT", async (ctx) => {
+        _events.AddEvent("DISCONNECT", (ctx) => {
             WeakReferenceMessenger.Default.Send(new ServerDisconnectedMessage(_session));
             _echoSvc.Echo(AllWindows, $"* Disconnected: {ctx.Line}");
+            return Task.CompletedTask;
         }); 
-        _events.AddEvent("TOPIC", async (ctx) =>
+        _events.AddEvent("TOPIC", (ctx) =>
         {
             WeakReferenceMessenger.Default.Send(new ChannelTopicChangeMessage(_session) { Channel = ctx.Recipient, Topic = ctx.Trailing });
             _echoSvc.Echo(ctx.LineParts[2], $"{ctx.Nick} changed the subject to: {ctx.Trailing}");
+            return Task.CompletedTask;
         });
-        _events.AddEvent("QUIT", async (ctx) =>
+        _events.AddEvent("QUIT", (ctx) =>
         {
             WeakReferenceMessenger.Default.Send(new UserQuitMessage(_session)
             {
-                Nick = ctx.Nick,
+                Nick = ctx.Nick!,
                 Host = ctx.LineParts[0].ExtractFullHost().ToString(),
-                Message = ctx.Trailing,
+                Message = ctx.Trailing!,
             });
+            return Task.CompletedTask;
         });
-        _events.AddEvent("JOIN", async (ctx) =>
+        _events.AddEvent("JOIN", (ctx) =>
         {
-            string? channel = ctx.Trailing;
+            string channel = ctx.Trailing!;
             if (ctx.Nick == _user.Nick)
             {
-                WeakReferenceMessenger.Default.Send(new ChannelAddMessage(_session) { Channel = channel });
-                return;
+                WeakReferenceMessenger.Default.Send(new ChannelAddMessage(_session) { Channel = channel! });
+                return Task.CompletedTask;
             }
-            WeakReferenceMessenger.Default.Send(new ChannelJoinMessage(_session) { Channel = channel, Nick = ctx.Nick });
+            WeakReferenceMessenger.Default.Send(new ChannelJoinMessage(_session) { Channel = channel!, Nick = ctx.Nick! });
             _echoSvc.Echo(channel, $"»» {ctx.Nick} ({ctx.LineParts[0].ExtractFullHost()}) joined {channel}");
+            return Task.CompletedTask;
         });
-        _events.AddEvent("PART", async (ctx) =>
+        _events.AddEvent("PART", (ctx) =>
         {
-            string? channel = ctx.Recipient;
+            string channel = ctx.Recipient!;
             WeakReferenceMessenger.Default.Send(new ChannelPartMessage(_session)
             {
-                Nick = ctx.Nick,
+                Nick = ctx.Nick!,
                 Host = ctx.LineParts[0].ExtractFullHost().ToString(),
                 Channel = channel,
-                Message = ctx.Trailing
+                Message = ctx.Trailing!
             });
             _echoSvc.Echo(channel, $"»» {ctx.Nick} ({ctx.LineParts[0].ExtractFullHost()}) parted {channel} ({ctx.Trailing})");
+            return Task.CompletedTask;
         });
-        _events.AddEvent("KICK", async (ctx) =>
+        _events.AddEvent("KICK", (ctx) =>
         {
             // :Holden!~Fignewton@45.12.235.52 KICK #test YourNick :no reason
             WeakReferenceMessenger.Default.Send(new ChannelKickMessage(_session)
             {
-                Nick = ctx.Nick,
+                Nick = ctx.Nick!,
                 KickedNick = ctx.LineParts[3],
                 Channel = ctx.Recipient,
-                Message = ctx.Trailing
+                Message = ctx.Trailing!
             });
 
             string text = ctx.LineParts[3] == _user.Nick ? "You were" : $"{ctx.Nick} was";
             _echoSvc.Echo(ctx.Recipient, $"»» {text} kicked from {ctx.Recipient} by {ctx.Nick} ({ctx.Trailing})");
+            return Task.CompletedTask;
         });
-        _events.AddEvent("NOTICE", async (ctx) =>
+        _events.AddEvent("NOTICE", (ctx) =>
         {
             _echoSvc.Echo(StatusWindow, $"-{ctx.Nick}- {ctx.Trailing}");
+            return Task.CompletedTask;
         });
-        _events.AddEvent("PRIVMSG", async (ctx) =>
+        _events.AddEvent("PRIVMSG", (ctx) =>
         {
             bool isDm = ctx.Recipient == _user.Nick;
             if (isDm) // handle query
             {
                 WeakReferenceMessenger.Default.Send(new QueryMessage(_session)
                 {
-                    Nick = ctx.Nick,
-                    Message = ctx.Trailing
+                    Nick = ctx.Nick!,
+                    Message = ctx.Trailing!
                 });
             }
-            _echoSvc.Echo(isDm ? ctx.Nick : ctx.Recipient, $"[{ctx.Nick}] {ctx.Trailing}");
+            _echoSvc.Echo(isDm ? ctx.Nick! : ctx.Recipient, $"[{ctx.Nick}] {ctx.Trailing}");
+            return Task.CompletedTask;
         });
-        _events.AddEvent("NICK", async (ctx) =>
+        _events.AddEvent("NICK", (ctx) =>
         {
             if (ctx.Trailing == _user.Nick)
             {
@@ -114,11 +122,12 @@ public class ViewModelRuntimeBinder : IIrcRuntimeBinder
 
                 WeakReferenceMessenger.Default.Send(new LocalUserNickChangeMessage(_session)
                 {
-                    Nick = ctx.Nick,
+                    Nick = ctx.Nick!,
                     NewNick = ctx.Trailing
                 });
-                return;
+                return Task.CompletedTask;
             }
+            return Task.CompletedTask;
             // TODO: finish adding this logic (requires comchans)
         });
 
@@ -142,17 +151,19 @@ public class ViewModelRuntimeBinder : IIrcRuntimeBinder
                 _echoSvc.Echo(channel, $"Topic set by {nick} on {dateTime:g}");
             }
         });
-        _events.AddEvent(ProtocolNumericConstants.RPL_TOPIC, async (ctx) =>
+        _events.AddEvent(ProtocolNumericConstants.RPL_TOPIC, (ctx) =>
         {
             string channel = ctx.LineParts[3];
-            WeakReferenceMessenger.Default.Send(new ChannelTopicMessage(_session) { Channel = channel, Topic = ctx.Trailing });
+            WeakReferenceMessenger.Default.Send(new ChannelTopicMessage(_session) { Channel = channel, Topic = ctx.Trailing! });
             _echoSvc.Echo(ctx.LineParts[3], $"Topic: {ctx.Trailing}");
+            return Task.CompletedTask;
         });
-        _events.AddEvent(ProtocolNumericConstants.RPL_NAMREPLY, async (ctx) =>
+        _events.AddEvent(ProtocolNumericConstants.RPL_NAMREPLY, (ctx) =>
         {
             string channel = ctx.LineParts[4];
-            string[] nicks = ctx.Trailing.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string[] nicks = ctx.Trailing!.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             WeakReferenceMessenger.Default.Send(new ChannelAddNicksMessage(_session) { Channel = channel, Nicks = nicks });
+            return Task.CompletedTask;
         });
 
         _events.AddEvent(ProtocolNumericConstants.RPL_YOURHOST, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
@@ -255,7 +266,7 @@ public class ViewModelRuntimeBinder : IIrcRuntimeBinder
         _events.AddEvent(ProtocolNumericConstants.ERR_FILEERROR, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.ERR_NONICKNAMEGIVEN, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.ERR_ERRONEUSNICKNAME, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.ERR_NICKNAMEINUSE, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
+        _events.AddEvent(ProtocolNumericConstants.ERR_NICKNAMEINUSE, (ctx) => { _echoSvc.Echo(StatusWindow, ctx.Trailing!); return Task.CompletedTask; });
         _events.AddEvent(ProtocolNumericConstants.ERR_NICKCOLLISION, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.ERR_UNAVAILRESOURCE, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.ERR_USERNOTINCHANNEL, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
