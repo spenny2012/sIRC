@@ -119,33 +119,42 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
         });
 
         // 001 - 099: Basic Replies (Welcome and Server Info)
-        _events.AddEvent(ProtocolNumericConstants.RPL_WELCOME, (ctx) => // 001
+        _events.AddEvent(ProtocolNumericConstants.RPL_WELCOME, (ctx) => // 001 - Welcome message
         {
             string id = ctx.LineParts[0][1..];
             _server.NetworkId = id;
             _echoSvc.Echo(StatusWindow, $"*** Connected to {id}");
             return Task.CompletedTask;
         });
-        _events.AddEvent(ProtocolNumericConstants.RPL_YOURHOST, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.RPL_ISUPPORT, (ctx) => // 005
+        _events.AddEvent(ProtocolNumericConstants.RPL_YOURHOST, (ctx) => // 002 - Your host
+        {
+            _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3));
+            return Task.CompletedTask;
+        });
+        _events.AddEvent(ProtocolNumericConstants.RPL_CREATED, (ctx) => // 003 - Server created message
+        {
+            _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3));
+            return Task.CompletedTask;
+        });
+        _events.AddEvent(ProtocolNumericConstants.RPL_ISUPPORT, (ctx) => // 005 - ISUPPORT information
         {
             WeakReferenceMessenger.Default.Send(new ServerISupportMessage(session) { });
             _echoSvc.Echo(StatusWindow, $"{ctx.Line.GetTokenFrom(3)}");
             return Task.CompletedTask;
         });
-        _events.AddEvent(ProtocolNumericConstants.PROCESSING_REQUEST, (ctx) => // 020
+        _events.AddEvent(ProtocolNumericConstants.PROCESSING_REQUEST, (ctx) => // 020 - Processing request message
         {
             _echoSvc.Echo(StatusWindow, ctx.Trailing!);
             return Task.CompletedTask;
         });
-        _events.AddEvent(ProtocolNumericConstants.RPL_TOPIC, (ctx) => // 332
+        _events.AddEvent(ProtocolNumericConstants.RPL_TOPIC, (ctx) => // 332 - Channel topic
         {
             string channel = ctx.LineParts[3];
             WeakReferenceMessenger.Default.Send(new ChannelTopicMessage(session) { Channel = channel, Topic = ctx.Trailing! });
             _echoSvc.Echo(ctx.LineParts[3], $"Topic: {ctx.Trailing}");
             return Task.CompletedTask;
         });
-        _events.AddEvent(ProtocolNumericConstants.RPL_TOPICWHOTIME, (ctx) => // 333
+        _events.AddEvent(ProtocolNumericConstants.RPL_TOPICWHOTIME, (ctx) => // 333 - Topic set by and when
         {
             string channel = ctx.LineParts[3];
             string nick = ctx.LineParts[4];
@@ -158,15 +167,13 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
             }
             return Task.CompletedTask;
         });
-        _events.AddEvent(ProtocolNumericConstants.RPL_NAMREPLY, (ctx) => // 353
+        _events.AddEvent(ProtocolNumericConstants.RPL_NAMREPLY, (ctx) => // 353 - List of users in a channel
         {
             string channel = ctx.LineParts[4];
             string[] nicks = ctx.Trailing!.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             WeakReferenceMessenger.Default.Send(new ChannelAddNicksMessage(session) { Channel = channel, Nicks = nicks });
             return Task.CompletedTask;
         });
-
-        _events.AddEvent(ProtocolNumericConstants.RPL_CREATED, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_MYINFO, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
 
         // 200 - 299: Trace and Stats Replies
