@@ -30,7 +30,7 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
         });
         _events.AddEvent("TOPIC", (ctx) =>
         {
-            WeakReferenceMessenger.Default.Send(new ChannelTopicChangeMessage(session) { Channel = ctx.Recipient, Topic = ctx.Trailing });
+            WeakReferenceMessenger.Default.Send(new ChannelTopicChangeMessage(session) { Channel = ctx.Recipient, Topic = ctx.Trailing! });
             _echoSvc.Echo(ctx.LineParts[2], $"{ctx.Nick} changed the subject to: {ctx.Trailing}");
             return Task.CompletedTask;
         });

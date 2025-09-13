@@ -158,13 +158,16 @@ public class IrcClient : IIrcClient
 
         // Ensure thread-safe sending
         await _sendSemaphore.WaitAsync().ConfigureAwait(false);
+
         try
         {
-            byte[] messageBytes = Encoding.UTF8.GetBytes(message + "\r\n");
+            if (!message.EndsWith("\r\n")) message += "\r\n";
+
+            byte[] messageBytes = Encoding.UTF8.GetBytes(message);
 #if DEBUG
             Debug.WriteLine($">> {message.TrimEnd()}");
 #endif
-            await _stream.WriteAsync(messageBytes, 0, messageBytes.Length).ConfigureAwait(false);
+            await _stream.WriteAsync(messageBytes).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is IOException || ex is ObjectDisposedException || ex is OperationCanceledException)
         {
@@ -215,7 +218,6 @@ public class IrcClient : IIrcClient
 #if DEBUG
                         Debug.WriteLine($"ReadLoopAsync: OnDataReceivedHandler error - {ex}");
 #endif
-                        // Continue processing other messages even if handler fails
                     }
                 }
             }
@@ -275,10 +277,7 @@ public class IrcClient : IIrcClient
 #endif
         try
         {
-            if (_reader != null)
-            {
-                _reader.Dispose();
-            }
+            _reader?.Dispose();
 
             if (_stream != null)
             {
