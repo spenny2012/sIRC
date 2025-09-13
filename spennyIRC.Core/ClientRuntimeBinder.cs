@@ -57,7 +57,7 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
         events.AddEvent("NICK", (ctx) =>
         {
             if (ctx.Nick == localUser.Nick)
-                localUser.Nick = ctx.Trailing;
+                localUser.Nick = ctx.Trailing!;
             return Task.CompletedTask;
         });
         events.AddEvent("JOIN", (ctx) =>
