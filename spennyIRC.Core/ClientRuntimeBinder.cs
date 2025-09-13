@@ -14,7 +14,7 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
             server.Host = ctx.LineParts[0][1..];
             return Task.CompletedTask;
         });
-        events.AddEvent(ProtocolNumericConstants.RPL_YOURHOST, static async (ctx) => { }); // 002 - Your Host
+        events.AddEvent(ProtocolNumericConstants.RPL_YOURHOST, static (ctx) => { return Task.CompletedTask;  }); // 002 - Your Host
         events.AddEvent(ProtocolNumericConstants.ERR_NICKNAMEINUSE, async (ctx) => // 433 - Nickname in use
         {
             // if not connected, change nick and store new credentials
@@ -71,20 +71,23 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
 
             return Task.CompletedTask;
         });
-        events.AddEvent("PART", async (ctx) =>
+        events.AddEvent("PART", (ctx) =>
         {
             if (ctx.Nick == localUser.Nick)
                 localUser.Channels.Remove(ctx.Recipient.TrimStart(':'));
+            return Task.CompletedTask;
         });
-        events.AddEvent("KICK", async (ctx) =>
+        events.AddEvent("KICK", (ctx) =>
         {
             bool localUserKicked = ctx.LineParts[3] == localUser.Nick;
             if (localUserKicked)
                 localUser.Channels.Remove(ctx.Recipient.TrimStart(':'));
+            return Task.CompletedTask;
         });
-        events.AddEvent("MODE", static async (ctx) =>
+        events.AddEvent("MODE", (ctx) =>
         {
             // TODO: handle modes
+            return Task.CompletedTask;
         });
         events.AddEvent("DISCONNECT", (ctx) =>
         {
