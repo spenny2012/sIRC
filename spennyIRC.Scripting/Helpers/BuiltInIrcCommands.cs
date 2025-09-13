@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace spennyIRC.Scripting.Helpers
 {
-    public static class IrcCommandHelpers
+    public static class BuiltInIrcCommands
     {
         const int DEFAULT_IRC_PORT = 6697;
         public static async Task ConnectServerAsync(string serverInfo, IIrcSession session)

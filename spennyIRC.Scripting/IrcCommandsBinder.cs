@@ -6,32 +6,32 @@ namespace spennyIRC.Scripting
     {
         public void Bind()
         {
-            AddCommand("server", IrcCommandHelpers.ConnectServerAsync);
-            AddCommand("voice", IrcCommandHelpers.VoiceAsync);
-            AddCommand("join", IrcCommandHelpers.JoinAsync);
-            AddCommand("rejoin", IrcCommandHelpers.RejoinAsync);
-            AddCommand("part", IrcCommandHelpers.PartAsync);
-            AddCommand("nick", IrcCommandHelpers.NickAsync);
-            AddCommand("quit", IrcCommandHelpers.QuitAsync);
-            AddCommand("raw", IrcCommandHelpers.RawAsync);
-            AddCommand("mode", IrcCommandHelpers.ModeAsync);
-            AddCommand("msg", IrcCommandHelpers.MsgAsync);
-            AddCommand("say", IrcCommandHelpers.SayAsync);
-            AddCommand("me", IrcCommandHelpers.MeAsync);
-            AddCommand("emote", IrcCommandHelpers.MeAsync);
-            AddCommand("notice", IrcCommandHelpers.NoticeAsync);
-            AddCommand("ctcp", IrcCommandHelpers.CtcpAsync);
-            AddCommand("kick", IrcCommandHelpers.KickAsync);
-            AddCommand("ban", IrcCommandHelpers.BanAsync);
-            AddCommand("unban", IrcCommandHelpers.UnbanAsync);
-            AddCommand("topic", IrcCommandHelpers.TopicAsync);
-            AddCommand("names", IrcCommandHelpers.NamesAsync);
-            AddCommand("list", IrcCommandHelpers.ListAsync);
-            AddCommand("whois", IrcCommandHelpers.WhoisAsync);
-            AddCommand("randnick", IrcCommandHelpers.RandNickAsync);
-            AddCommand("who", IrcCommandHelpers.WhoAsync);
-            AddCommand("session", IrcCommandHelpers.GetSessionInfoAsync);
-            AddCommand("resetinfo", IrcCommandHelpers.ResetInfoAsync);
+            AddCommand("server", BuiltInIrcCommands.ConnectServerAsync);
+            AddCommand("voice", BuiltInIrcCommands.VoiceAsync);
+            AddCommand("join", BuiltInIrcCommands.JoinAsync);
+            AddCommand("rejoin", BuiltInIrcCommands.RejoinAsync);
+            AddCommand("part", BuiltInIrcCommands.PartAsync);
+            AddCommand("nick", BuiltInIrcCommands.NickAsync);
+            AddCommand("quit", BuiltInIrcCommands.QuitAsync);
+            AddCommand("raw", BuiltInIrcCommands.RawAsync);
+            AddCommand("mode", BuiltInIrcCommands.ModeAsync);
+            AddCommand("msg", BuiltInIrcCommands.MsgAsync);
+            AddCommand("say", BuiltInIrcCommands.SayAsync);
+            AddCommand("me", BuiltInIrcCommands.MeAsync);
+            AddCommand("emote", BuiltInIrcCommands.MeAsync);
+            AddCommand("notice", BuiltInIrcCommands.NoticeAsync);
+            AddCommand("ctcp", BuiltInIrcCommands.CtcpAsync);
+            AddCommand("kick", BuiltInIrcCommands.KickAsync);
+            AddCommand("ban", BuiltInIrcCommands.BanAsync);
+            AddCommand("unban", BuiltInIrcCommands.UnbanAsync);
+            AddCommand("topic", BuiltInIrcCommands.TopicAsync);
+            AddCommand("names", BuiltInIrcCommands.NamesAsync);
+            AddCommand("list", BuiltInIrcCommands.ListAsync);
+            AddCommand("whois", BuiltInIrcCommands.WhoisAsync);
+            AddCommand("randnick", BuiltInIrcCommands.RandNickAsync);
+            AddCommand("who", BuiltInIrcCommands.WhoAsync);
+            AddCommand("session", BuiltInIrcCommands.GetSessionInfoAsync);
+            AddCommand("resetinfo", BuiltInIrcCommands.ResetInfoAsync);
         }
     }
 }

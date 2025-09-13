@@ -75,7 +75,7 @@ public partial class App : Application
 #endif
     }
 
-    private void ConfigureServices(IServiceCollection services)
+    private static void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<MainWindowViewModel>();
         services.AddTransient<MainWindow>();
