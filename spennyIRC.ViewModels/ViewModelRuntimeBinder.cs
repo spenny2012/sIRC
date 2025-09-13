@@ -10,45 +10,33 @@ using spennyIRC.ViewModels.Messages.Server;
 
 namespace spennyIRC.ViewModels;
 
-// TODO: rename this
-public class ViewModelRuntimeBinder : IIrcRuntimeBinder
+public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
 {
     private const string StatusWindow = "Status";
     private const string AllWindows = "All";
-
-    private readonly IIrcSession _session;
-    private readonly IIrcLocalUser _user;
-    private readonly IEchoService _echoSvc;
-    private readonly IIrcEvents _events;
-    private readonly IIrcServer _server;
-
-    public ViewModelRuntimeBinder(IIrcSession session)
-    {
-        _session = session;
-        _echoSvc = session.EchoService;
-        _user = session.LocalUser;
-        _events = session.Events;
-        _server = session.Server;
-    }
+    private readonly IIrcLocalUser _user = session.LocalUser;
+    private readonly IEchoService _echoSvc = session.EchoService;
+    private readonly IIrcEvents _events = session.Events;
+    private readonly IIrcServer _server = session.Server;
 
     public void Bind()
     {
         // TODO: add message for disconnect to clear all names from channels
         _events.AddEvent("DISCONNECT", (ctx) =>
         {
-            WeakReferenceMessenger.Default.Send(new ServerDisconnectedMessage(_session));
+            WeakReferenceMessenger.Default.Send(new ServerDisconnectedMessage(session));
             _echoSvc.Echo(AllWindows, $"* Disconnected: {ctx.Line}");
             return Task.CompletedTask;
         });
         _events.AddEvent("TOPIC", (ctx) =>
         {
-            WeakReferenceMessenger.Default.Send(new ChannelTopicChangeMessage(_session) { Channel = ctx.Recipient, Topic = ctx.Trailing });
+            WeakReferenceMessenger.Default.Send(new ChannelTopicChangeMessage(session) { Channel = ctx.Recipient, Topic = ctx.Trailing });
             _echoSvc.Echo(ctx.LineParts[2], $"{ctx.Nick} changed the subject to: {ctx.Trailing}");
             return Task.CompletedTask;
         });
         _events.AddEvent("QUIT", (ctx) =>
         {
-            WeakReferenceMessenger.Default.Send(new UserQuitMessage(_session)
+            WeakReferenceMessenger.Default.Send(new UserQuitMessage(session)
             {
                 Nick = ctx.Nick!,
                 Host = ctx.LineParts[0].ExtractFullHost().ToString(),
@@ -61,17 +49,17 @@ public class ViewModelRuntimeBinder : IIrcRuntimeBinder
             string channel = ctx.Trailing!;
             if (ctx.Nick == _user.Nick)
             {
-                WeakReferenceMessenger.Default.Send(new ChannelAddMessage(_session) { Channel = channel! });
+                WeakReferenceMessenger.Default.Send(new ChannelAddMessage(session) { Channel = channel! });
                 return Task.CompletedTask;
             }
-            WeakReferenceMessenger.Default.Send(new ChannelJoinMessage(_session) { Channel = channel!, Nick = ctx.Nick! });
+            WeakReferenceMessenger.Default.Send(new ChannelJoinMessage(session) { Channel = channel!, Nick = ctx.Nick! });
             _echoSvc.Echo(channel, $"»» {ctx.Nick} ({ctx.LineParts[0].ExtractFullHost()}) joined {channel}");
             return Task.CompletedTask;
         });
         _events.AddEvent("PART", (ctx) =>
         {
             string channel = ctx.Recipient!;
-            WeakReferenceMessenger.Default.Send(new ChannelPartMessage(_session)
+            WeakReferenceMessenger.Default.Send(new ChannelPartMessage(session)
             {
                 Nick = ctx.Nick!,
                 Host = ctx.LineParts[0].ExtractFullHost().ToString(),
@@ -83,7 +71,7 @@ public class ViewModelRuntimeBinder : IIrcRuntimeBinder
         });
         _events.AddEvent("KICK", (ctx) =>
         {
-            WeakReferenceMessenger.Default.Send(new ChannelKickMessage(_session)
+            WeakReferenceMessenger.Default.Send(new ChannelKickMessage(session)
             {
                 Nick = ctx.Nick!,
                 KickedNick = ctx.LineParts[3],
@@ -104,7 +92,7 @@ public class ViewModelRuntimeBinder : IIrcRuntimeBinder
             bool isDm = ctx.Recipient == _user.Nick;
             if (isDm) // handle query
             {
-                WeakReferenceMessenger.Default.Send(new QueryMessage(_session)
+                WeakReferenceMessenger.Default.Send(new QueryMessage(session)
                 {
                     Nick = ctx.Nick!,
                     Message = ctx.Trailing!
@@ -119,7 +107,7 @@ public class ViewModelRuntimeBinder : IIrcRuntimeBinder
             {
                 _echoSvc.Echo(AllWindows, $"*** You are now known as {ctx.Trailing}");
 
-                WeakReferenceMessenger.Default.Send(new LocalUserNickChangeMessage(_session)
+                WeakReferenceMessenger.Default.Send(new LocalUserNickChangeMessage(session)
                 {
                     Nick = ctx.Nick!,
                     NewNick = ctx.Trailing
@@ -141,13 +129,20 @@ public class ViewModelRuntimeBinder : IIrcRuntimeBinder
         _events.AddEvent(ProtocolNumericConstants.RPL_YOURHOST, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_ISUPPORT, (ctx) => // 005
         {
-            WeakReferenceMessenger.Default.Send(new ServerISupportMessage(_session) { });
+            WeakReferenceMessenger.Default.Send(new ServerISupportMessage(session) { });
             _echoSvc.Echo(StatusWindow, $"{ctx.Line.GetTokenFrom(3)}");
             return Task.CompletedTask;
         });
         _events.AddEvent(ProtocolNumericConstants.PROCESSING_REQUEST, (ctx) => // 020
         {
             _echoSvc.Echo(StatusWindow, ctx.Trailing!);
+            return Task.CompletedTask;
+        });
+        _events.AddEvent(ProtocolNumericConstants.RPL_TOPIC, (ctx) => // 332
+        {
+            string channel = ctx.LineParts[3];
+            WeakReferenceMessenger.Default.Send(new ChannelTopicMessage(session) { Channel = channel, Topic = ctx.Trailing! });
+            _echoSvc.Echo(ctx.LineParts[3], $"Topic: {ctx.Trailing}");
             return Task.CompletedTask;
         });
         _events.AddEvent(ProtocolNumericConstants.RPL_TOPICWHOTIME, (ctx) => // 333
@@ -163,24 +158,16 @@ public class ViewModelRuntimeBinder : IIrcRuntimeBinder
             }
             return Task.CompletedTask;
         });
-        _events.AddEvent(ProtocolNumericConstants.RPL_TOPIC, (ctx) => // 332
-        {
-            string channel = ctx.LineParts[3];
-            WeakReferenceMessenger.Default.Send(new ChannelTopicMessage(_session) { Channel = channel, Topic = ctx.Trailing! });
-            _echoSvc.Echo(ctx.LineParts[3], $"Topic: {ctx.Trailing}");
-            return Task.CompletedTask;
-        });
         _events.AddEvent(ProtocolNumericConstants.RPL_NAMREPLY, (ctx) => // 353
         {
             string channel = ctx.LineParts[4];
             string[] nicks = ctx.Trailing!.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            WeakReferenceMessenger.Default.Send(new ChannelAddNicksMessage(_session) { Channel = channel, Nicks = nicks });
+            WeakReferenceMessenger.Default.Send(new ChannelAddNicksMessage(session) { Channel = channel, Nicks = nicks });
             return Task.CompletedTask;
         });
 
         _events.AddEvent(ProtocolNumericConstants.RPL_CREATED, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_MYINFO, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
-
 
         // 200 - 299: Trace and Stats Replies
         _events.AddEvent(ProtocolNumericConstants.RPL_TRACELINK, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
@@ -222,14 +209,14 @@ public class ViewModelRuntimeBinder : IIrcRuntimeBinder
         _events.AddEvent(ProtocolNumericConstants.RPL_ISON, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_UNAWAY, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_NOWAWAY, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISUSER, async (ctx) => _echoSvc.Echo(_session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISSERVER, async (ctx) => _echoSvc.Echo(_session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISOPERATOR, async (ctx) => _echoSvc.Echo(_session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
+        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISUSER, async (ctx) => _echoSvc.Echo(session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
+        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISSERVER, async (ctx) => _echoSvc.Echo(session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
+        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISOPERATOR, async (ctx) => _echoSvc.Echo(session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_WHOWASUSER, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_ENDOFWHO, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISIDLE, async (ctx) => _echoSvc.Echo(_session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.RPL_ENDOFWHOIS, async (ctx) => _echoSvc.Echo(_session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
-        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISCHANNELS, async (ctx) => _echoSvc.Echo(_session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
+        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISIDLE, async (ctx) => _echoSvc.Echo(session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
+        _events.AddEvent(ProtocolNumericConstants.RPL_ENDOFWHOIS, async (ctx) => _echoSvc.Echo(session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
+        _events.AddEvent(ProtocolNumericConstants.RPL_WHOISCHANNELS, async (ctx) => _echoSvc.Echo(session.ActiveWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_LIST, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_LISTEND, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
         _events.AddEvent(ProtocolNumericConstants.RPL_CHANNELMODEIS, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
