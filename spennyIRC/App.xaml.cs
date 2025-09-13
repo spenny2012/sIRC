@@ -10,16 +10,13 @@ using System.Windows;
  * Color windows when new message is added
  * Use reflection for all commands
  * Handle channels after disconnect
- * Add emotes
  * Fix potential bug in PART event in ViewModelRuntimeBinder
  * Come up with an elegant solution for handling the /names bug
  * Finish channel modes & user status modes in ClientRuntimeBinder and InternalAddressList
  * ServerViewModel and other viewmodel object disposal
- * Update nick list during nick changes
- * Add context menus to channels
+ * Add context menus 
  * Cleanup:
         ServerViewModel WeakReferenceManager calls
- * Finish implementingIalEventsBinder
  * Add settings class to project, create UI, and plug it in to instances
  */
 namespace spennyIRC;

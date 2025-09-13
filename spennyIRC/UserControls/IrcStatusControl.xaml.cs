@@ -16,12 +16,6 @@ public partial class IrcStatusControl : UserControl
     {
         InitializeComponent();
         InitializeChatDisplay();
-        PrintIntro();
-    }
-
-    private void PrintIntro()
-    {
-
     }
 
     private void InitializeChatDisplay()

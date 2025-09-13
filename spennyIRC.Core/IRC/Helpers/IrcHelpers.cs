@@ -293,8 +293,7 @@ public static class IrcHelpers
     public static Dictionary<string, string> ExtractNetworkSettingsFrom005(this string line)
     {
         Dictionary<string, string> dictionary = [];
-        const string pattern = @"(\S+)=([^\s]+)";
-        Regex regex = new(pattern);
+        Regex regex = new(@"(\S+)=([^\s]+)");
 
         MatchCollection matches = regex.Matches(line);
         foreach (Match match in matches)
