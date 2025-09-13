@@ -15,18 +15,23 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
             return Task.CompletedTask;
         });
         events.AddEvent(ProtocolNumericConstants.RPL_YOURHOST, static async (ctx) => { }); // 002 - Your Host
-        //events.AddEvent(ProtocolNumericConstants.ERR_NICKNAMEINUSE, (ctx) => // 433 - Nickname in use
-        //{ // TODO: finish implementing
-        //    // if not connected, resend credentials
-        //    //if (server.Connected)
-        //    //{
-        //    //}
-        //    //else // else change nick
-        //    //{
-        //    //    await ctx.IrcClient.SendMessageAsync($"NICK {localUser.Nick2}");
-        //    //}
-        //    return Task.CompletedTask;
-        //});
+        events.AddEvent(ProtocolNumericConstants.ERR_NICKNAMEINUSE, async (ctx) => // 433 - Nickname in use
+        {
+            // if not connected, change nick and store new credentials
+            if (!server.Connected) 
+            {
+                // if nick is already changed to nick2 and is also invalid
+                if (localUser.Nick == localUser.Nick2)
+                {
+                    return;
+                }
+                // update local user nick
+                localUser.Nick = localUser.Nick2;
+                
+                // change nick
+                await ctx.IrcClient.SendMessageAsync($"NICK {localUser.Nick2}");
+            }
+        });
         events.AddEvent(ProtocolNumericConstants.RPL_ISUPPORT, (ctx) => // 005 - I Support
         {
             Dictionary<string, string> settings = ctx.Line.ExtractNetworkSettingsFrom005();

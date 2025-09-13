@@ -33,7 +33,7 @@ public partial class App : Application
 #if DEBUG
         Trace.Listeners.Add(new TextWriterTraceListener($"debug_{DateTime.Now:yyyy-MM-dd}.txt"));
         Trace.AutoFlush = true;
-        Trace.WriteLine($"\r\n[{DateTime.Now.ToLocalTime()}] sIRC started..");
+        Trace.WriteLine($"[{DateTime.Now.ToLocalTime()}] sIRC started..");
 #endif
 
         ServiceCollection serviceCollection = new();
@@ -71,7 +71,7 @@ public partial class App : Application
         MainWindow mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.ShowDialog();
 #if DEBUG
-        Debug.WriteLine("Closing Application");
+        Debug.WriteLine("Closing Application\r\n");
 #endif
     }
 
