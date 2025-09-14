@@ -171,7 +171,6 @@ public static class IrcHelpers
         ReadOnlySpan<char> nickSpan = nick.AsSpan();
 
         int maxLength = nickSpan.Length < 5 ? nickSpan.Length : 5;
-
         for (int i = 0; i < maxLength; i++)
         {
             char currentChar = nickSpan[i];
@@ -209,7 +208,6 @@ public static class IrcHelpers
         // Extract the nick without access prefixes
         string resultNick = accessCount > 0 ? nickSpan[accessCount..].ToString() : nickSpan.ToString();
         IrcChannelAccessType[] resultAccess = accessSpan[..accessCount].ToArray();
-
         return (resultNick, resultAccess);
     }
 

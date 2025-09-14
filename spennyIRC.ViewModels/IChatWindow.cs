@@ -1,4 +1,5 @@
-﻿using spennyIRC.Core.IRC;
+﻿using CommunityToolkit.Mvvm.Input;
+using spennyIRC.Core.IRC;
 using System.Windows.Input;
 
 namespace spennyIRC.ViewModels;
@@ -10,6 +11,6 @@ public interface IChatWindow : IDisposable
     bool IsSelected { get; set; }
     string Text { get; set; }
     IIrcSession Session { get; }
-    ICommand ExecuteCommand { get; }
+    IAsyncRelayCommand ExecuteCommand { get; }
 }
 

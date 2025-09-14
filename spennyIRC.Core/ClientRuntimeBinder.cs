@@ -10,6 +10,7 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
     {
         events.AddEvent(ProtocolNumericConstants.RPL_WELCOME, (ctx) => // 001 - Welcome
         {
+            // :ircnet.hostsailor.com 001 sIK90lR :Welcome to the Internet Relay Network sIK90lR!~atEVT@185.202.221.94
             server.Connected = true;
             server.Host = ctx.LineParts[0][1..];
             return Task.CompletedTask;
@@ -91,12 +92,7 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
         });
         events.AddEvent("DISCONNECT", (ctx) =>
         {
-            server.Network = string.Empty;
-            server.NetworkId = string.Empty;
-            server.Port = string.Empty;
-            server.Host = string.Empty;
-            server.Connected = false;
-            server.Settings.Clear();
+            server.Clear();
             return Task.CompletedTask;
         });
         events.AddEvent("VERSION", static async (ctx) =>

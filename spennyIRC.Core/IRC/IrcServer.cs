@@ -9,4 +9,15 @@ public class IrcServerInfo : IIrcServer
     public bool IsTls { get; set; }
     public bool Connected { get; set; }
     public Dictionary<string, string> Settings { get; set; } = [];
+
+    public void Clear()
+    {
+        Connected = false;
+        IsTls = false;
+        Host = string.Empty;
+        Port = string.Empty;
+        Network = string.Empty;
+        NetworkId = string.Empty;
+        Settings.Clear();
+    }
 }

@@ -1,5 +1,6 @@
 ﻿using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
+using System;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -20,9 +21,13 @@ namespace spennyIRC.Scripting.Helpers
                 session.EchoService.Echo("Status", $"*** Connecting to {serverInfo}...");
 
                 string[]? paramsParts = serverInfo.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                string server = paramsParts![0];
                 if (paramsParts == null || paramsParts.Length < 2)
                 {
-                    await session.ClientManager.ConnectAsync(paramsParts![0], DEFAULT_IRC_PORT, true);
+                    session.Server.Port = $"+{DEFAULT_IRC_PORT}";
+                    session.Server.IsTls = true;
+                    session.Server.Host = server;
+                    await session.ClientManager.ConnectAsync(server, DEFAULT_IRC_PORT, true);
                     return;
                 }
 
@@ -30,6 +35,9 @@ namespace spennyIRC.Scripting.Helpers
                 bool useSsl = specifiedPort.StartsWith('+');
                 if (int.TryParse(useSsl ? specifiedPort[1..] : specifiedPort, out int newPort))
                 {
+                    session.Server.Host = server;
+                    session.Server.Port = specifiedPort;
+                    session.Server.IsTls = useSsl;
                     await session.ClientManager.ConnectAsync(paramsParts[0], newPort, useSsl);
                     return;
                 }
@@ -43,6 +51,7 @@ namespace spennyIRC.Scripting.Helpers
 #if RELEASE
                 session.EchoService.Echo("Status", $"ERROR: {e.Message}");
 #endif
+                session.Server.Clear();
             }
         }
 
@@ -274,7 +283,7 @@ namespace spennyIRC.Scripting.Helpers
             session.LocalUser.Realname = MiscHelpers.GenerateRandomString(10);
 
             session.EchoService.Echo(session.ActiveWindow, $"Reset user info:\r\n Nick: {session.LocalUser.Nick}\r\n Ident: {session.LocalUser.Ident}\r\n Real Name: {session.LocalUser.Realname}");
- 
+
             return Task.CompletedTask;
         }
 

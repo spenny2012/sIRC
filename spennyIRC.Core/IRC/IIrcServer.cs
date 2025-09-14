@@ -9,4 +9,5 @@ public interface IIrcServer
     bool IsTls { get; set; }
     bool Connected { get; set; }
     Dictionary<string, string> Settings { get; set; }
+    void Clear();
 }

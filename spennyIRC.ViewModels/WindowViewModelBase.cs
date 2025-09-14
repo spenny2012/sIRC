@@ -1,4 +1,5 @@
-﻿using spennyIRC.Core.IRC;
+﻿using CommunityToolkit.Mvvm.Input;
+using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
 using spennyIRC.Scripting;
 using System.Windows.Input;
@@ -13,7 +14,7 @@ public abstract class WindowViewModelBase(IIrcSession session, IIrcCommands comm
     private string _text = string.Empty;
     private string _name = string.Empty;
     private string _caption = string.Empty;
-    private ICommand? _executeCommand;
+    private IAsyncRelayCommand? _executeCommand;
     private bool _disposed;
 
     public virtual string Name
@@ -45,7 +46,7 @@ public abstract class WindowViewModelBase(IIrcSession session, IIrcCommands comm
         get => _session;
     }
 
-    public ICommand ExecuteCommand => _executeCommand ??= new RelayCommand(async (s) => { await DoExecuteCommand(); }, (o) => true);
+    public IAsyncRelayCommand ExecuteCommand => _executeCommand ??= new AsyncRelayCommand(DoExecuteCommand);
 
     public void Dispose()
     {
