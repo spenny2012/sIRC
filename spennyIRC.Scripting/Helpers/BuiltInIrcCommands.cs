@@ -16,7 +16,10 @@ namespace spennyIRC.Scripting.Helpers
                 ArgumentException.ThrowIfNullOrWhiteSpace(serverInfo);
 
                 if (session.Server.Connected)
+                {
                     await session.ClientManager.QuitAsync();
+                    await Task.Delay(TimeSpan.FromSeconds(1));
+                }
 
                 session.EchoService.Echo("Status", $"*** Connecting to {serverInfo}...");
 
@@ -113,9 +116,10 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync(parameters);
         }
 
-        public static async Task ModeAsync(string parameters, IIrcSession session)
+        public static Task ModeAsync(string parameters, IIrcSession session)
         {
             // Implement mode command logic here
+            return Task.CompletedTask;
         }
 
         public static async Task MsgAsync(string parameters, IIrcSession session)
@@ -265,7 +269,7 @@ namespace spennyIRC.Scripting.Helpers
 
         }
 
-        public static async Task GetSessionInfoAsync(string parameters, IIrcSession session)
+        public static Task GetSessionInfoAsync(string parameters, IIrcSession session)
         {
             session.EchoService.Echo(session.ActiveWindow, "-");
 
@@ -273,6 +277,8 @@ namespace spennyIRC.Scripting.Helpers
             PrintClassProperties(session.Server, session);
 
             session.EchoService.Echo(session.ActiveWindow, "-");
+
+            return Task.CompletedTask;
         }
 
         public static Task ResetInfoAsync(string parameters, IIrcSession session)
