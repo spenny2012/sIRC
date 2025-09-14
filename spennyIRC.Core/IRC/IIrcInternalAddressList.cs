@@ -34,5 +34,7 @@ public interface IIrcInternalAddressList
     /// Handle quit and notify offline
     /// </summary>
     void RemoveNick(string nick);
+    IIrcUser? FindUserByNick(string nick);
+    IIrcUser? FindUserByHost(string host);
 }
 

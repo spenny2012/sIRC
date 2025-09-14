@@ -2,7 +2,7 @@
 
 namespace spennyIRC.Core.IRC.Helpers;
 
-public static class IrcHelpers
+public static class IrcProtocolHelpers
 {
     //public static string ExtractFullHost(this string line)
     //{

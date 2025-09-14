@@ -1,40 +1,55 @@
-﻿namespace spennyIRC.Core.IRC;
+﻿using spennyIRC.Core.IRC.Helpers;
 
-//TODO: finish implementing this
+namespace spennyIRC.Core.IRC;
+
 public class IrcInternalAddressList : IIrcInternalAddressList
 {
     private static readonly IrcUserFactory _userFactory = new();
-    private Dictionary<string, IIrcUser> Addresses { get; } = [];
+    private Dictionary<string, IIrcUser> Nicks { get; } = [];
+    private Dictionary<string, IIrcUser> Hosts { get; } = [];
 
-    public void Clear() => Addresses.Clear();
-
-    public void InsertUser(IrcExtractedUserInfo user) // Handles notify online
+    public void Clear()
     {
-        if (!Addresses.ContainsKey(user.Nick))
-            Addresses[user.Nick] = _userFactory.CreateUser(user);
+        Nicks.Clear();
+        Hosts.Clear();
+    }
+
+    public void InsertUser(IrcExtractedUserInfo extractedUser) // Handles notify online
+    {
+        IIrcUser user = _userFactory.CreateUser(extractedUser);
+
+        if (!Nicks.ContainsKey(extractedUser.Nick))
+            Nicks[extractedUser.Nick] = user;
+
+        AddHostEntryIfNoneExists(user);
     }
 
     public void UpsertUser(IrcExtractedUserInfo user, string channel) // Handles numeric 352
     {
-        if (Addresses.TryGetValue(user.Nick, out IIrcUser? userInfo))
+        // if nick is found, modify the found entry
+        if (Nicks.TryGetValue(user.Nick, out IIrcUser? foundUser))
         {
             if (user.Ident != null)
-                userInfo.Ident = user.Ident;
+                foundUser.Ident = user.Ident;
 
             if (user.Domain != null)
-                userInfo.Domain = user.Domain;
+                foundUser.Domain = user.Domain;
 
-            if (userInfo.Channels.TryGetValue(channel, out IIrcUserChannel? foundChannel))
+            if (foundUser.Channels.TryGetValue(channel, out IIrcUserChannel? foundChannel))
                 foundChannel.Access = [.. user.Access];
             else
-                userInfo.Channels[channel] = new IrcUserChannel { Access = [.. user.Access] };
+                foundUser.Channels[channel] = new IrcUserChannel { Access = [.. user.Access] };
+
+            AddHostEntryIfNoneExists(foundUser);
         }
+        // no nick was found, create user
         else
         {
             // TODO: check for host entry before creation
             IIrcUser ircUser = _userFactory.CreateUser(user);
             ircUser.Channels[channel] = new IrcUserChannel { Access = [.. user.Access] };
-            Addresses[user.Nick] = ircUser;
+            Nicks[user.Nick] = ircUser;
+            AddHostEntryIfNoneExists(ircUser);
         }
     }
 
@@ -48,7 +63,7 @@ public class IrcInternalAddressList : IIrcInternalAddressList
 
     public void UpsertChannel(string nick, string channel) // Handle join
     {
-        if (Addresses.TryGetValue(nick, out IIrcUser? userInfo))
+        if (Nicks.TryGetValue(nick, out IIrcUser? userInfo))
         {
             if (!userInfo.Channels.TryGetValue(channel, out _))
                 userInfo.Channels[channel] = new IrcUserChannel();
@@ -57,17 +72,17 @@ public class IrcInternalAddressList : IIrcInternalAddressList
                 IIrcUserChannel foundChannel = userInfo.Channels[channel];
                 foundChannel.Access.Clear();
             }
+
+            return;
         }
-        else
-        {
-            IIrcUser ircUser = _userFactory.CreateUser(nick, channel);
-            Addresses[nick] = ircUser;
-        }
+
+        IIrcUser ircUser = _userFactory.CreateUser(nick, channel);
+        Nicks[nick] = ircUser;
     }
 
     public void RemoveChannel(string nick, string channel) // Handle part
     {
-        if (!Addresses.TryGetValue(nick, out IIrcUser? userInfo) || !userInfo.Channels.TryGetValue(channel, out _))
+        if (!Nicks.TryGetValue(nick, out IIrcUser? userInfo) || !userInfo.Channels.TryGetValue(channel, out _))
             return;
 
         userInfo.Channels.Remove(channel);
@@ -75,16 +90,53 @@ public class IrcInternalAddressList : IIrcInternalAddressList
 
     public void ChangeNick(string nick, string newNick) // Handle nick change
     {
-        if (!Addresses.TryGetValue(nick, out IIrcUser? userInfo)) return;
+        if (!Nicks.TryGetValue(nick, out IIrcUser? userInfo)) return;
 
-        Addresses.Remove(nick);
-        Addresses[newNick] = userInfo;
+        Nicks.Remove(nick);
+        userInfo.Nick = nick;
+        Nicks[newNick] = userInfo;
     }
 
     public void RemoveNick(string nick) // Handle quit
     {
-        if (!Addresses.TryGetValue(nick, out IIrcUser? userInfo)) return;
+        if (!Nicks.TryGetValue(nick, out IIrcUser? userInfo)) return;
 
-        Addresses.Remove(nick);
+        Nicks.Remove(nick);
+        RemoveHostEntryIfExists(userInfo);
+    }
+
+    public IIrcUser? FindUserByNick(string nick) => FindBy(Nicks, nick);
+
+    public IIrcUser? FindUserByHost(string host) => FindBy(Hosts, host);
+
+    public IIrcUser[]? QueryIal(string query)
+    {
+        // extract query bits
+
+        // if there's a nick present, bypass all other checks and user Addresses
+        // if no nick but it's a full host without no wildcards, check Hosts
+        // if contains a wildcard, loop through Addresses
+        throw new NotImplementedException();
+    }
+
+    private void AddHostEntryIfNoneExists(IIrcUser user)
+    {
+        string? host = user.GetHost();
+        if (host == null || Hosts.ContainsKey(host)) return;
+        Hosts[host] = user;
+    }
+
+    private void RemoveHostEntryIfExists(IIrcUser user)
+    {
+        string? host = user.GetHost();
+        if (host == null || !Hosts.ContainsKey(host)) return;
+        Hosts.Remove(host);
+    }
+
+    private static IIrcUser? FindBy(Dictionary<string, IIrcUser> collection, string index)
+    {
+        if (!collection.TryGetValue(index, out IIrcUser? found)) return null;
+
+        return found;
     }
 }
