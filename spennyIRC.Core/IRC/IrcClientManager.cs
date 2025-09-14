@@ -3,9 +3,9 @@
 //TODO: 2) Add IIrcSession
 public class IrcClientManager : IIrcClientManager, IDisposable
 {
-    private readonly IIrcLocalUser _user;
     private readonly IIrcClient _ircClient;
     private readonly IIrcEvents _ircClientEvents;
+    private readonly IIrcLocalUser _user;
     private bool isDisposed;
 
     public IrcClientManager(IIrcClient client, IIrcEvents events, IIrcLocalUser user)
@@ -27,6 +27,12 @@ public class IrcClientManager : IIrcClientManager, IDisposable
         await _ircClient.SendMessageAsync($"USER {_user.Ident} * * :{_user.Realname}");
     }
 
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
     public async Task QuitAsync(string quitMsg = "Test")
     {
         ObjectDisposedException.ThrowIf(isDisposed, this);
@@ -35,6 +41,18 @@ public class IrcClientManager : IIrcClientManager, IDisposable
         await _ircClient.DisconnectAsync();
 
         await Task.Delay(TimeSpan.FromSeconds(1));
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!isDisposed)
+        {
+            if (disposing)
+            {
+                _ircClient.Dispose();
+            }
+            isDisposed = true;
+        }
     }
 
     private async Task OnDisconnected(string message)
@@ -56,23 +74,5 @@ public class IrcClientManager : IIrcClientManager, IDisposable
 
         IIrcReceivedContext ircContext = IrcReceivedContextFactory.Create(_ircClient, message, lineParts);
         await _ircClientEvents.TryExecute(ircContext.Event, ircContext);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!isDisposed)
-        {
-            if (disposing)
-            {
-                _ircClient.Dispose();
-            }
-            isDisposed = true;
-        }
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
     }
 }

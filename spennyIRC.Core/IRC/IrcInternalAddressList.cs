@@ -5,14 +5,26 @@ namespace spennyIRC.Core.IRC;
 public class IrcInternalAddressList : IIrcInternalAddressList
 {
     private static readonly IrcUserFactory _userFactory = new();
-    private Dictionary<string, IIrcUser> Nicks { get; } = [];
     private Dictionary<string, IIrcUser> Hosts { get; } = [];
+    private Dictionary<string, IIrcUser> Nicks { get; } = [];
+    public void ChangeNick(string nick, string newNick) // Handle nick change
+    {
+        if (!Nicks.TryGetValue(nick, out IIrcUser? userInfo)) return;
+
+        Nicks.Remove(nick);
+        userInfo.Nick = nick;
+        Nicks[newNick] = userInfo;
+    }
 
     public void Clear()
     {
         Nicks.Clear();
         Hosts.Clear();
     }
+
+    public IIrcUser? FindUserByHost(string host) => FindBy(Hosts, host);
+
+    public IIrcUser? FindUserByNick(string nick) => FindBy(Nicks, nick);
 
     public void InsertUser(IrcExtractedUserInfo extractedUser) // Handles notify online
     {
@@ -22,6 +34,51 @@ public class IrcInternalAddressList : IIrcInternalAddressList
             Nicks[extractedUser.Nick] = user;
 
         AddHostEntryIfNoneExists(user);
+    }
+
+    public IIrcUser[]? QueryIal(string query)
+    {
+        // extract query bits
+
+        // if there's a nick present, bypass all other checks and user Addresses
+        // if no nick but it's a full host without no wildcards, check Hosts
+        // if contains a wildcard, loop through Addresses
+        throw new NotImplementedException();
+    }
+
+    public void RemoveChannel(string nick, string channel) // Handle part
+    {
+        if (!Nicks.TryGetValue(nick, out IIrcUser? userInfo) || !userInfo.Channels.TryGetValue(channel, out _))
+            return;
+
+        userInfo.Channels.Remove(channel);
+    }
+
+    public void RemoveNick(string nick) // Handle quit
+    {
+        if (!Nicks.TryGetValue(nick, out IIrcUser? userInfo)) return;
+
+        Nicks.Remove(nick);
+        RemoveHostEntryIfExists(userInfo);
+    }
+
+    public void UpsertChannel(string nick, string channel) // Handle join
+    {
+        if (Nicks.TryGetValue(nick, out IIrcUser? userInfo))
+        {
+            if (!userInfo.Channels.TryGetValue(channel, out _))
+                userInfo.Channels[channel] = new IrcUserChannel();
+            else
+            {
+                IIrcUserChannel foundChannel = userInfo.Channels[channel];
+                foundChannel.Access.Clear();
+            }
+
+            return;
+        }
+
+        IIrcUser ircUser = _userFactory.CreateUser(nick, channel);
+        Nicks[nick] = ircUser;
     }
 
     public void UpsertUser(IrcExtractedUserInfo user, string channel) // Handles numeric 352
@@ -60,63 +117,11 @@ public class IrcInternalAddressList : IIrcInternalAddressList
             UpsertUser(user, channel);
         }
     }
-
-    public void UpsertChannel(string nick, string channel) // Handle join
+    private static IIrcUser? FindBy(Dictionary<string, IIrcUser> collection, string index)
     {
-        if (Nicks.TryGetValue(nick, out IIrcUser? userInfo))
-        {
-            if (!userInfo.Channels.TryGetValue(channel, out _))
-                userInfo.Channels[channel] = new IrcUserChannel();
-            else
-            {
-                IIrcUserChannel foundChannel = userInfo.Channels[channel];
-                foundChannel.Access.Clear();
-            }
+        if (!collection.TryGetValue(index, out IIrcUser? found)) return null;
 
-            return;
-        }
-
-        IIrcUser ircUser = _userFactory.CreateUser(nick, channel);
-        Nicks[nick] = ircUser;
-    }
-
-    public void RemoveChannel(string nick, string channel) // Handle part
-    {
-        if (!Nicks.TryGetValue(nick, out IIrcUser? userInfo) || !userInfo.Channels.TryGetValue(channel, out _))
-            return;
-
-        userInfo.Channels.Remove(channel);
-    }
-
-    public void ChangeNick(string nick, string newNick) // Handle nick change
-    {
-        if (!Nicks.TryGetValue(nick, out IIrcUser? userInfo)) return;
-
-        Nicks.Remove(nick);
-        userInfo.Nick = nick;
-        Nicks[newNick] = userInfo;
-    }
-
-    public void RemoveNick(string nick) // Handle quit
-    {
-        if (!Nicks.TryGetValue(nick, out IIrcUser? userInfo)) return;
-
-        Nicks.Remove(nick);
-        RemoveHostEntryIfExists(userInfo);
-    }
-
-    public IIrcUser? FindUserByNick(string nick) => FindBy(Nicks, nick);
-
-    public IIrcUser? FindUserByHost(string host) => FindBy(Hosts, host);
-
-    public IIrcUser[]? QueryIal(string query)
-    {
-        // extract query bits
-
-        // if there's a nick present, bypass all other checks and user Addresses
-        // if no nick but it's a full host without no wildcards, check Hosts
-        // if contains a wildcard, loop through Addresses
-        throw new NotImplementedException();
+        return found;
     }
 
     private void AddHostEntryIfNoneExists(IIrcUser user)
@@ -131,12 +136,5 @@ public class IrcInternalAddressList : IIrcInternalAddressList
         string? host = user.GetHost();
         if (host == null || !Hosts.ContainsKey(host)) return;
         Hosts.Remove(host);
-    }
-
-    private static IIrcUser? FindBy(Dictionary<string, IIrcUser> collection, string index)
-    {
-        if (!collection.TryGetValue(index, out IIrcUser? found)) return null;
-
-        return found;
     }
 }

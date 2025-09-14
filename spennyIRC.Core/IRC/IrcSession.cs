@@ -9,11 +9,11 @@ public class IrcSession(IIrcEvents events,
     IEchoService echoService) : IIrcSession
 {
     public string ActiveWindow { get; set; } = "Status";
-    public IIrcEvents Events => events;
     public IIrcClient Client => client;
-    public IIrcServer Server => server;
-    public IIrcLocalUser LocalUser => user;
-    public IIrcInternalAddressList Ial => addressList;
     public IIrcClientManager ClientManager => ircClientManager;
     public IEchoService EchoService => echoService;
+    public IIrcEvents Events => events;
+    public IIrcInternalAddressList Ial => addressList;
+    public IIrcLocalUser LocalUser => user;
+    public IIrcServer Server => server;
 }
