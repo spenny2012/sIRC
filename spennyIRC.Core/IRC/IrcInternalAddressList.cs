@@ -7,6 +7,7 @@ public class IrcInternalAddressList : IIrcInternalAddressList
     private static readonly IrcUserFactory _userFactory = new();
     private Dictionary<string, IIrcUser> Hosts { get; } = [];
     private Dictionary<string, IIrcUser> Nicks { get; } = [];
+
     public void ChangeNick(string nick, string newNick) // Handle nick change
     {
         if (!Nicks.TryGetValue(nick, out IIrcUser? userInfo)) return;
@@ -117,6 +118,7 @@ public class IrcInternalAddressList : IIrcInternalAddressList
             UpsertUser(user, channel);
         }
     }
+    #region private
     private static IIrcUser? FindBy(Dictionary<string, IIrcUser> collection, string index)
     {
         if (!collection.TryGetValue(index, out IIrcUser? found)) return null;
@@ -136,5 +138,6 @@ public class IrcInternalAddressList : IIrcInternalAddressList
         string? host = user.GetHost();
         if (host == null || !Hosts.ContainsKey(host)) return;
         Hosts.Remove(host);
-    }
+    } 
+    #endregion
 }
