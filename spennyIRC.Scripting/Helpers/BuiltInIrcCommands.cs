@@ -17,7 +17,6 @@ namespace spennyIRC.Scripting.Helpers
                 if (session.Server.Connected)
                 {
                     await session.ClientManager.QuitAsync();
-                    await Task.Delay(TimeSpan.FromSeconds(1));
                 }
 
                 session.EchoService.Echo("Status", $"*** Connecting to {serverInfo}...");

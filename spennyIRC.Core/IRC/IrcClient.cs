@@ -108,6 +108,8 @@ public class IrcClient : IIrcClient
             await CleanupConnection().ConfigureAwait(false);
             throw;
         }
+
+        await Task.Delay(TimeSpan.FromSeconds(1));
     }
 
     public async Task DisconnectAsync()

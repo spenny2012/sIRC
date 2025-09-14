@@ -23,8 +23,6 @@ public class IrcClientManager : IIrcClientManager, IDisposable
 
         await _ircClient.ConnectAsync(server, port, useSsl);
 
-        await Task.Delay(TimeSpan.FromSeconds(1));
-
         await _ircClient.SendMessageAsync($"NICK {_user.Nick}");
         await _ircClient.SendMessageAsync($"USER {_user.Ident} * * :{_user.Realname}");
     }
@@ -35,6 +33,8 @@ public class IrcClientManager : IIrcClientManager, IDisposable
 
         await _ircClient.SendMessageAsync($"QUIT :{quitMsg}");
         await _ircClient.DisconnectAsync();
+
+        await Task.Delay(TimeSpan.FromSeconds(1));
     }
 
     private async Task OnDisconnected(string message)
