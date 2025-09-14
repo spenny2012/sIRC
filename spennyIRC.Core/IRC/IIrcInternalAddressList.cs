@@ -11,11 +11,11 @@ public interface IIrcInternalAddressList
     /// </summary>
     void InsertUser(IrcExtractedUserInfo user);
     /// <summary>
-    /// Handle server numeric 352
+    /// Handle server numeric 352 - WHO reply
     /// </summary>
     void UpsertUser(IrcExtractedUserInfo user, string channel);
     /// <summary>
-    /// Handle server numeric 353
+    /// Handle server numeric 353 - List of users in a channel
     /// </summary>
     void UpsertUsers(IrcExtractedUserInfo[] users, string channel);
     /// <summary>

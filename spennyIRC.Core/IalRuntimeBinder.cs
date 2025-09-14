@@ -9,13 +9,13 @@ public class IalRuntimeBinder(IIrcEvents events, IIrcInternalAddressList ial) : 
     {
         events.AddEvent(ProtocolNumericConstants.RPL_MONONLINE, (ctx) => // 730 - Notify online
         {
-            IrcExtractedUserInfo userInfo = ctx.Trailing.ExtractBasicUserInfo();
+            IrcExtractedUserInfo userInfo = ctx.Trailing!.ExtractBasicUserInfo();
             ial.InsertUser(userInfo);
             return Task.CompletedTask;
         });
         events.AddEvent(ProtocolNumericConstants.RPL_MONOFFLINE, (ctx) => // 731 - Notify offline
         {
-            string? nick = ctx.Trailing;
+            string nick = ctx.Trailing!;
             ial.RemoveNick(nick);
             return Task.CompletedTask;
         });
@@ -36,31 +36,29 @@ public class IalRuntimeBinder(IIrcEvents events, IIrcInternalAddressList ial) : 
 
         events.AddEvent(ProtocolNumericConstants.RPL_NAMREPLY, (ctx) => // 353 - Names 
         {
-            IrcExtractedUserInfo[] users = ctx.Trailing.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                                              .Select(x => x.ExtractUserInfoFrom353())
-                                              .ToArray();
+            IrcExtractedUserInfo[] users = [.. ctx.Trailing!.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => x.ExtractUserInfoFrom353())];
             ial.UpsertUsers(users, ctx.LineParts[4]);
             return Task.CompletedTask;
         });
         events.AddEvent("JOIN", (ctx) =>
         {
             IrcExtractedUserInfo info = ctx.LineParts[0][1..].ExtractBasicUserInfo();
-            ial.UpsertChannel(info.Nick, ctx.Trailing);
+            ial.UpsertChannel(info.Nick, ctx.Trailing!);
             return Task.CompletedTask;
         });
         events.AddEvent("PART", (ctx) =>
         {
-            ial.RemoveChannel(ctx.Nick, ctx.Recipient);
+            ial.RemoveChannel(ctx.Nick!, ctx.Recipient);
             return Task.CompletedTask;
         });
         events.AddEvent("NICK", (ctx) =>
         {
-            ial.ChangeNick(ctx.Nick, ctx.Trailing);
+            ial.ChangeNick(ctx.Nick!, ctx.Trailing!);
             return Task.CompletedTask;
         });
         events.AddEvent("KICK", (ctx) =>
         {
-            ial.RemoveChannel(ctx.Nick, ctx.Recipient);
+            ial.RemoveChannel(ctx.Nick!, ctx.Recipient);
             return Task.CompletedTask;
         });
         events.AddEvent("MODE", (ctx) => // TODO: finish this, make this less awful
@@ -86,7 +84,7 @@ public class IalRuntimeBinder(IIrcEvents events, IIrcInternalAddressList ial) : 
         });
         events.AddEvent("QUIT", (ctx) =>
         {
-            ial.RemoveNick(ctx.Nick);
+            ial.RemoveNick(ctx.Nick!);
             return Task.CompletedTask;
         });
         // TODO: Add WHOIS
