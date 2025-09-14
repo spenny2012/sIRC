@@ -1,10 +1,10 @@
-﻿using spennyIRC.Core.IRC.Helpers;
+﻿using spennyIRC.Core.IRC.Constants;
+using spennyIRC.Core.IRC.Helpers;
 
 namespace spennyIRC.Core.IRC;
 
 public static class IrcReceivedContextFactory
 {
-    private const char CTCP_CHAR = '\u0001';
     private const string DISCONNECT = "DISCONNECT";
 
     public static IIrcReceivedContext CreateDisconnect(IIrcClient client, string line)
@@ -22,6 +22,7 @@ public static class IrcReceivedContextFactory
 
     public static IIrcReceivedContext Create(IIrcClient client, string line, string[] lineParts)
     {
+        // create basic context
         IrcReceivedContext ctx = new()
         {
             IrcClient = client,
@@ -31,6 +32,7 @@ public static class IrcReceivedContextFactory
             Recipient = lineParts.Length > 2 ? lineParts[2] : string.Empty
         };
 
+        // check for disconnect
         if (string.Equals(lineParts[0], "ERROR") && string.Equals(lineParts[1], ":Closing Link:"))
         {
             ctx.Event = DISCONNECT; // TODO: parse this out better
@@ -39,17 +41,19 @@ public static class IrcReceivedContextFactory
 
         string trailing = ctx.Trailing = line.ExtractTrailing(2);
 
-        if (int.TryParse(ctx.Event, out _))
+        // check if event is int
+        if (int.TryParse(ctx.Event, out _)) 
             return ctx;
 
         ReadOnlySpan<char> firstPart = lineParts[0].AsSpan();
         int index = firstPart.IndexOf('!');
         ctx.Nick = index == -1 ? firstPart[1..].ToString() : firstPart[1..index].ToString();
 
-        if (ctx.Event == "PRIVMSG" && trailing[..1][0] == CTCP_CHAR)
+        // if is ctcp
+        if (ctx.Event == "PRIVMSG" && trailing[..1][0] == CharacterConstants.CTCP_CHAR)
         {
             string ctcpType = trailing[1..];
-            if (ctcpType[^1..][0] == CTCP_CHAR)
+            if (ctcpType[^1..][0] == CharacterConstants.CTCP_CHAR)
                 ctcpType = ctcpType[..^1];
             ctx.Event = ctcpType;
         }
