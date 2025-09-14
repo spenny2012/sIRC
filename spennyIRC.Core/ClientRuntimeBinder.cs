@@ -92,7 +92,9 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
         });
         events.AddEvent("DISCONNECT", (ctx) =>
         {
+            localUser.Away = false;
             server.Clear();
+
             return Task.CompletedTask;
         });
         events.AddEvent("VERSION", static async (ctx) =>

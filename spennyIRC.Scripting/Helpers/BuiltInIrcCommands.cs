@@ -27,9 +27,9 @@ namespace spennyIRC.Scripting.Helpers
                 string server = paramsParts![0];
                 if (paramsParts == null || paramsParts.Length < 2)
                 {
+                    session.Server.Host = server;
                     session.Server.Port = $"+{DEFAULT_IRC_PORT}";
                     session.Server.IsTls = true;
-                    session.Server.Host = server;
                     await session.ClientManager.ConnectAsync(server, DEFAULT_IRC_PORT, true);
                     return;
                 }
@@ -94,8 +94,8 @@ namespace spennyIRC.Scripting.Helpers
         {
             if (!session.Server.Connected)
             {
-                session.LocalUser.Nick = parameters;
-                session.EchoService.Echo(session.ActiveWindow, $"*** You are now known as {parameters}");
+                string nick = session.LocalUser.Nick = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0];
+                session.EchoService.Echo(session.ActiveWindow, $"*** You are now known as {nick}");
                 return;
             }
 
@@ -186,7 +186,7 @@ namespace spennyIRC.Scripting.Helpers
             }
         }
 
-        public static async Task UnbanAsync(string parameters, IIrcSession session)
+        public static async Task  UnbanAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
 
@@ -272,10 +272,8 @@ namespace spennyIRC.Scripting.Helpers
         public static Task GetSessionInfoAsync(string parameters, IIrcSession session)
         {
             session.EchoService.Echo(session.ActiveWindow, "-");
-
             PrintClassProperties(session.LocalUser, session);
             PrintClassProperties(session.Server, session);
-
             session.EchoService.Echo(session.ActiveWindow, "-");
 
             return Task.CompletedTask;
@@ -287,7 +285,6 @@ namespace spennyIRC.Scripting.Helpers
             session.LocalUser.Nick2 = "s" + MiscHelpers.GenerateRandomString(7);
             session.LocalUser.Ident = MiscHelpers.GenerateRandomString(5);
             session.LocalUser.Realname = MiscHelpers.GenerateRandomString(10);
-
             session.EchoService.Echo(session.ActiveWindow, $"Reset user info:\r\n Nick: {session.LocalUser.Nick}\r\n Ident: {session.LocalUser.Ident}\r\n Real Name: {session.LocalUser.Realname}");
 
             return Task.CompletedTask;
