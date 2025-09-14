@@ -27,6 +27,11 @@ public class ServerViewModel : WindowViewModelBase
         RegisterUISubscriptions();
     }
 
+    ~ServerViewModel()
+    {
+        WeakReferenceMessenger.Default.UnregisterAll(this);
+    }
+
     public ObservableCollection<IChatWindow> Channels // TODO: rename to Windows
     {
         get => _channels;
@@ -248,9 +253,4 @@ public class ServerViewModel : WindowViewModelBase
         return windows.FirstOrDefault(c => c.Name == name);
     }
     #endregion
-
-    ~ServerViewModel()
-    {
-        WeakReferenceMessenger.Default.UnregisterAll(this);
-    }
 }
