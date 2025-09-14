@@ -1,6 +1,5 @@
 ﻿using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
-using System;
 using System.Diagnostics;
 using System.Reflection;
 

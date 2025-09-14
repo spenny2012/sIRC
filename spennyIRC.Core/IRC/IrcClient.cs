@@ -1,12 +1,12 @@
 using System.Diagnostics;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-
+using System.Security.Cryptography.X509Certificates;
 
 namespace spennyIRC.Core.IRC;
-public class IrcClient : IIrcClient
+
+public class IrcClient : IIrcClient 
 {
     private TcpClient? _tcpClient;
     private Stream? _stream;

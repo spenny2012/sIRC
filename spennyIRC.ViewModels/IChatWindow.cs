@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using spennyIRC.Core.IRC;
-using System.Windows.Input;
 
 namespace spennyIRC.ViewModels;
 

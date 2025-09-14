@@ -2,7 +2,6 @@
 using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
 using spennyIRC.Scripting;
-using System.Windows.Input;
 
 namespace spennyIRC.ViewModels;
 

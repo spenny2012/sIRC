@@ -4,7 +4,6 @@ using spennyIRC.Core;
 using spennyIRC.Core.IRC;
 using spennyIRC.Scripting;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 
 namespace spennyIRC.ViewModels;
 
