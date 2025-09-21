@@ -5,8 +5,10 @@ using spennyIRC.Scripting;
 using spennyIRC.ViewModels;
 using System.Diagnostics;
 using System.Windows;
+
 // TODO: 1-
-/* How should scripts deal with different server instances?
+/* Ensure disposal of chanel viewmodel means controls are being disposed too
+ * How should scripts deal with different server instances?
  * Color windows when new message is added
  * Use reflection for all commands
  * Handle channels after disconnect
@@ -14,11 +16,12 @@ using System.Windows;
  * Come up with an elegant solution for handling the /names bug
  * Finish channel modes & user status modes in ClientRuntimeBinder and InternalAddressList
  * ServerViewModel and other viewmodel object disposal
- * Add context menus 
+ * Add context menus
  * Cleanup:
         ServerViewModel WeakReferenceManager calls
  * Add settings class to project, create UI, and plug it in to instances
  */
+
 namespace spennyIRC;
 
 /// <summary>
@@ -47,7 +50,6 @@ public partial class App : Application
 
         DispatcherUnhandledException += App_DispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-
     }
 
     private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

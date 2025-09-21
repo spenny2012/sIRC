@@ -68,15 +68,16 @@ public class ServerViewModel : WindowViewModelBase
 
         WeakReferenceMessenger.Default.Register<QueryMessage>(this, (r, m) =>
         {
-            if (m.Session != _session || FindWindowByName(Channels, m.Nick, out QueryViewModel nickWindow)) return;
+            if (m.Session != _session || FindWindowByName(Channels, m.Nick, out QueryViewModel _)) return;
             ThreadSafeInvoker.InvokeIfNecessary(() => Channels.Add(new QueryViewModel(_session, _commands, m.Nick)));
         });
 
         WeakReferenceMessenger.Default.Register<ServerISupportMessage>(this, (r, m) =>
         {
             if (m.Session != _session) return;
-            if (!string.IsNullOrEmpty(_server.Network))
-                Caption = _server.Network;
+            //if (!string.IsNullOrEmpty(_server.Network))
+            //if (!string.IsNullOrEmpty(_server.Network))
+            Caption = _server.Network;
         });
     }
 

@@ -10,8 +10,8 @@ public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
 {
     protected IIrcCommands _commands;
     protected IIrcSession _session;
+    protected bool _disposed;
     private string _caption = string.Empty;
-    private bool _disposed;
     private IAsyncRelayCommand? _executeCommand;
     private bool _isSelected;
     private string _name = string.Empty;
@@ -57,7 +57,7 @@ public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
         set => SetProperty(ref _text, value);
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         if (_disposed) return;
         _disposed = true;

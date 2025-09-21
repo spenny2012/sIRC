@@ -35,7 +35,6 @@ public partial class IrcChannelControl : UserControl
         Dispatcher.Invoke(() =>
         {
             paragraph.Inlines.Add(new Run(text + Environment.NewLine));
-
             ChatDisplay.ScrollToEnd();
         });
     }
@@ -46,8 +45,8 @@ public partial class IrcChannelControl : UserControl
         {
             if (e.OldValue != null)
             {
-                var vm = (ChannelViewModel)e.OldValue;
-                vm.EchoService.DoEcho -= DoEcho;
+                ChannelViewModel oldVm = (ChannelViewModel)e.OldValue;
+                oldVm.EchoService.DoEcho -= DoEcho;
             }
             return;
         }
@@ -65,11 +64,5 @@ public partial class IrcChannelControl : UserControl
 
     private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
     {
-    }
-
-    private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-    {
-        if (e.IsDown && e.Key == System.Windows.Input.Key.Enter)
-            _vm.ExecuteCommand.Execute(null);
     }
 }

@@ -51,7 +51,7 @@ public partial class IrcQueryControl : UserControl
     {
         if (e.NewValue == null && e.OldValue != null)
         {
-            var vm = (QueryViewModel)e.OldValue;
+            QueryViewModel vm = (QueryViewModel)e.OldValue;
             if (vm.EchoService.DoEcho != null)
                 vm.EchoService.DoEcho -= DoEcho;
         }
