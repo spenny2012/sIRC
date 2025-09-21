@@ -9,34 +9,22 @@ namespace spennyIRC.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    private readonly IServiceProvider _svc;
     private readonly Dictionary<IIrcSession, IServiceScope> _scopes = [];
+    private readonly IServiceProvider _svc;
+    private IChatWindow _activeContent;
+    private IAsyncRelayCommand _addServerCommand;
+    private ObservableCollection<ServerViewModel> _servers = [];
 #if DEBUG
     private string _title = "sIRC (debuging)";
 
 #else
     private string _title = "sIRC";
 #endif
-    private IAsyncRelayCommand _addServerCommand;
-    private IChatWindow _activeContent;
-    private ObservableCollection<ServerViewModel> _servers = [];
 
     public MainWindowViewModel(IServiceProvider svc)
     {
         _svc = svc;
         AddServer();
-    }
-
-    public string Title
-    {
-        get => _title;
-        set => SetProperty(ref _title, value);
-    }
-
-    public ObservableCollection<ServerViewModel> Servers
-    {
-        get => _servers;
-        set => SetProperty(ref _servers, value);
     }
 
     public IChatWindow ActiveContent
@@ -48,11 +36,23 @@ public class MainWindowViewModel : ViewModelBase
 
             value.Session.ActiveWindow = value.Name;
             SetProperty(ref _activeContent, value);
-
         }
     }
 
     public IAsyncRelayCommand AddServerCommand => _addServerCommand ??= new AsyncRelayCommand(AddServer);
+
+    public ObservableCollection<ServerViewModel> Servers
+    {
+        get => _servers;
+        set => SetProperty(ref _servers, value);
+    }
+
+    public string Title
+    {
+        get => _title;
+        set => SetProperty(ref _title, value);
+    }
+
     //public ICommand CloseServerCommand => _addServerCommand ??= new RelayCommand((s) => CloseServer(), (o) => true);
 
     public Task AddServer()
@@ -88,4 +88,3 @@ public class MainWindowViewModel : ViewModelBase
         //_scopes.Add(newSession, scope);
     }
 }
-

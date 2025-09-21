@@ -10,11 +10,11 @@ public class IrcInternalAddressList : IIrcInternalAddressList
 
     public void ChangeNick(string nick, string newNick) // Handle nick change
     {
-        if (!Nicks.TryGetValue(nick, out IIrcUser? userInfo)) return;
+        if (!Nicks.TryGetValue(nick, out IIrcUser? foundUser)) return;
 
         Nicks.Remove(nick);
-        userInfo.Nick = nick;
-        Nicks[newNick] = userInfo;
+        foundUser.Nick = nick;
+        Nicks[newNick] = foundUser;
     }
 
     public void Clear()
@@ -23,18 +23,18 @@ public class IrcInternalAddressList : IIrcInternalAddressList
         Hosts.Clear();
     }
 
-    public IIrcUser? FindUserByHost(string host) => FindBy(Hosts, host);
+    public IIrcUser? FindUserByHost(string host) => FindEntry(Hosts, host);
 
-    public IIrcUser? FindUserByNick(string nick) => FindBy(Nicks, nick);
+    public IIrcUser? FindUserByNick(string nick) => FindEntry(Nicks, nick);
 
     public void InsertUser(IrcExtractedUserInfo extractedUser) // Handles notify online
     {
-        IIrcUser user = _userFactory.CreateUser(extractedUser);
+        IIrcUser newUser = _userFactory.CreateUser(extractedUser);
 
         if (!Nicks.ContainsKey(extractedUser.Nick))
-            Nicks[extractedUser.Nick] = user;
+            Nicks[extractedUser.Nick] = newUser;
 
-        AddHostEntryIfNoneExists(user);
+        AddHostEntryIfNoneExists(newUser);
     }
 
     public IIrcUser[]? QueryIal(string query)
@@ -49,29 +49,29 @@ public class IrcInternalAddressList : IIrcInternalAddressList
 
     public void RemoveChannel(string nick, string channel) // Handle part
     {
-        if (!Nicks.TryGetValue(nick, out IIrcUser? userInfo) || !userInfo.Channels.TryGetValue(channel, out _))
+        if (!Nicks.TryGetValue(nick, out IIrcUser? foundUser) || !foundUser.Channels.TryGetValue(channel, out _))
             return;
 
-        userInfo.Channels.Remove(channel);
+        foundUser.Channels.Remove(channel);
     }
 
     public void RemoveNick(string nick) // Handle quit
     {
-        if (!Nicks.TryGetValue(nick, out IIrcUser? userInfo)) return;
+        if (!Nicks.TryGetValue(nick, out IIrcUser? foundUser)) return;
 
         Nicks.Remove(nick);
-        RemoveHostEntryIfExists(userInfo);
+        RemoveHostEntryIfExists(foundUser);
     }
 
     public void UpsertChannel(string nick, string channel) // Handle join
     {
-        if (Nicks.TryGetValue(nick, out IIrcUser? userInfo))
+        if (Nicks.TryGetValue(nick, out IIrcUser? foundUser))
         {
-            if (!userInfo.Channels.TryGetValue(channel, out _))
-                userInfo.Channels[channel] = new IrcUserChannel();
+            if (!foundUser.Channels.TryGetValue(channel, out _))
+                foundUser.Channels[channel] = new IrcUserChannel();
             else
             {
-                IIrcUserChannel foundChannel = userInfo.Channels[channel];
+                IIrcUserChannel foundChannel = foundUser.Channels[channel];
                 foundChannel.Access.Clear();
             }
 
@@ -104,10 +104,10 @@ public class IrcInternalAddressList : IIrcInternalAddressList
         else
         {
             // TODO: check for host entry before creation
-            IIrcUser ircUser = _userFactory.CreateUser(user);
-            ircUser.Channels[channel] = new IrcUserChannel { Access = [.. user.Access] };
-            Nicks[user.Nick] = ircUser;
-            AddHostEntryIfNoneExists(ircUser);
+            IIrcUser newUser = _userFactory.CreateUser(user);
+            newUser.Channels[channel] = new IrcUserChannel { Access = [.. user.Access] };
+            Nicks[user.Nick] = newUser;
+            AddHostEntryIfNoneExists(newUser);
         }
     }
 
@@ -118,12 +118,12 @@ public class IrcInternalAddressList : IIrcInternalAddressList
             UpsertUser(user, channel);
         }
     }
-    #region private
-    private static IIrcUser? FindBy(Dictionary<string, IIrcUser> collection, string index)
-    {
-        if (!collection.TryGetValue(index, out IIrcUser? found)) return null;
 
-        return found;
+    #region private
+
+    private static IIrcUser? FindEntry(Dictionary<string, IIrcUser> collection, string index)
+    {
+        return !collection.TryGetValue(index, out IIrcUser? found) ? null : found;
     }
 
     private void AddHostEntryIfNoneExists(IIrcUser user)
@@ -138,6 +138,7 @@ public class IrcInternalAddressList : IIrcInternalAddressList
         string? host = user.GetHost();
         if (host == null || !Hosts.ContainsKey(host)) return;
         Hosts.Remove(host);
-    } 
-    #endregion
+    }
+
+    #endregion private
 }

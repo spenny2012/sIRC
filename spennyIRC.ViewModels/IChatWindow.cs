@@ -5,11 +5,11 @@ namespace spennyIRC.ViewModels;
 
 public interface IChatWindow : IDisposable
 {
-    string Name { get; set; }
     string Caption { get; set; }
-    bool IsSelected { get; set; }
-    string Text { get; set; }
-    IIrcSession Session { get; }
+    IAsyncRelayCommand ClearCommand { get; }
     IAsyncRelayCommand ExecuteCommand { get; }
+    bool IsSelected { get; set; }
+    string Name { get; set; }
+    IIrcSession Session { get; }
+    string Text { get; set; }
 }
-

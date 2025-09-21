@@ -8,7 +8,7 @@ using spennyIRC.ViewModels.Messages.LocalUser;
 using spennyIRC.ViewModels.Messages.Server;
 using System.Collections.ObjectModel;
 
-// TODO: properly handle the disposing of ServerViewModel and other classes 
+// TODO: properly handle the disposing of ServerViewModel and other classes
 namespace spennyIRC.ViewModels;
 
 public class ServerViewModel : WindowViewModelBase
@@ -49,6 +49,7 @@ public class ServerViewModel : WindowViewModelBase
     }
 
     #region UI Subscriptions
+
     private void RegisterUISubscriptions() // TODO: Reconsider threadsafe invoker
     {
         WeakReferenceMessenger.Default.Register<ChannelJoinMessage>(this, (r, m) =>
@@ -232,10 +233,12 @@ public class ServerViewModel : WindowViewModelBase
                 }
             }
         });
-    } 
-    #endregion
+    }
+
+    #endregion UI Subscriptions
 
     #region Helper
+
     private static bool FindWindowByName<T>(ObservableCollection<IChatWindow> windows, string name, out T value)
         where T : IChatWindow
     {
@@ -252,5 +255,6 @@ public class ServerViewModel : WindowViewModelBase
     {
         return windows.FirstOrDefault(c => c.Name == name);
     }
-    #endregion
+
+    #endregion Helper
 }

@@ -7,6 +7,7 @@ public class IrcClientManager : IIrcClientManager, IDisposable
     private readonly IIrcEvents _ircClientEvents;
     private readonly IIrcLocalUser _user;
     private bool isDisposed;
+    private IIrcSession? _session;
 
     public IrcClientManager(IIrcClient client, IIrcEvents events, IIrcLocalUser user)
     {
@@ -20,9 +21,7 @@ public class IrcClientManager : IIrcClientManager, IDisposable
     public async Task ConnectAsync(string server, int port, bool useSsl = false)
     {
         ObjectDisposedException.ThrowIf(isDisposed, this);
-
         await _ircClient.ConnectAsync(server, port, useSsl);
-
         await _ircClient.SendMessageAsync($"NICK {_user.Nick}");
         await _ircClient.SendMessageAsync($"USER {_user.Ident} * * :{_user.Realname}");
     }
@@ -36,11 +35,14 @@ public class IrcClientManager : IIrcClientManager, IDisposable
     public async Task QuitAsync(string quitMsg = "Test")
     {
         ObjectDisposedException.ThrowIf(isDisposed, this);
-
         await _ircClient.SendMessageAsync($"QUIT :{quitMsg}");
         await _ircClient.DisconnectAsync();
-
         await Task.Delay(TimeSpan.FromSeconds(1));
+    }
+
+    public void SetSession(IIrcSession session)
+    {
+        _session = session;
     }
 
     protected virtual void Dispose(bool disposing)

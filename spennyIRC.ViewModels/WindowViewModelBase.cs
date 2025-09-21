@@ -7,20 +7,14 @@ namespace spennyIRC.ViewModels;
 
 public abstract class WindowViewModelBase(IIrcSession session, IIrcCommands commands) : ViewModelBase, IChatWindow
 {
-    protected IIrcSession _session = session;
     protected IIrcCommands _commands = commands;
-    private bool _isSelected;
-    private string _text = string.Empty;
-    private string _name = string.Empty;
+    protected IIrcSession _session = session;
     private string _caption = string.Empty;
-    private IAsyncRelayCommand? _executeCommand;
     private bool _disposed;
-
-    public virtual string Name
-    {
-        get => _name;
-        set => SetProperty(ref _name, value);
-    }
+    private IAsyncRelayCommand? _executeCommand;
+    private bool _isSelected;
+    private string _name = string.Empty;
+    private string _text = string.Empty;
 
     public virtual string Caption
     {
@@ -28,10 +22,25 @@ public abstract class WindowViewModelBase(IIrcSession session, IIrcCommands comm
         set => SetProperty(ref _caption, value);
     }
 
+    public IAsyncRelayCommand ClearCommand => throw new NotImplementedException();
+
+    public IAsyncRelayCommand ExecuteCommand => _executeCommand ??= new AsyncRelayCommand(DoExecuteCommand);
+
     public virtual bool IsSelected
     {
         get => _isSelected;
         set => SetProperty(ref _isSelected, value);
+    }
+
+    public virtual string Name
+    {
+        get => _name;
+        set => SetProperty(ref _name, value);
+    }
+
+    public virtual IIrcSession Session
+    {
+        get => _session;
     }
 
     public virtual string Text
@@ -40,19 +49,10 @@ public abstract class WindowViewModelBase(IIrcSession session, IIrcCommands comm
         set => SetProperty(ref _text, value);
     }
 
-    public virtual IIrcSession Session
-    {
-        get => _session;
-    }
-
-    public IAsyncRelayCommand ExecuteCommand => _executeCommand ??= new AsyncRelayCommand(DoExecuteCommand);
-
     public void Dispose()
     {
         if (_disposed) return;
-
         _disposed = true;
-
         GC.SuppressFinalize(this);
     }
 
