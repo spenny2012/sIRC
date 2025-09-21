@@ -1,7 +1,13 @@
-﻿using spennyIRC.Core.IRC;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using spennyIRC.Core.IRC;
 using spennyIRC.Scripting;
 using spennyIRC.ViewModels.Helpers;
+using spennyIRC.ViewModels.Messages;
+using spennyIRC.ViewModels.Messages.Channel;
+using spennyIRC.ViewModels.Messages.LocalUser;
+using spennyIRC.ViewModels.Messages.Server;
 using System.Collections.ObjectModel;
+using System.Threading.Channels;
 
 namespace spennyIRC.ViewModels;
 
@@ -17,8 +23,7 @@ public class ChannelViewModel : WindowViewModelBase
     public ChannelViewModel(IIrcSession session, IIrcCommands commands, string channel) : base(session, commands)
     {
         _echoSvc = session.EchoService;
-        Name = channel;
-        Channel = Caption = channel;
+        Name = Channel = Caption = channel;
     }
 
     public string Channel
@@ -49,6 +54,83 @@ public class ChannelViewModel : WindowViewModelBase
     {
         get { return _nickList; }
         set => SetProperty(ref _nickList, value);
+    }
+
+    protected override void RegisterUISubscriptions()
+    {
+        WeakReferenceMessenger.Default.Register<ServerDisconnectedMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session) return;
+            ThreadSafeInvoker.InvokeIfNecessary(() => NickList.Clear());
+        });
+
+        WeakReferenceMessenger.Default.Register<ChannelKickMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session || m.Channel != Channel) return;
+            if (m.KickedNick == _session.LocalUser.Nick)
+            {
+                ThreadSafeInvoker.InvokeIfNecessary(() => NickList.Clear());
+            }
+        });
+
+        WeakReferenceMessenger.Default.Register<ChannelJoinMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session || m.Channel != Channel) return;
+            ThreadSafeInvoker.InvokeIfNecessary(() =>
+            {
+                NickList.Add(m.Nick);
+                SortNickList();
+            });
+        });
+
+        WeakReferenceMessenger.Default.Register<ChannelTopicChangeMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session || m.Channel != Channel) return;
+            ThreadSafeInvoker.InvokeIfNecessary(() => ChannelTopic = m.Topic);
+        });
+
+        WeakReferenceMessenger.Default.Register<ChannelTopicMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session || m.Channel != Channel) return;
+            ThreadSafeInvoker.InvokeIfNecessary(() => ChannelTopic = m.Topic);
+        });
+
+        WeakReferenceMessenger.Default.Register<ChannelAddNicksMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session || m.Channel != Channel) return;
+            ThreadSafeInvoker.InvokeIfNecessary(() =>
+            {
+                for (int i = 0; i < m.Nicks.Length; i++)
+                {
+                    string nick = m.Nicks[i];
+                    NickList.Add(nick);
+                }
+                SortNickList();
+            });
+        });
+
+        WeakReferenceMessenger.Default.Register<ChannelPartMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session || m.Channel != Channel) return;
+            string? foundNick = FindNick(m.Nick);
+            if (foundNick == null) return;
+            ThreadSafeInvoker.InvokeIfNecessary(() => NickList.Remove(foundNick));
+        });
+
+        WeakReferenceMessenger.Default.Register<UserQuitMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session) return;
+            string? foundNick = FindNick(m.Nick);
+            if (foundNick == null) return;
+            ThreadSafeInvoker.InvokeIfNecessary(() => NickList.Remove(foundNick));
+            _session.EchoService.Echo(Channel, $"»» {m.Nick} ({m.Host}) has quit IRC ({m.Message})");
+        });
+
+        WeakReferenceMessenger.Default.Register<LocalUserNickChangeMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session || FindNick(m.Nick) == null) return;
+            ThreadSafeInvoker.InvokeIfNecessary(() => ChangeNick(m.Nick, m.NewNick));
+        });
     }
 
     /// <summary>
@@ -99,26 +181,5 @@ public class ChannelViewModel : WindowViewModelBase
         }
     }
 
-    public void SortNickList()
-    {
-        NickList.UserAccessSort();
-    }
+    public void SortNickList() => NickList.UserAccessSort();
 }
-//public string? FindNick(string nick)
-//{
-//    for (int i = 0; i < NickList.Count; i++)
-//    {
-//        string currentNick = NickList[i];
-//        if (channelStatusChars.Contains(currentNick[0]))
-//        {
-//            currentNick = currentNick[1..];
-//        }
-
-//        if (nick.Equals(currentNick))
-//        {
-//            return NickList[i];
-//        }
-//    }
-
-//    return null;
-//}

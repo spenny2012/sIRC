@@ -1,20 +1,28 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
 using spennyIRC.Scripting;
 
 namespace spennyIRC.ViewModels;
 
-public abstract class WindowViewModelBase(IIrcSession session, IIrcCommands commands) : ViewModelBase, IChatWindow
+public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
 {
-    protected IIrcCommands _commands = commands;
-    protected IIrcSession _session = session;
+    protected IIrcCommands _commands;
+    protected IIrcSession _session;
     private string _caption = string.Empty;
     private bool _disposed;
     private IAsyncRelayCommand? _executeCommand;
     private bool _isSelected;
     private string _name = string.Empty;
     private string _text = string.Empty;
+
+    public WindowViewModelBase(IIrcSession session, IIrcCommands commands)
+    {
+        _commands = commands;
+        _session = session;
+        RegisterUISubscriptions();
+    }
 
     public virtual string Caption
     {
@@ -53,8 +61,12 @@ public abstract class WindowViewModelBase(IIrcSession session, IIrcCommands comm
     {
         if (_disposed) return;
         _disposed = true;
+        WeakReferenceMessenger.Default.UnregisterAll(this);
         GC.SuppressFinalize(this);
     }
+
+    protected virtual void RegisterUISubscriptions()
+    { }
 
     private async Task DoExecuteCommand()
     {

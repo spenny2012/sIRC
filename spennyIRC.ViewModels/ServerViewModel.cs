@@ -23,13 +23,6 @@ public class ServerViewModel : WindowViewModelBase
         _user = session.LocalUser;
         Name = "Status";
         Caption = "(No Network)";
-
-        RegisterUISubscriptions();
-    }
-
-    ~ServerViewModel()
-    {
-        WeakReferenceMessenger.Default.UnregisterAll(this);
     }
 
     public ObservableCollection<IChatWindow> Channels // TODO: rename to Windows
@@ -38,50 +31,22 @@ public class ServerViewModel : WindowViewModelBase
         set => SetProperty(ref _channels, value);
     }
 
-    public void CloseWindow(string name)
-    {
-        IChatWindow? window = FindWindowByName(_channels, name);
-        if (window == null) return;
-
-        Channels.Remove(window);
-
-        window.Dispose();
-    }
-
     #region UI Subscriptions
 
-    private void RegisterUISubscriptions() // TODO: Reconsider threadsafe invoker
+    protected override void RegisterUISubscriptions() // TODO: Reconsider threadsafe invoker
     {
-        WeakReferenceMessenger.Default.Register<ChannelJoinMessage>(this, (r, m) =>
-        {
-            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() =>
-            {
-                channel.NickList.Add(m.Nick);
-                channel.SortNickList();
-            });
-        });
-
         WeakReferenceMessenger.Default.Register<ChannelPartMessage>(this, (r, m) =>
         {
-            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) return;
+            if (m.Session != _session) return;
             if (m.Nick == _user.Nick)
             {
+                if (!FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) return;
                 ThreadSafeInvoker.InvokeIfNecessary(() =>
                 {
                     Channels.Remove(channel);
+                    channel.Dispose();
                 });
-                return;
             }
-
-            string? foundNick = channel.FindNick(m.Nick);
-
-            if (foundNick == null) return;
-
-            ThreadSafeInvoker.InvokeIfNecessary(() =>
-            {
-                channel.NickList.Remove(foundNick);
-            });
         });
 
         WeakReferenceMessenger.Default.Register<ChannelAddMessage>(this, (r, m) =>
@@ -102,91 +67,17 @@ public class ServerViewModel : WindowViewModelBase
             });
         });
 
-        WeakReferenceMessenger.Default.Register<ChannelAddNicksMessage>(this, (r, m) =>
-        {
-            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() =>
-            {
-                for (int i = 0; i < m.Nicks.Length; i++)
-                {
-                    string nick = m.Nicks[i];
-                    channel.NickList.Add(nick);
-                }
-
-                channel.SortNickList();
-            });
-        });
-
-        WeakReferenceMessenger.Default.Register<ChannelTopicMessage>(this, (r, m) =>
-        {
-            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() =>
-            {
-                channel.ChannelTopic = m.Topic;
-            });
-        });
-
         WeakReferenceMessenger.Default.Register<ServerDisconnectedMessage>(this, (r, m) =>
         {
             if (m.Session != _session) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() =>
-            {
-                for (int i = 0; i < Channels.Count; i++)
-                {
-                    IChatWindow? channel = Channels[i];
-                    if (channel is ChannelViewModel cvm)
-                        cvm.NickList.Clear();
-                }
-                Caption = "(No Network)";
-            });
-        });
-
-        WeakReferenceMessenger.Default.Register<UserQuitMessage>(this, (r, m) =>
-        {
-            if (m.Session != _session) return;
-
-            for (int i = 0; i < Channels.Count; i++)
-            {
-                IChatWindow channel = Channels[i]; // TODO: find a better way to do this
-                if (channel is ChannelViewModel cvm)
-                {
-                    string? foundNick = cvm.FindNick(m.Nick);
-
-                    if (foundNick == null) continue;
-
-                    ThreadSafeInvoker.InvokeIfNecessary(() =>
-                    {
-                        cvm.NickList.Remove(foundNick);
-                    });
-
-                    cvm.EchoService.Echo(cvm.Channel, $"»» {m.Nick} ({m.Host}) has quit IRC ({m.Message})");
-                }
-                else if (channel is QueryViewModel qvm && m.Nick == qvm.Name)
-                {
-                    qvm.EchoService.Echo(qvm.Name, $"»» {m.Nick} ({m.Host}) has quit IRC ({m.Message})");
-                }
-            }
-        });
-
-        WeakReferenceMessenger.Default.Register<ChannelTopicChangeMessage>(this, (r, m) =>
-        {
-            if (m.Session != _session || !FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() =>
-            {
-                channel.ChannelTopic = m.Topic;
-            });
+            ThreadSafeInvoker.InvokeIfNecessary(() => Caption = "(No Network)");
         });
 
         WeakReferenceMessenger.Default.Register<QueryMessage>(this, (r, m) =>
         {
             if (m.Session != _session) return;
             if (!FindWindowByName(Channels, m.Nick, out QueryViewModel nickWindow))
-            {
-                ThreadSafeInvoker.InvokeIfNecessary(() =>
-                {
-                    Channels.Add(new QueryViewModel(_session, _commands, m.Nick));
-                });
-            }
+                ThreadSafeInvoker.InvokeIfNecessary(() => Channels.Add(new QueryViewModel(_session, _commands, m.Nick)));
         });
 
         WeakReferenceMessenger.Default.Register<ServerISupportMessage>(this, (r, m) =>
@@ -194,44 +85,6 @@ public class ServerViewModel : WindowViewModelBase
             if (m.Session != _session) return;
             if (!string.IsNullOrEmpty(_server.Network))
                 Caption = _server.Network;
-        });
-
-        WeakReferenceMessenger.Default.Register<ChannelKickMessage>(this, (r, m) =>
-        {
-            if (m.Session != _session) return;
-            if (m.KickedNick == _user.Nick)
-            {
-                if (FindWindowByName(Channels, m.Channel, out ChannelViewModel channel))
-                {
-                    ThreadSafeInvoker.InvokeIfNecessary(() =>
-                    {
-                        channel.NickList.Clear();
-                    });
-                }
-            }
-        });
-        WeakReferenceMessenger.Default.Register<LocalUserNickChangeMessage>(this, (r, m) =>
-        {
-            if (m.Session != _session) return;
-
-            for (int i = 0; i < Channels.Count; i++)
-            {
-                IChatWindow channel = Channels[i];
-                if (channel is ChannelViewModel cvm)
-                {
-                    ThreadSafeInvoker.InvokeIfNecessary(() =>
-                    {
-                        cvm.ChangeNick(m.Nick, m.NewNick);
-                    });
-                }
-                else if (channel is QueryViewModel qvm && m.Nick == qvm.Name)
-                {
-                    ThreadSafeInvoker.InvokeIfNecessary(() =>
-                    {
-                        qvm.Name = qvm.Caption = m.NewNick;
-                    });
-                }
-            }
         });
     }
 
@@ -249,11 +102,6 @@ public class ServerViewModel : WindowViewModelBase
             return true;
         }
         return false;
-    }
-
-    private static IChatWindow? FindWindowByName(ObservableCollection<IChatWindow> windows, string name)
-    {
-        return windows.FirstOrDefault(c => c.Name == name);
     }
 
     #endregion Helper
