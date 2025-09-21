@@ -14,6 +14,7 @@ namespace spennyIRC.ViewModels;
 public class ChannelViewModel : WindowViewModelBase
 {
     private static readonly char[] channelStatusChars = ['~', '&', '@', '%', '+'];
+    private static readonly HashSet<char> statusCharsSet = new(channelStatusChars);
     private string _channelTopic = string.Empty;
     private string _channel = string.Empty;
     private ObservableCollection<string> _nickList = [];
@@ -152,33 +153,36 @@ public class ChannelViewModel : WindowViewModelBase
         return null;
     }
 
-    /// <summary>
-    /// Change a nick in the nick list, ignoring all status chars
-    /// </summary>
-    public void ChangeNick(string oldNick, string newNick)
+    private void ChangeNick(string oldNick, string newNick)
     {
-        int index = NickList.IndexOf(oldNick);
-        if (index == -1)
+        for (int i = 0; i < NickList.Count; i++)
         {
-            for (int i = 0; i < NickList.Count; i++)
+            string current = NickList[i];
+
+            if (current == oldNick)
             {
-                string currentNick = NickList[i].TrimStart(channelStatusChars);
-                if (oldNick.TrimStart(channelStatusChars).Equals(currentNick))
-                {
-                    index = i;
-                    break;
-                }
+                UpdateNickAtIndex(i, current, newNick);
+                return;
+            }
+
+            string currentTrimmed = current.TrimStart(channelStatusChars);
+            if (currentTrimmed == oldNick)
+            {
+                UpdateNickAtIndex(i, current, newNick);
+                return;
             }
         }
+    }
 
-        if (index != -1)
-        {
-            string statusChar = channelStatusChars.Contains(NickList[index][0])
-                ? NickList[index][0].ToString()
-                : string.Empty;
-            NickList[index] = statusChar + newNick.TrimStart(channelStatusChars);
-            SortNickList();
-        }
+    private void UpdateNickAtIndex(int index, string oldNick, string newNick)
+    {
+        string updatedNick = statusCharsSet.Contains(oldNick[0])
+            ? oldNick[0] + newNick
+            : newNick;
+
+        NickList[index] = updatedNick;
+
+        SortNickList();
     }
 
     public void SortNickList() => NickList.UserAccessSort();

@@ -37,10 +37,10 @@ public class QueryViewModel : WindowViewModelBase
             ThreadSafeInvoker.InvokeIfNecessary(() => Name = Caption = m.NewNick);
         });
 
-        WeakReferenceMessenger.Default.Register<UserQuitMessage>(this, (r, m) =>
-        {
-            if (m.Session != _session || m.Nick != Name) return;
-            _session.EchoService.Echo(Name, $"»» {m.Nick} ({m.Host}) has quit IRC ({m.Message})");
-        });
+        //WeakReferenceMessenger.Default.Register<UserQuitMessage>(this, (r, m) =>
+        //{
+        //    if (m.Session != _session || m.Nick != Name) return;
+        //    _session.EchoService.Echo(Name, $"»» {m.Nick} ({m.Host}) has quit IRC ({m.Message})");
+        //});
     }
 }

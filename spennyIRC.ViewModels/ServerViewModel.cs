@@ -14,13 +14,13 @@ namespace spennyIRC.ViewModels;
 public class ServerViewModel : WindowViewModelBase
 {
     private readonly IIrcServer _server;
-    private readonly IIrcLocalUser _user;
+    private readonly IIrcLocalUser _localUser;
     private ObservableCollection<IChatWindow> _channels = [];
 
     public ServerViewModel(IIrcSession session, IIrcCommands commands) : base(session, commands)
     {
         _server = session.Server;
-        _user = session.LocalUser;
+        _localUser = session.LocalUser;
         Name = "Status";
         Caption = "(No Network)";
     }
@@ -37,16 +37,14 @@ public class ServerViewModel : WindowViewModelBase
     {
         WeakReferenceMessenger.Default.Register<ChannelPartMessage>(this, (r, m) =>
         {
-            if (m.Session != _session) return;
-            if (m.Nick == _user.Nick)
+            if (m.Session != _session || m.Nick != _localUser.Nick || !FindWindowByName(Channels, m.Channel, out ChannelViewModel channel))
+                return;
+
+            ThreadSafeInvoker.InvokeIfNecessary(() =>
             {
-                if (!FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) return;
-                ThreadSafeInvoker.InvokeIfNecessary(() =>
-                {
-                    Channels.Remove(channel);
-                    channel.Dispose();
-                });
-            }
+                Channels.Remove(channel);
+                channel.Dispose();
+            });
         });
 
         WeakReferenceMessenger.Default.Register<ChannelAddMessage>(this, (r, m) =>
@@ -75,9 +73,8 @@ public class ServerViewModel : WindowViewModelBase
 
         WeakReferenceMessenger.Default.Register<QueryMessage>(this, (r, m) =>
         {
-            if (m.Session != _session) return;
-            if (!FindWindowByName(Channels, m.Nick, out QueryViewModel nickWindow))
-                ThreadSafeInvoker.InvokeIfNecessary(() => Channels.Add(new QueryViewModel(_session, _commands, m.Nick)));
+            if (m.Session != _session || FindWindowByName(Channels, m.Nick, out QueryViewModel nickWindow)) return;
+            ThreadSafeInvoker.InvokeIfNecessary(() => Channels.Add(new QueryViewModel(_session, _commands, m.Nick)));
         });
 
         WeakReferenceMessenger.Default.Register<ServerISupportMessage>(this, (r, m) =>
