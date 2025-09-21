@@ -30,10 +30,7 @@ public class IrcContentControl : ContentControl
         presenter?.UpdateContent();
     }
 
-    private void CachingContentPresenter_Loaded(object sender, RoutedEventArgs e)
-    {
-        UpdateContent();
-    }
+    private void CachingContentPresenter_Loaded(object sender, RoutedEventArgs e) => UpdateContent();
 
     private void UpdateContent()
     {
@@ -46,12 +43,8 @@ public class IrcContentControl : ContentControl
         IChatWindow key = (IChatWindow)CacheKey;
 
         if (IrcContentControlCache.Cache.TryGetValue(key, out UserControl? cachedContent))
-        {
             Content = cachedContent;
-        }
         else
-        {
             Content = IrcContentControlCache.AddControlAndKey(key);
-        }
     }
 }

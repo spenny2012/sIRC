@@ -143,13 +143,9 @@ public class ChannelViewModel : WindowViewModelBase
         {
             string currentNick = NickList[i];
             if (channelStatusChars.Contains(currentNick[0]) && currentNick.TrimStart(channelStatusChars).Equals(nick))
-            {
                 return currentNick;
-            }
             else if (currentNick.Equals(nick))
-            {
                 return currentNick;
-            }
         }
 
         return null;
@@ -160,7 +156,6 @@ public class ChannelViewModel : WindowViewModelBase
         for (int i = 0; i < NickList.Count; i++)
         {
             string current = NickList[i];
-
             if (current == oldNick)
             {
                 UpdateNickAtIndex(i, current, newNick);

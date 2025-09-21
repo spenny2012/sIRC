@@ -159,7 +159,7 @@ namespace spennyIRC.Scripting.Helpers
         {
             if (!IsConnected(session)) return;
 
-            await session.Client.SendMessageAsync($"PRIVMSG {session.ActiveWindow} :\u0001ACTION {parameters}");
+            await session.Client.SendMessageAsync($"PRIVMSG {session.ActiveWindow} :\u0001ACTION {parameters}\u0001");
             session.EchoService.Echo(session.ActiveWindow, $"* {session.LocalUser.Nick} {parameters}");
         }
 
