@@ -11,6 +11,7 @@ public partial class IrcQueryControl : UserControl
 {
     private QueryViewModel _vm;
     private Paragraph paragraph;
+
     public IrcQueryControl()
     {
         InitializeComponent();
@@ -26,13 +27,15 @@ public partial class IrcQueryControl : UserControl
 
     private void RegisterEcho()
     {
-        _vm.EchoService.DoEcho += (window, txt) =>
+        _vm.EchoService.DoEcho += DoEcho;
+    }
+
+    private void DoEcho(string window, string text)
+    {
+        if (window == _vm.Name || window == "All")
         {
-            if (window == _vm.Name || window == "All")
-            {
-                WriteLine(txt);
-            }
-        };
+            WriteLine(text);
+        }
     }
 
     public void WriteLine(string text)
@@ -46,11 +49,11 @@ public partial class IrcQueryControl : UserControl
 
     private void UserControl_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
     {
-        if (DataContext == null)
+        if (e.NewValue == null && e.OldValue != null)
         {
-            // Unbind
-
-            return;
+            var vm = (QueryViewModel)e.OldValue;
+            if (vm.EchoService.DoEcho != null)
+                vm.EchoService.DoEcho -= DoEcho;
         }
 
         _vm = (QueryViewModel)DataContext;

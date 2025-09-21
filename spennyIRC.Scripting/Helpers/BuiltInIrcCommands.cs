@@ -7,7 +7,8 @@ namespace spennyIRC.Scripting.Helpers
 {
     public static class BuiltInIrcCommands
     {
-        const int DEFAULT_IRC_PORT = 6697;
+        private const int DEFAULT_IRC_PORT = 6697;
+
         public static async Task BanAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -105,10 +106,15 @@ namespace spennyIRC.Scripting.Helpers
             return Task.CompletedTask;
         }
 
+        //public static Task PartAllChannelsAsync(string parameters, IIrcSession session)
+        //{
+        //    session.Client.SendMessageAsync("JOIN #0,0");
+        //    return Task.CompletedTask;
+        //}
+
         public static async Task IalLookupAsync(string parameters, IIrcSession session)
         {
             IIrcInternalAddressList ial = session.Ial;
-
         }
 
         public static bool IsConnected(IIrcSession session)
@@ -312,6 +318,7 @@ namespace spennyIRC.Scripting.Helpers
             string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             await session.Client.SendMessageAsync($"MODE {paramParts[0]} +v {paramParts[1]}");
         }
+
         public static async Task WhoAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;

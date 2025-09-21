@@ -31,7 +31,7 @@ public static class ViewModelHelpers
     }
     public static void ComparisonSort<T>(this ObservableCollection<T> collection, Comparison<T> comparison)
     {
-        List<T> sortedList = new(collection);
+        List<T> sortedList = [.. collection];
         sortedList.Sort(comparison);
         for (int i = 0; i < sortedList.Count; i++)
         {

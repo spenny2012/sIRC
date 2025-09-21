@@ -2,7 +2,6 @@
 using spennyIRC.Core.IRC;
 using spennyIRC.Scripting;
 using spennyIRC.ViewModels.Helpers;
-using spennyIRC.ViewModels.Messages;
 using spennyIRC.ViewModels.Messages.Channel;
 using spennyIRC.ViewModels.Messages.LocalUser;
 using spennyIRC.ViewModels.Messages.Server;
@@ -33,18 +32,14 @@ public class ServerViewModel : WindowViewModelBase
 
     #region UI Subscriptions
 
-    protected override void RegisterUISubscriptions() // TODO: Reconsider threadsafe invoker
+    protected override void RegisterUISubscriptions()
     {
         WeakReferenceMessenger.Default.Register<ChannelPartMessage>(this, (r, m) =>
         {
             if (m.Session != _session || m.Nick != _localUser.Nick || !FindWindowByName(Channels, m.Channel, out ChannelViewModel channel))
                 return;
 
-            ThreadSafeInvoker.InvokeIfNecessary(() =>
-            {
-                Channels.Remove(channel);
-                channel.Dispose();
-            });
+            ThreadSafeInvoker.InvokeIfNecessary(() => Channels.Remove(channel));
         });
 
         WeakReferenceMessenger.Default.Register<ChannelAddMessage>(this, (r, m) =>

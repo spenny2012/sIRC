@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace spennyIRC.Core.IRC.Helpers;
+﻿namespace spennyIRC.Core.IRC.Helpers;
 
 public static class IrcUserHelpers
 {

@@ -19,6 +19,7 @@ namespace spennyIRC.Scripting
             AddCommand("nick", BuiltInIrcCommands.NickAsync);
             AddCommand("notice", BuiltInIrcCommands.NoticeAsync);
             AddCommand("part", BuiltInIrcCommands.PartAsync);
+            //AddCommand("partall", BuiltInIrcCommands.PartAllChannelsAsync);
             AddCommand("quit", BuiltInIrcCommands.QuitAsync);
             AddCommand("randnick", BuiltInIrcCommands.RandNickAsync);
             AddCommand("raw", BuiltInIrcCommands.RawAsync);

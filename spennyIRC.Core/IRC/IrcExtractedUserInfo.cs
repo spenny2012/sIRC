@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace spennyIRC.Core.IRC;
+﻿namespace spennyIRC.Core.IRC;
 
 public readonly record struct IrcExtractedUserInfo()
 {

@@ -3,7 +3,6 @@ using spennyIRC.Core.IRC;
 using spennyIRC.Scripting;
 using spennyIRC.ViewModels.Messages;
 using spennyIRC.ViewModels.Messages.LocalUser;
-using System.Threading.Channels;
 
 namespace spennyIRC.ViewModels;
 

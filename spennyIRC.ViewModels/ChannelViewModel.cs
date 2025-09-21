@@ -7,14 +7,12 @@ using spennyIRC.ViewModels.Messages.Channel;
 using spennyIRC.ViewModels.Messages.LocalUser;
 using spennyIRC.ViewModels.Messages.Server;
 using System.Collections.ObjectModel;
-using System.Threading.Channels;
 
 namespace spennyIRC.ViewModels;
 
 public class ChannelViewModel : WindowViewModelBase
 {
-    private static readonly char[] channelStatusChars = ['~', '&', '@', '%', '+'];
-    private static readonly HashSet<char> statusCharsSet = new(channelStatusChars);
+    private static readonly char[] channelStatusChars = ['@', '%', '+', '~', '&'];
     private string _channelTopic = string.Empty;
     private string _channel = string.Empty;
     private ObservableCollection<string> _nickList = [];
@@ -144,9 +142,13 @@ public class ChannelViewModel : WindowViewModelBase
         for (int i = 0; i < NickList.Count; i++)
         {
             string currentNick = NickList[i];
-            if (currentNick.TrimStart(channelStatusChars).Equals(nick))
+            if (channelStatusChars.Contains(currentNick[0]) && currentNick.TrimStart(channelStatusChars).Equals(nick))
             {
-                return NickList[i];
+                return currentNick;
+            }
+            else if (currentNick.Equals(nick))
+            {
+                return currentNick;
             }
         }
 
@@ -176,7 +178,7 @@ public class ChannelViewModel : WindowViewModelBase
 
     private void UpdateNickAtIndex(int index, string oldNick, string newNick)
     {
-        string updatedNick = statusCharsSet.Contains(oldNick[0])
+        string updatedNick = channelStatusChars.Contains(oldNick[0])
             ? oldNick[0] + newNick
             : newNick;
 

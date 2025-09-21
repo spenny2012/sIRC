@@ -20,13 +20,10 @@ public class IrcCommandTextBox : TextBox
     {
         if (e.Key == Key.Enter)
         {
-            // Store command before execution
             string command = Text;
 
-            // Execute the command (this will clear Text via databinding)
             ((IChatWindow)DataContext).ExecuteCommand.Execute(null);
 
-            // Add to history if not empty
             if (!string.IsNullOrWhiteSpace(command))
             {
                 _history.Add(command);
@@ -36,7 +33,6 @@ public class IrcCommandTextBox : TextBox
                 }
             }
 
-            // Reset history position
             _currentHistoryIndex = _history.Count;
             _currentText = string.Empty;
 
@@ -48,7 +44,6 @@ public class IrcCommandTextBox : TextBox
         {
             if (_history.Count == 0) return;
 
-            // Save current text if we're at the end of history
             if (_currentHistoryIndex == _history.Count)
             {
                 _currentText = Text;
