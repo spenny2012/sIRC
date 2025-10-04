@@ -22,7 +22,9 @@ namespace spennyIRC.Scripting
                 {
                     IrcCommandAttribute? attribute = method.GetCustomAttribute<IrcCommandAttribute>();
 
-                    string commandName = attribute.Command;
+                    if (attribute == null) continue;
+
+                    string? commandName = attribute.Command;
 
                     if (string.IsNullOrEmpty(commandName))
                     {
