@@ -8,7 +8,7 @@ namespace spennyIRC.ViewModels;
 
 public class QueryViewModel : WindowViewModelBase
 {
-    private IEchoService _echoSvc;
+    private IWindowService _echoSvc;
 
     public QueryViewModel(IIrcSession session, IIrcCommands commands, string name) : base(session, commands)
     {
@@ -16,7 +16,7 @@ public class QueryViewModel : WindowViewModelBase
         _echoSvc = session.EchoService;
     }
 
-    public IEchoService EchoService
+    public IWindowService EchoService
     {
         get => _echoSvc;
         set => SetProperty(ref _echoSvc, value);

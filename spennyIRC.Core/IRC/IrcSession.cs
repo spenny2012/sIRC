@@ -6,12 +6,12 @@ public class IrcSession(IIrcEvents events,
     IIrcLocalUser user,
     IIrcInternalAddressList addressList,
     IIrcClientManager ircClientManager,
-    IEchoService echoService) : IIrcSession
+    IWindowService echoService) : IIrcSession
 {
     public string ActiveWindow { get; set; } = "Status";
     public IIrcClient Client => client;
     public IIrcClientManager ClientManager => ircClientManager;
-    public IEchoService EchoService => echoService;
+    public IWindowService EchoService => echoService;
     public IIrcEvents Events => events;
     public IIrcInternalAddressList Ial => addressList;
     public IIrcLocalUser LocalUser => user;

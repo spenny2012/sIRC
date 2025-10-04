@@ -7,7 +7,9 @@ using System.Diagnostics;
 using System.Windows;
 
 // TODO: 1-
-/* Ensure disposal of chanel viewmodel means controls are being disposed too
+/* Fix nick change bug during connect
+ * Command binder should use reflection
+ * Ensure disposal of chanel viewmodel means controls are being disposed too
  * How should scripts deal with different server instances?
  * Color windows when new message is added
  * Use reflection for all commands
@@ -99,6 +101,6 @@ public partial class App : Application
         services.AddScoped<IIrcEvents, IrcEvents>();
         services.AddScoped<IIrcServer, IrcServerInfo>();
         services.AddScoped<IIrcClientManager, IrcClientManager>();
-        services.AddScoped<IEchoService, EchoService>();
+        services.AddScoped<IWindowService, WindowService>();
     }
 }

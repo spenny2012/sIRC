@@ -1,14 +1,17 @@
 ﻿using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
+using spennyIRC.Scripting.Attributes;
 using System.Diagnostics;
 using System.Reflection;
 
 namespace spennyIRC.Scripting.Helpers
 {
+    [IrcCommandClass("Basic Commands")]
     public static class BuiltInIrcCommands
     {
         private const int DEFAULT_IRC_PORT = 6697;
 
+        [IrcCommand("bans a user")]
         public static async Task BanAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -20,6 +23,7 @@ namespace spennyIRC.Scripting.Helpers
             }
         }
 
+        [IrcCommand("server", "connect to a server")]
         public static async Task ConnectServerAsync(string serverInfo, IIrcSession session)
         {
             try
@@ -68,6 +72,7 @@ namespace spennyIRC.Scripting.Helpers
             }
         }
 
+        [IrcCommand("performs a ctcp on a user")]
         public static async Task CtcpAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -96,6 +101,7 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync(message);
         }
 
+        [IrcCommand("for debug purposes.  shows user session info")]
         public static Task GetSessionInfoAsync(string parameters, IIrcSession session)
         {
             session.EchoService.Echo(session.ActiveWindow, "-");
@@ -126,6 +132,7 @@ namespace spennyIRC.Scripting.Helpers
             return session.Server.Connected;
         }
 
+        [IrcCommand("joins a channel")]
         public static async Task JoinAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -133,6 +140,7 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync($"JOIN {parameters}");
         }
 
+        [IrcCommand("kicks a user")]
         public static async Task KickAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -148,6 +156,7 @@ namespace spennyIRC.Scripting.Helpers
             }
         }
 
+        [IrcCommand("lists channels")]
         public static async Task ListAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -155,6 +164,7 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync($"LIST {parameters}");
         }
 
+        [IrcCommand("performs an emote")]
         public static async Task MeAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -169,6 +179,7 @@ namespace spennyIRC.Scripting.Helpers
             return Task.CompletedTask;
         }
 
+        [IrcCommand("sends a user or a channel a message")]
         public static async Task MsgAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -180,6 +191,7 @@ namespace spennyIRC.Scripting.Helpers
             session.EchoService.Echo(session.ActiveWindow, $"*{paramParts[0]}* {msg}");
         }
 
+        [IrcCommand("performs names")]
         public static async Task NamesAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -187,6 +199,7 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync($"NAMES {parameters}");
         }
 
+        [IrcCommand("changes nick")]
         public static async Task NickAsync(string parameters, IIrcSession session)
         {
             if (!session.Server.Connected)
@@ -199,6 +212,7 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync($"NICK {parameters}");
         }
 
+        [IrcCommand("sends a notice to a user or a channel")]
         public static async Task NoticeAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -210,6 +224,7 @@ namespace spennyIRC.Scripting.Helpers
             session.EchoService.Echo(session.ActiveWindow, $"-{paramParts[0]}- {msg}");
         }
 
+        [IrcCommand("parts a channel")]
         public static async Task PartAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -241,6 +256,7 @@ namespace spennyIRC.Scripting.Helpers
             }
         }
 
+        [IrcCommand("quits a server")]
         public static async Task QuitAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -248,6 +264,7 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync($"QUIT :{parameters}");
         }
 
+        [IrcCommand("changes nick to a random one")]
         public static async Task RandNickAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -255,6 +272,7 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync($"NICK s{MiscHelpers.GenerateRandomString(8)}");
         }
 
+        [IrcCommand("sends a raw message to the current IRC server")]
         public static async Task RawAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -262,6 +280,7 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync(parameters);
         }
 
+        [IrcCommand("rejoins a channel")]
         public static async Task RejoinAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -270,6 +289,7 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync($"PART {session.ActiveWindow}\r\nJOIN {session.ActiveWindow}");
         }
 
+        [IrcCommand("generates new user information")]
         public static Task ResetInfoAsync(string parameters, IIrcSession session)
         {
             session.LocalUser.Nick = "s" + MiscHelpers.GenerateRandomString(7);
@@ -281,6 +301,7 @@ namespace spennyIRC.Scripting.Helpers
             return Task.CompletedTask;
         }
 
+        [IrcCommand("messages the active window")]
         public static async Task SayAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -289,6 +310,7 @@ namespace spennyIRC.Scripting.Helpers
             session.EchoService.Echo(session.ActiveWindow, $"[{session.LocalUser.Nick}] {parameters}");
         }
 
+        [IrcCommand("changes topic of a channel")]
         public static async Task TopicAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -300,6 +322,7 @@ namespace spennyIRC.Scripting.Helpers
             }
         }
 
+        [IrcCommand("unbans a user from a channel")]
         public static async Task UnbanAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -311,6 +334,7 @@ namespace spennyIRC.Scripting.Helpers
             }
         }
 
+        [IrcCommand("voices a user in a specified channel")]
         public static async Task VoiceAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -319,6 +343,7 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync($"MODE {paramParts[0]} +v {paramParts[1]}");
         }
 
+        [IrcCommand("performs a who")]
         public static async Task WhoAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
@@ -326,11 +351,28 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync($"WHO {parameters}");
         }
 
+        [IrcCommand("performs a whois")]
         public static async Task WhoisAsync(string parameters, IIrcSession session)
         {
             if (!IsConnected(session)) return;
 
             await session.Client.SendMessageAsync($"WHOIS {parameters}");
+        }
+
+        [IrcCommand("sets ident")]
+        public static Task SetIdentAsync(string arg1, IIrcSession session)
+        {
+            if (arg1 == null) return Task.CompletedTask;
+            session.EchoService.Echo(session.ActiveWindow, $"Ident set to: {(session.LocalUser.Ident = arg1.Split(' ')[0])}");
+            return Task.CompletedTask;
+        }
+
+        [IrcCommand("sets realname")]
+        public static Task SetRealNameAsync(string arg1, IIrcSession session)
+        {
+            if (arg1 == null) return Task.CompletedTask;
+            session.EchoService.Echo(session.ActiveWindow, $"Real name set to: {(session.LocalUser.Realname = arg1)}");
+            return Task.CompletedTask;
         }
     }
 }

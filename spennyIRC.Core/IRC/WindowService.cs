@@ -1,7 +1,7 @@
 ﻿namespace spennyIRC.Core.IRC;
 
 // TODO: move this to viewmodels
-public class EchoService : IEchoService
+public class WindowService : IWindowService
 {
     public Action<string, string> DoEcho { get; set; }
 

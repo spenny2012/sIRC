@@ -17,7 +17,7 @@ public class ChannelViewModel : WindowViewModelBase
     private string _channel = string.Empty;
     private ObservableCollection<string> _nickList = [];
     private IEnumerable<string> _selectedNicks = [];
-    private IEchoService _echoSvc;
+    private IWindowService _echoSvc;
 
     public ChannelViewModel(IIrcSession session, IIrcCommands commands, string channel) : base(session, commands)
     {
@@ -37,7 +37,7 @@ public class ChannelViewModel : WindowViewModelBase
         set => SetProperty(ref _channelTopic, value);
     }
 
-    public IEchoService EchoService
+    public IWindowService EchoService
     {
         get => _echoSvc;
         set => SetProperty(ref _echoSvc, value);

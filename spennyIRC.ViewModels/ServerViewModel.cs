@@ -5,9 +5,11 @@ using spennyIRC.ViewModels.Helpers;
 using spennyIRC.ViewModels.Messages.Channel;
 using spennyIRC.ViewModels.Messages.LocalUser;
 using spennyIRC.ViewModels.Messages.Server;
+using spennyIRC.ViewModels.Messages.Window;
 using System.Collections.ObjectModel;
 
 // TODO: properly handle the disposing of ServerViewModel and other classes
+// TODO: use dictionary for window lookup
 namespace spennyIRC.ViewModels;
 
 public class ServerViewModel : WindowViewModelBase
@@ -74,6 +76,11 @@ public class ServerViewModel : WindowViewModelBase
                 Channels.Add(new QueryViewModel(_session, _commands, m.Nick));
                 Channels.AlphaNumericSort();
             });
+        });
+        WeakReferenceMessenger.Default.Register<NickChangedMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session || !FindWindowByName(Channels, m.Nick, out QueryViewModel qvm)) return;
+            qvm.Caption = qvm.Name = m.NewNick;
         });
 
         WeakReferenceMessenger.Default.Register<ServerISupportMessage>(this, (r, m) =>

@@ -7,6 +7,7 @@ using spennyIRC.ViewModels.Messages;
 using spennyIRC.ViewModels.Messages.Channel;
 using spennyIRC.ViewModels.Messages.LocalUser;
 using spennyIRC.ViewModels.Messages.Server;
+using spennyIRC.ViewModels.Messages.Window;
 
 namespace spennyIRC.ViewModels;
 
@@ -15,7 +16,7 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
     private const string StatusWindow = "Status";
     private const string AllWindows = "All";
     private readonly IIrcLocalUser _user = session.LocalUser;
-    private readonly IEchoService _echoSvc = session.EchoService;
+    private readonly IWindowService _echoSvc = session.EchoService;
     private readonly IIrcEvents _events = session.Events;
     private readonly IIrcServer _server = session.Server;
 
@@ -112,8 +113,15 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
                     Nick = ctx.Nick!,
                     NewNick = ctx.Trailing
                 });
+
                 return Task.CompletedTask;
             }
+            WeakReferenceMessenger.Default.Send(new NickChangedMessage(session)
+            {
+                Nick = ctx.Nick!,
+                NewNick = ctx.Trailing!
+            });
+
             return Task.CompletedTask;
             // TODO: finish adding this logic (requires comchans)
         });
@@ -296,4 +304,3 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
         _events.AddEvent(ProtocolNumericConstants.RPL_MONOFFLINE, async (ctx) => _echoSvc.Echo(StatusWindow, ctx.Line.GetTokenFrom(3)));
     }
 }
-

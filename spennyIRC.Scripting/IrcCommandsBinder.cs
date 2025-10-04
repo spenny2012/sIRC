@@ -1,4 +1,7 @@
-﻿using spennyIRC.Scripting.Helpers;
+﻿using spennyIRC.Core.IRC;
+using spennyIRC.Scripting.Attributes;
+using spennyIRC.Scripting.Helpers;
+using System.Reflection;
 
 namespace spennyIRC.Scripting
 {
@@ -6,33 +9,39 @@ namespace spennyIRC.Scripting
     {
         public void Bind()
         {
-            AddCommand("ban", BuiltInIrcCommands.BanAsync);
-            AddCommand("ctcp", BuiltInIrcCommands.CtcpAsync);
-            AddCommand("emote", BuiltInIrcCommands.MeAsync);
-            AddCommand("join", BuiltInIrcCommands.JoinAsync);
-            AddCommand("kick", BuiltInIrcCommands.KickAsync);
-            AddCommand("list", BuiltInIrcCommands.ListAsync);
-            AddCommand("me", BuiltInIrcCommands.MeAsync);
-            AddCommand("mode", BuiltInIrcCommands.ModeAsync);
-            AddCommand("msg", BuiltInIrcCommands.MsgAsync);
-            AddCommand("names", BuiltInIrcCommands.NamesAsync);
-            AddCommand("nick", BuiltInIrcCommands.NickAsync);
-            AddCommand("notice", BuiltInIrcCommands.NoticeAsync);
-            AddCommand("part", BuiltInIrcCommands.PartAsync);
-            //AddCommand("partall", BuiltInIrcCommands.PartAllChannelsAsync);
-            AddCommand("quit", BuiltInIrcCommands.QuitAsync);
-            AddCommand("randnick", BuiltInIrcCommands.RandNickAsync);
-            AddCommand("raw", BuiltInIrcCommands.RawAsync);
-            AddCommand("rejoin", BuiltInIrcCommands.RejoinAsync);
-            AddCommand("resetinfo", BuiltInIrcCommands.ResetInfoAsync);
-            AddCommand("say", BuiltInIrcCommands.SayAsync);
-            AddCommand("server", BuiltInIrcCommands.ConnectServerAsync);
-            AddCommand("session", BuiltInIrcCommands.GetSessionInfoAsync);
-            AddCommand("topic", BuiltInIrcCommands.TopicAsync);
-            AddCommand("unban", BuiltInIrcCommands.UnbanAsync);
-            AddCommand("voice", BuiltInIrcCommands.VoiceAsync);
-            AddCommand("who", BuiltInIrcCommands.WhoAsync);
-            AddCommand("whois", BuiltInIrcCommands.WhoisAsync);
+            IEnumerable<Type> types = Assembly.GetExecutingAssembly()
+                .GetTypes()
+                .Where(t => t.GetCustomAttribute<IrcCommandClassAttribute>() != null);
+
+            foreach (Type? type in types)
+            {
+                IEnumerable<MethodInfo> methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
+                    .Where(m => m.GetCustomAttribute<IrcCommandAttribute>() != null);
+
+                foreach (MethodInfo? method in methods)
+                {
+                    IrcCommandAttribute? attribute = method.GetCustomAttribute<IrcCommandAttribute>();
+
+                    string commandName = attribute.Command;
+
+                    if (string.IsNullOrEmpty(commandName))
+                    {
+                        commandName = method.Name;
+                        if (commandName.EndsWith("async", StringComparison.OrdinalIgnoreCase))
+                        {
+                            commandName = commandName[..^5];
+                        }
+                    }
+
+                    commandName = commandName.ToLower();
+
+                    Func<string, IIrcSession, Task> func = (Func<string, IIrcSession, Task>)Delegate.CreateDelegate(
+                        typeof(Func<string, IIrcSession, Task>),
+                        method);
+
+                    AddCommand(commandName, func);
+                }
+            }
         }
     }
 }
