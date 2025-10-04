@@ -212,7 +212,7 @@ public static class IrcProtocolHelpers
     }
 
     /// <summary>
-    /// This function is to be used for numeric 352 
+    /// This function is to be used for numeric 352
     /// </summary>
     ///
     public static IrcChannelAccessType[] ExtractAccessTypeFrom352(this string modes)
@@ -272,6 +272,7 @@ public static class IrcProtocolHelpers
             };
         }
     }
+
     public static IrcExtractedUserInfo ExtractUserInfoFrom352(this string[] lineParts)
     {
         string nick = lineParts[7];

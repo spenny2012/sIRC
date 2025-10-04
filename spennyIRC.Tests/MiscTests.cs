@@ -10,6 +10,5 @@ public class MiscTests
     {
         ExtractedCommandInfo extractedInfo = CommandHelpers.ExtractCommandAndParams("/msg test HELLO");
         string fromToken = "/msg test HELLO".GetTokenFrom(2);
-
     }
 }

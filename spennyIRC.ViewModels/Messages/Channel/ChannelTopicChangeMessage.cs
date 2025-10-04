@@ -1,4 +1,5 @@
 ﻿using spennyIRC.Core.IRC;
+
 namespace spennyIRC.ViewModels.Messages.Channel;
 
 public class ChannelTopicChangeMessage(IIrcSession session) : MessageBase(session)

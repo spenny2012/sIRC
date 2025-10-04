@@ -42,7 +42,7 @@ public static class IrcReceivedContextFactory
         string trailing = ctx.Trailing = line.ExtractTrailing(2);
 
         // check if event is int
-        if (int.TryParse(ctx.Event, out _)) 
+        if (int.TryParse(ctx.Event, out _))
             return ctx;
 
         ReadOnlySpan<char> firstPart = lineParts[0].AsSpan();

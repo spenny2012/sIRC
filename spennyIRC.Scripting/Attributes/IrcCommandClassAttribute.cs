@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace spennyIRC.Scripting.Attributes
+﻿namespace spennyIRC.Scripting.Attributes
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class IrcCommandClassAttribute(string description) : Attribute

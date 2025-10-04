@@ -29,6 +29,7 @@ public static class ViewModelHelpers
             nicklist[i] = sortedList[i];
         }
     }
+
     public static void ComparisonSort<T>(this ObservableCollection<T> collection, Comparison<T> comparison)
     {
         List<T> sortedList = [.. collection];
@@ -38,6 +39,7 @@ public static class ViewModelHelpers
             collection[i] = sortedList[i];
         }
     }
+
     // TODO: this is very buggy. fix it
     public static void AlphaNumericSort(this ObservableCollection<IChatWindow> chatWindows)
     {

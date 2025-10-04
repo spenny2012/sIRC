@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows.Threading;
+
 namespace spennyIRC.ViewModels;
 
 public static class ThreadSafeInvoker

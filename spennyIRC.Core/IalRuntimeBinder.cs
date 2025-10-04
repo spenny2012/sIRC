@@ -34,7 +34,7 @@ public class IalRuntimeBinder(IIrcEvents events, IIrcInternalAddressList ial) : 
             return Task.CompletedTask;
         });
 
-        events.AddEvent(ProtocolNumericConstants.RPL_NAMREPLY, (ctx) => // 353 - Names 
+        events.AddEvent(ProtocolNumericConstants.RPL_NAMREPLY, (ctx) => // 353 - Names
         {
             IrcExtractedUserInfo[] users = [.. ctx.Trailing!.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => x.ExtractUserInfoFrom353())];
             ial.UpsertUsers(users, ctx.LineParts[4]);
@@ -98,7 +98,7 @@ Events to monitor:
 * JOIN           :icrawl55!irc@1E5498DC.904CBC6.A1AB8D51.IP JOIN :#ASDASDASD
 * PART           :ASDASDASD!~asdasdads@702C07FF.251B41EB.C2CFB607.IP PART #ASDASDASD :EMO-PART
 * NICK           :ASDASDASD!~asdasdads@702C07FF.251B41EB.C2CFB607.IP NICK :ASDASDASD_
-* PRIVMSG (PM)           
+* PRIVMSG (PM)
 * WHO (352)      :shrimp.test.org 352 YourNick #ASDASDASD ~Hello E9726DF6.B6B17E60.81B556F8.IP * YourNick H@ :0 Hi Guys
 * WHOIS
 * NOTIFY (NOTICE)
@@ -109,10 +109,10 @@ Events to monitor:
  311
  319
  312
- 318         
+ 318
 */
-//events.AddEvent("312", (ctx) => //RPL_WHOISOPERATOR 
-//{ 730, 731, 
+//events.AddEvent("312", (ctx) => //RPL_WHOISOPERATOR
+//{ 730, 731,
 //    return Task.CompletedTask;
 //});
 //events.AddEvent("313", (ctx) => // RPL_WHOISIDLE

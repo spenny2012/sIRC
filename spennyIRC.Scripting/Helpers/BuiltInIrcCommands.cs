@@ -102,7 +102,7 @@ namespace spennyIRC.Scripting.Helpers
         }
 
         [IrcCommand("for debug purposes.  shows user session info")]
-        public static Task GetSessionInfoAsync(string parameters, IIrcSession session)
+        public static Task SessionInfoAsync(string parameters, IIrcSession session)
         {
             session.EchoService.Echo(session.ActiveWindow, "-");
             PrintClassProperties(session.LocalUser, session);

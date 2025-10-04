@@ -9,5 +9,6 @@ public interface IIrcServer
     string NetworkId { get; set; }
     string Port { get; set; }
     Dictionary<string, string> Settings { get; set; }
+
     void Clear();
 }

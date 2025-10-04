@@ -1,5 +1,4 @@
-﻿
-namespace spennyIRC.Core.IRC;
+﻿namespace spennyIRC.Core.IRC;
 
 public interface IIrcLocalUser
 {

@@ -1,6 +1,5 @@
 ﻿using spennyIRC.Core.IRC;
 using spennyIRC.Scripting.Attributes;
-using spennyIRC.Scripting.Helpers;
 using System.Reflection;
 
 namespace spennyIRC.Scripting

@@ -7,6 +7,7 @@ public readonly record struct IrcExtractedUserInfo()
     public string? Domain { get; init; }
     public IrcChannelAccessType[] Access { get; init; } = [];
 }
+
 //public string FullHost
 //{
 //    get

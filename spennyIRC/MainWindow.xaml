@@ -19,14 +19,14 @@
             </ToolBar>
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <local:MainIrcWindowControl DataContext="{Binding }" Grid.Row="0" />
                 <StatusBar Grid.Row="1">
-                    <StatusBarItem Content="Status: "/>
+                    <StatusBarItem Content="Status: " />
                 </StatusBar>
             </Grid>
-        </DockPanel>        
+        </DockPanel>
     </Grid>
 </Window>

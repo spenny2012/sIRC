@@ -15,11 +15,11 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
             server.Host = ctx.LineParts[0][1..];
             return Task.CompletedTask;
         });
-        events.AddEvent(ProtocolNumericConstants.RPL_YOURHOST, static (ctx) => { return Task.CompletedTask;  }); // 002 - Your Host
+        events.AddEvent(ProtocolNumericConstants.RPL_YOURHOST, static (ctx) => { return Task.CompletedTask; }); // 002 - Your Host
         events.AddEvent(ProtocolNumericConstants.ERR_NICKNAMEINUSE, async (ctx) => // 433 - Nickname in use
         {
             // if not connected, change nick and store new credentials
-            if (!server.Connected) 
+            if (!server.Connected)
             {
                 // if nick is already changed to nick2 and is also invalid
                 if (localUser.Nick == localUser.Nick2)
@@ -28,7 +28,7 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
                 }
                 // update local user nick
                 localUser.Nick = localUser.Nick2;
-                
+
                 // change nick
                 await ctx.IrcClient.SendMessageAsync($"NICK {localUser.Nick2}");
             }
@@ -104,8 +104,7 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
     }
 }
 
-
-/* 
+/*
 Fields to monitor:
     * 001 RPL_WELCOME (server info)       |   :irc.atw-inter.net 001 YourNick :Welcome to the Internet Relay Network YourNick!~Hello@45.13.235.55
     * 002 RPL_YOURHOST                    |   :irc.atw-inter.net 002 YourNick :Your host is irc.atw-inter.net, running version 2.11.2p3+0PNv1.06
@@ -115,7 +114,7 @@ Fields to monitor:
     * NICK (local user)                   |   :YourNick!~Hello@45.13.235.55 NICK :YourNick2
     * JOIN (local user)                   |   :YourNick!~Hello@45.13.235.55 JOIN :#test
     * MODE (local user)                   |   :YourNick MODE YourNick :+i
-    * PART (local user)                   |   
+    * PART (local user)                   |
     * QUIT (local user)                   |   ERROR :Closing Link: YourNick[~Hello@45.13.235.55] ("TEST")
-    * AWAY (local user)                   |   
+    * AWAY (local user)                   |
 */

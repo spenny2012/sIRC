@@ -3,8 +3,10 @@
 public static class ProtocolNumericConstants
 {
     public const string PROCESSING_REQUEST = "020"; // Processing request message
+
     // 001 - 099: Basic Replies (Welcome and Server Info)
     public const string RPL_WELCOME = "001";        // Welcome message
+
     public const string RPL_YOURHOST = "002";       // Your host
     public const string RPL_CREATED = "003";        // Server created message
     public const string RPL_MYINFO = "004";         // Server info
@@ -12,6 +14,7 @@ public static class ProtocolNumericConstants
 
     // 200 - 299: Trace and Stats Replies
     public const string RPL_TRACELINK = "200";      // Trace link
+
     public const string RPL_TRACECONNECTING = "201"; // Trace connecting
     public const string RPL_TRACEHANDSHAKE = "202"; // Trace handshake
     public const string RPL_TRACEUNKNOWN = "203";   // Trace unknown
@@ -46,6 +49,7 @@ public static class ProtocolNumericConstants
 
     // 300 - 399: User and Channel Replies
     public const string RPL_AWAY = "301";           // Away message
+
     public const string RPL_USERHOST = "302";       // Userhost response
     public const string RPL_ISON = "303";           // Is user online
     public const string RPL_UNAWAY = "305";         // User is no longer away
@@ -85,6 +89,7 @@ public static class ProtocolNumericConstants
 
     // 400 - 499: Error Replies
     public const string ERR_NOSUCHNICK = "401";     // No such nick
+
     public const string ERR_NOSUCHSERVER = "402";   // No such server
     public const string ERR_NOSUCHCHANNEL = "403";  // No such channel
     public const string ERR_CANNOTSENDTOCHAN = "404"; // Cannot send to channel
@@ -125,10 +130,12 @@ public static class ProtocolNumericConstants
 
     // 500 - 599: Server Errors
     public const string ERR_UNKNOWNERROR = "500";   // Unknown error
+
     public const string ERR_UMODEUNKNOWNFLAG = "501"; // Mode unknown flag
     public const string ERR_USERSDONTMATCH = "502"; // Users don't match
 
     // IRCv3 Extensions
     public const string RPL_MONONLINE = "730";      // Monitored user is online (IRCv3 MONITOR)
+
     public const string RPL_MONOFFLINE = "731";     // Monitored user is offline (IRCv3 MONITOR)
 }

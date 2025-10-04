@@ -15,6 +15,5 @@ public partial class MainIrcWindowControl : UserControl
 
     private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-
     }
 }
