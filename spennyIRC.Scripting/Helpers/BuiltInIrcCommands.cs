@@ -23,8 +23,8 @@ namespace spennyIRC.Scripting.Helpers
             }
         }
 
-        [IrcCommand("server", "connect to a server")]
-        public static async Task ConnectServerAsync(string serverInfo, IIrcSession session)
+        [IrcCommand("connect to a server")]
+        public static async Task ServerAsync(string serverInfo, IIrcSession session)
         {
             try
             {
