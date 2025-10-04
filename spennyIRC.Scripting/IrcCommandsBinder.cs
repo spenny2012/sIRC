@@ -5,10 +5,13 @@ using System.Reflection;
 
 namespace spennyIRC.Scripting
 {
+    //TODO: add help command
     public class IrcCommandsBinder(IIrcCommands commands) : IrcCommandsBinderBase(commands)
     {
         public void Bind()
         {
+            AddCommand("help", "lists commands", ListCommandsAsync);
+
             IEnumerable<Type> types = Assembly.GetExecutingAssembly()
                 .GetTypes()
                 .Where(t => t.GetCustomAttribute<IrcCommandClassAttribute>() != null);
@@ -37,13 +40,19 @@ namespace spennyIRC.Scripting
 
                     commandName = commandName.ToLower();
 
+                    string commandDescription = attribute.Description;
+
                     Func<string, IIrcSession, Task> func = (Func<string, IIrcSession, Task>)Delegate.CreateDelegate(
                         typeof(Func<string, IIrcSession, Task>),
                         method);
 
-                    AddCommand(commandName, func);
+                    AddCommand(commandName, commandDescription, func);
                 }
             }
+        }
+
+        private async Task ListCommandsAsync(string parameters, IIrcSession session)
+        {
         }
     }
 }

@@ -8,7 +8,7 @@ namespace spennyIRC.ViewModels
         {
             // UI commands
             //AddCommand("list", ViewModelCommandHelpers.ListAsync);
-            AddCommand("clear", ViewModelCommandHelpers.ClearAsync);
+            AddCommand("clear", "clears a chat window", ViewModelCommandHelpers.ClearAsync);
         }
     }
 }

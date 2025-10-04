@@ -4,9 +4,9 @@ namespace spennyIRC.Scripting;
 
 public class IrcCommands : IIrcCommands
 {
-    public Dictionary<string, IIrcCommand> Commands { get; private set; } = new (StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, IIrcCommand> Commands { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
 
-    public bool AddCommand(string name, IIrcCommand command)
+    public bool AddCommand(string name, string description, IIrcCommand command)
     {
         if (Commands.TryGetValue(name, out _))
         {
