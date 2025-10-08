@@ -7,19 +7,18 @@ using System.Diagnostics;
 using System.Windows;
 
 // TODO: 1-
-/* Fix nick change bug during connect
- * Command binder should use reflection
- * Ensure disposal of chanel viewmodel means controls are being disposed too
- * How should scripts deal with different server instances?
- * Color windows when new message is added
- * Use reflection for all commands
- * Handle channels after disconnect
- * Fix potential bug in PART event in ViewModelRuntimeBinder
- * Come up with an elegant solution for handling the /names bug
- * Finish channel modes & user status modes in ClientRuntimeBinder and InternalAddressList
- * ServerViewModel and other viewmodel object disposal
- * Add context menus
- * Cleanup:
+/* BUG - Fix nick change bug during connect
+ * BUG - Fix chat nick bug where name stays through user disconnect
+
+ * Feature - Add context menus
+ * Feature - Ensure disposal of chanel viewmodel means controls are being disposed too
+ * Feature - Color windows when new message is added
+ * Feature - Use reflection for all commands
+ * Feature - Handle channels after disconnect
+ * Feature - Come up with an elegant solution for handling the /names bug
+ * Feature - Finish channel modes & user status modes in ClientRuntimeBinder and InternalAddressList
+ * Feature - ServerViewModel and other viewmodel object disposal
+ * Feature - Cleanup:
         ServerViewModel WeakReferenceManager calls
  * Add settings class to project, create UI, and plug it in to instances
  */

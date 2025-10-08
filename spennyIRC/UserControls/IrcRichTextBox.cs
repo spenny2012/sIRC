@@ -14,7 +14,7 @@ public class IrcRichTextBox : RichTextBox
     private double _lastExtentHeight;
     private bool _isResizing;
     private bool _wasAtBottom;
-    private DispatcherOperation _pendingResizeAction;
+    private DispatcherOperation? _pendingResizeAction;
 
     public IrcRichTextBox() : base()
     {

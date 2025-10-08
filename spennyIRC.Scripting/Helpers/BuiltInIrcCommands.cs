@@ -296,6 +296,7 @@ namespace spennyIRC.Scripting.Helpers
             session.LocalUser.Nick2 = "s" + MiscHelpers.GenerateRandomString(7);
             session.LocalUser.Ident = MiscHelpers.GenerateRandomString(5);
             session.LocalUser.Realname = MiscHelpers.GenerateRandomString(10);
+
             session.EchoService.Echo(session.ActiveWindow, $"Reset user info:\r\n Nick: {session.LocalUser.Nick}\r\n Ident: {session.LocalUser.Ident}\r\n Real Name: {session.LocalUser.Realname}");
 
             return Task.CompletedTask;
@@ -359,19 +360,19 @@ namespace spennyIRC.Scripting.Helpers
             await session.Client.SendMessageAsync($"WHOIS {parameters}");
         }
 
-        [IrcCommand("sets ident")]
-        public static Task SetIdentAsync(string arg1, IIrcSession session)
+        [IrcCommand("sets local user's ident (user must reconnect to any active servers for changes to take effect)")]
+        public static Task SetIdentAsync(string parameters, IIrcSession session)
         {
-            if (arg1 == null) return Task.CompletedTask;
-            session.EchoService.Echo(session.ActiveWindow, $"Ident set to: {(session.LocalUser.Ident = arg1.Split(' ')[0])}");
+            if (parameters == null) return Task.CompletedTask;
+            session.EchoService.Echo(session.ActiveWindow, $"Ident set to: {(session.LocalUser.Ident = parameters.Split(' ')[0])}");
             return Task.CompletedTask;
         }
 
-        [IrcCommand("sets realname")]
-        public static Task SetRealNameAsync(string arg1, IIrcSession session)
+        [IrcCommand("sets local user's realname (user must reconnect to any active servers for changes to take effect)")]
+        public static Task SetRealNameAsync(string parameters, IIrcSession session)
         {
-            if (arg1 == null) return Task.CompletedTask;
-            session.EchoService.Echo(session.ActiveWindow, $"Real name set to: {(session.LocalUser.Realname = arg1)}");
+            if (parameters == null) return Task.CompletedTask;
+            session.EchoService.Echo(session.ActiveWindow, $"Real name set to: {(session.LocalUser.Realname = parameters)}");
             return Task.CompletedTask;
         }
     }
