@@ -180,11 +180,9 @@ public class ChannelViewModel : WindowViewModelBase
 
     private void UpdateNickAtIndex(int index, string oldNick, string newNick)
     {
-        string updatedNick = channelStatusChars.Contains(oldNick[0])
+        NickList[index] = channelStatusChars.Contains(oldNick[0])
             ? oldNick[0] + newNick
             : newNick;
-
-        NickList[index] = updatedNick;
 
         SortNickList();
     }
