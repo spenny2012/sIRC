@@ -6,6 +6,7 @@ using spennyIRC.ViewModels.Messages;
 using spennyIRC.ViewModels.Messages.Channel;
 using spennyIRC.ViewModels.Messages.LocalUser;
 using spennyIRC.ViewModels.Messages.Server;
+using spennyIRC.ViewModels.Messages.Window;
 using System.Collections.ObjectModel;
 
 namespace spennyIRC.ViewModels;
@@ -126,6 +127,12 @@ public class ChannelViewModel : WindowViewModelBase
         });
 
         WeakReferenceMessenger.Default.Register<LocalUserNickChangeMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session || FindNick(m.Nick) == null) return;
+            ThreadSafeInvoker.InvokeIfNecessary(() => ChangeNick(m.Nick, m.NewNick));
+        });
+
+        WeakReferenceMessenger.Default.Register<NickChangedMessage>(this, (r, m) =>
         {
             if (m.Session != _session || FindNick(m.Nick) == null) return;
             ThreadSafeInvoker.InvokeIfNecessary(() => ChangeNick(m.Nick, m.NewNick));
