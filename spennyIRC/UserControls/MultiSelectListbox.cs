@@ -24,5 +24,4 @@ public class MultiSelectListbox : ListBox
 
     public static readonly DependencyProperty SelectedItemsListProperty =
        DependencyProperty.Register(nameof(SelectedItemsList), typeof(IList), typeof(MultiSelectListbox), new PropertyMetadata(null));
-
 }

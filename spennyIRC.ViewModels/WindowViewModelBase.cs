@@ -1,21 +1,27 @@
-﻿using spennyIRC.Core.IRC.Helpers;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using spennyIRC.Core.IRC;
+using spennyIRC.Core.IRC.Helpers;
+using spennyIRC.Scripting;
 
 namespace spennyIRC.ViewModels;
 
-
-public abstract class WindowViewModelBase(ISpennyIrcInstance _session) : ViewModelBase, IChatWindow
+public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
 {
-    private bool _isSelected;
-    private string _text = string.Empty;
-    private string _name = string.Empty;
+    protected IIrcCommands _commands;
+    protected IIrcSession _session;
+    protected bool _disposed;
     private string _caption = string.Empty;
-    private ICommand? _executeCommand;
+    private IAsyncRelayCommand? _executeCommand;
+    private bool _isSelected;
+    private string _name = string.Empty;
+    private string _text = string.Empty;
 
-    public virtual string Name
+    public WindowViewModelBase(IIrcSession session, IIrcCommands commands)
     {
-        get => _name;
-        set => SetProperty(ref _name, value);
+        _commands = commands;
+        _session = session;
+        RegisterUISubscriptions();
     }
 
     public virtual string Caption
@@ -24,10 +30,25 @@ public abstract class WindowViewModelBase(ISpennyIrcInstance _session) : ViewMod
         set => SetProperty(ref _caption, value);
     }
 
+    public IAsyncRelayCommand ClearCommand => throw new NotImplementedException();
+
+    public IAsyncRelayCommand ExecuteCommand => _executeCommand ??= new AsyncRelayCommand(DoExecuteCommand);
+
     public virtual bool IsSelected
     {
         get => _isSelected;
         set => SetProperty(ref _isSelected, value);
+    }
+
+    public virtual string Name
+    {
+        get => _name;
+        set => SetProperty(ref _name, value);
+    }
+
+    public virtual IIrcSession Session
+    {
+        get => _session;
     }
 
     public virtual string Text
@@ -36,13 +57,16 @@ public abstract class WindowViewModelBase(ISpennyIrcInstance _session) : ViewMod
         set => SetProperty(ref _text, value);
     }
 
-    public virtual ISpennyIrcInstance Session
+    public virtual void Dispose()
     {
-        get => _session;
-        set => SetProperty(ref _session, value);
+        if (_disposed) return;
+        _disposed = true;
+        WeakReferenceMessenger.Default.UnregisterAll(this);
+        GC.SuppressFinalize(this);
     }
 
-    public ICommand ExecuteCommand => _executeCommand ??= new RelayCommand(async (s) => { await DoExecuteCommand(); }, (o) => true);
+    protected virtual void RegisterUISubscriptions()
+    { }
 
     private async Task DoExecuteCommand()
     {
@@ -51,17 +75,13 @@ public abstract class WindowViewModelBase(ISpennyIrcInstance _session) : ViewMod
         if (Text[0] != '/')
         {
             if (!Name.Equals("Status"))
-                _session.IrcCommands.ExecuteCommand("say", Text, _session.Session).GetAwaiter().GetResult();
-
+                _commands.ExecuteCommand("say", Text, _session).GetAwaiter().GetResult();
             Text = string.Empty;
             return;
         }
 
         ExtractedCommandInfo commandInfo = Text.ExtractCommandAndParams();
         Text = string.Empty;
-
-        await _session.IrcCommands.ExecuteCommand(commandInfo.ParsedCmd, commandInfo.CmdParameters, _session.Session);
+        await _commands.ExecuteCommand(commandInfo.ParsedCmd, commandInfo.CmdParameters, _session);
     }
 }
-
-

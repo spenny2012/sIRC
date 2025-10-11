@@ -1,13 +1,13 @@
-﻿using System.Diagnostics;
-namespace spennyIRC.Core.IRC;
+﻿namespace spennyIRC.Core.IRC;
 
 //TODO: 2) Add IIrcSession
 public class IrcClientManager : IIrcClientManager, IDisposable
 {
-    private readonly IIrcLocalUser _user;
     private readonly IIrcClient _ircClient;
     private readonly IIrcEvents _ircClientEvents;
+    private readonly IIrcLocalUser _user;
     private bool isDisposed;
+    private IIrcSession? _session;
 
     public IrcClientManager(IIrcClient client, IIrcEvents events, IIrcLocalUser user)
     {
@@ -21,35 +21,28 @@ public class IrcClientManager : IIrcClientManager, IDisposable
     public async Task ConnectAsync(string server, int port, bool useSsl = false)
     {
         ObjectDisposedException.ThrowIf(isDisposed, this);
-
         await _ircClient.ConnectAsync(server, port, useSsl);
         await _ircClient.SendMessageAsync($"NICK {_user.Nick}");
-        await _ircClient.SendMessageAsync($"USER {_user.Ident} YourHost YourServer :{_user.Realname}");
+        await _ircClient.SendMessageAsync($"USER {_user.Ident} * * :{_user.Realname}");
     }
 
-    private async Task OnDisconnected(string message)
+    public void Dispose()
     {
-        IIrcReceivedContext ircContext = IrcReceivedContextFactory.CreateDisconnect(_ircClient, message);
-        await _ircClientEvents.TryExecute(ircContext.Event, ircContext);
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
-    private async Task OnMessageReceived(string message)
+    public async Task QuitAsync(string quitMsg = "Test")
     {
-#if DEBUG
-        Debug.WriteLine(message);
-#endif
-        string[] lineParts = message.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        ObjectDisposedException.ThrowIf(isDisposed, this);
+        await _ircClient.SendMessageAsync($"QUIT :{quitMsg}");
+        await _ircClient.DisconnectAsync();
+        await Task.Delay(TimeSpan.FromSeconds(1));
+    }
 
-        /* Handle ping */
-        if (string.Equals(lineParts[0], "PING", StringComparison.Ordinal))
-        {
-            await _ircClient.SendMessageAsync($"PONG {lineParts[1][1..]}");
-            return;
-        }
-
-        IIrcReceivedContext ircContext = IrcReceivedContextFactory.Create(_ircClient, message, lineParts);
-
-        await _ircClientEvents.TryExecute(ircContext.Event, ircContext);
+    public void SetSession(IIrcSession session)
+    {
+        _session = session;
     }
 
     protected virtual void Dispose(bool disposing)
@@ -64,9 +57,24 @@ public class IrcClientManager : IIrcClientManager, IDisposable
         }
     }
 
-    public void Dispose()
+    private async Task OnDisconnected(string message)
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        IIrcReceivedContext ircContext = IrcReceivedContextFactory.CreateDisconnect(_ircClient, message);
+        await _ircClientEvents.TryExecute(ircContext.Event, ircContext);
+    }
+
+    private async Task OnMessageReceived(string message)
+    {
+        string[] lineParts = message.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        /* Handle ping */
+        if (string.Equals(lineParts[0], "PING", StringComparison.Ordinal))
+        {
+            await _ircClient.SendMessageAsync($"PONG {lineParts[1][1..]}");
+            return;
+        }
+
+        IIrcReceivedContext ircContext = IrcReceivedContextFactory.Create(_ircClient, message, lineParts);
+        await _ircClientEvents.TryExecute(ircContext.Event, ircContext);
     }
 }

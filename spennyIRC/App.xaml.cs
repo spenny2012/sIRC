@@ -1,27 +1,28 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using spennyIRC.Core;
 using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
 using spennyIRC.Scripting;
 using spennyIRC.ViewModels;
+using System.Diagnostics;
 using System.Windows;
+
 // TODO: 1-
-/* How should scripts deal with different server instances?
- * Color windows when new message is added
- * Use reflection for all commands
- * Handle channels after disconnect
- * Add emotes
- * Fix potential bug in PART event in ViewModelRuntimeBinder
- * Come up with an elegant solution for handling the /names bug
- * Finish channel modes & user status modes in ClientRuntimeBinder and InternalAddressList
- * ServerViewModel and other viewmodel object disposal
- * Update nick list during nick changes
- * Add context menus to channels
- * Cleanup:
+/* BUG - Fix nick change bug during connect
+ * BUG - Fix chat nick bug where name stays through user disconnect
+
+ * Feature - Add context menus
+ * Feature - Ensure disposal of chanel viewmodel means controls are being disposed too
+ * Feature - Color windows when new message is added
+ * Feature - Use reflection for all commands
+ * Feature - Handle channels after disconnect
+ * Feature - Come up with an elegant solution for handling the /names bug
+ * Feature - Finish channel modes & user status modes in ClientRuntimeBinder and InternalAddressList
+ * Feature - ServerViewModel and other viewmodel object disposal
+ * Feature - Cleanup:
         ServerViewModel WeakReferenceManager calls
- * Finish implementingIalEventsBinder
  * Add settings class to project, create UI, and plug it in to instances
  */
+
 namespace spennyIRC;
 
 /// <summary>
@@ -33,6 +34,12 @@ public partial class App : Application
 
     public App()
     {
+#if DEBUG
+        Trace.Listeners.Add(new TextWriterTraceListener($"debug_{DateTime.Now:yyyy-MM-dd}.txt"));
+        Trace.AutoFlush = true;
+        Trace.WriteLine($"[{DateTime.Now.ToLocalTime()}] sIRC started..");
+#endif
+
         ServiceCollection serviceCollection = new();
         ConfigureServices(serviceCollection);
 
@@ -49,22 +56,29 @@ public partial class App : Application
     private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
         MessageBox.Show("ERROR", e.ExceptionObject.ToString());
+#if DEBUG
+        Debug.WriteLine(e.ExceptionObject.ToString());
+#endif
     }
 
     private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
     {
         MessageBox.Show("ERROR", e.Exception.ToString());
+#if DEBUG
+        Debug.WriteLine(e.Exception.ToString());
+#endif
     }
 
     protected override void OnStartup(StartupEventArgs e)
     {
         MainWindow mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-        mainWindow.Show();
-
-        base.OnStartup(e);
+        mainWindow.ShowDialog();
+#if DEBUG
+        Debug.WriteLine("Closing Application\r\n");
+#endif
     }
 
-    private void ConfigureServices(IServiceCollection services)
+    private static void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<MainWindowViewModel>();
         services.AddTransient<MainWindow>();
@@ -77,36 +91,15 @@ public partial class App : Application
             // TODO: replace code belode with fields from settings
             return new IrcLocalUser
             {
-                Nick = "s" + MiscHelpers.GenerateRandomString(7),
+                Nick = "s" + MiscHelpers.GenerateRandomString(6),
                 Nick2 = "YourNick2",
-                Ident = MiscHelpers.GenerateRandomString(3),
+                Ident = MiscHelpers.GenerateRandomString(5),
                 Realname = MiscHelpers.GenerateRandomString(3)
             };
         });
         services.AddScoped<IIrcEvents, IrcEvents>();
         services.AddScoped<IIrcServer, IrcServerInfo>();
         services.AddScoped<IIrcClientManager, IrcClientManager>();
-        services.AddScoped<IEchoService, EchoService>();
-        services.AddTransient<ISpennyIrcInstance, SpennyIrcInstance>(x =>
-        {
-            IServiceScope scope = _serviceProvider.CreateScope();
-            IServiceProvider sp = scope.ServiceProvider;
-            IIrcSession ircSession = sp.GetRequiredService<IIrcSession>();
-            IIrcCommands ircCommands = x.GetRequiredService<IIrcCommands>();
-            IIrcEvents events = ircSession.Events;
-            SpennyIrcInstance spennyIrcSession = new(ircSession, ircCommands, scope);
-
-            List<IIrcRuntimeBinder> eventsToBind =
-            [
-                new ClientRuntimeBinder(events, ircSession.Server, ircSession.LocalUser),
-                new IalRuntimeBinder(events, ircSession.Ial),
-                new ViewModelRuntimeBinder(spennyIrcSession)
-            ];
-
-            foreach (IIrcRuntimeBinder evt in eventsToBind)
-                evt.Bind();
-
-            return spennyIrcSession;
-        });
+        services.AddScoped<IWindowService, WindowService>();
     }
 }

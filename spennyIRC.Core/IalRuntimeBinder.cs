@@ -9,13 +9,13 @@ public class IalRuntimeBinder(IIrcEvents events, IIrcInternalAddressList ial) : 
     {
         events.AddEvent(ProtocolNumericConstants.RPL_MONONLINE, (ctx) => // 730 - Notify online
         {
-            IrcExtractedUserInfo userInfo = ctx.Trailing.ExtractBasicUserInfo();
+            IrcExtractedUserInfo userInfo = ctx.Trailing!.ExtractBasicUserInfo();
             ial.InsertUser(userInfo);
             return Task.CompletedTask;
         });
         events.AddEvent(ProtocolNumericConstants.RPL_MONOFFLINE, (ctx) => // 731 - Notify offline
         {
-            string? nick = ctx.Trailing;
+            string nick = ctx.Trailing!;
             ial.RemoveNick(nick);
             return Task.CompletedTask;
         });
@@ -34,33 +34,31 @@ public class IalRuntimeBinder(IIrcEvents events, IIrcInternalAddressList ial) : 
             return Task.CompletedTask;
         });
 
-        events.AddEvent(ProtocolNumericConstants.RPL_NAMREPLY, (ctx) => // 353 - Names 
+        events.AddEvent(ProtocolNumericConstants.RPL_NAMREPLY, (ctx) => // 353 - Names
         {
-            IrcExtractedUserInfo[] users = ctx.Trailing.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                                              .Select(x => x.ExtractUserInfoFrom353())
-                                              .ToArray();
+            IrcExtractedUserInfo[] users = [.. ctx.Trailing!.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => x.ExtractUserInfoFrom353())];
             ial.UpsertUsers(users, ctx.LineParts[4]);
             return Task.CompletedTask;
         });
         events.AddEvent("JOIN", (ctx) =>
         {
             IrcExtractedUserInfo info = ctx.LineParts[0][1..].ExtractBasicUserInfo();
-            ial.UpsertChannel(info.Nick, ctx.Trailing);
+            ial.UpsertChannel(info.Nick, ctx.Trailing!);
             return Task.CompletedTask;
         });
         events.AddEvent("PART", (ctx) =>
         {
-            ial.RemoveChannel(ctx.Nick, ctx.Recipient);
+            ial.RemoveChannel(ctx.Nick!, ctx.Recipient);
             return Task.CompletedTask;
         });
         events.AddEvent("NICK", (ctx) =>
         {
-            ial.ChangeNick(ctx.Nick, ctx.Trailing);
+            ial.ChangeNick(ctx.Nick!, ctx.Trailing!);
             return Task.CompletedTask;
         });
         events.AddEvent("KICK", (ctx) =>
         {
-            ial.RemoveChannel(ctx.Nick, ctx.Recipient);
+            ial.RemoveChannel(ctx.Nick!, ctx.Recipient);
             return Task.CompletedTask;
         });
         events.AddEvent("MODE", (ctx) => // TODO: finish this, make this less awful
@@ -86,7 +84,7 @@ public class IalRuntimeBinder(IIrcEvents events, IIrcInternalAddressList ial) : 
         });
         events.AddEvent("QUIT", (ctx) =>
         {
-            ial.RemoveNick(ctx.Nick);
+            ial.RemoveNick(ctx.Nick!);
             return Task.CompletedTask;
         });
         // TODO: Add WHOIS
@@ -100,7 +98,7 @@ Events to monitor:
 * JOIN           :icrawl55!irc@1E5498DC.904CBC6.A1AB8D51.IP JOIN :#ASDASDASD
 * PART           :ASDASDASD!~asdasdads@702C07FF.251B41EB.C2CFB607.IP PART #ASDASDASD :EMO-PART
 * NICK           :ASDASDASD!~asdasdads@702C07FF.251B41EB.C2CFB607.IP NICK :ASDASDASD_
-* PRIVMSG (PM)           
+* PRIVMSG (PM)
 * WHO (352)      :shrimp.test.org 352 YourNick #ASDASDASD ~Hello E9726DF6.B6B17E60.81B556F8.IP * YourNick H@ :0 Hi Guys
 * WHOIS
 * NOTIFY (NOTICE)
@@ -111,10 +109,10 @@ Events to monitor:
  311
  319
  312
- 318         
+ 318
 */
-//events.AddEvent("312", (ctx) => //RPL_WHOISOPERATOR 
-//{ 730, 731, 
+//events.AddEvent("312", (ctx) => //RPL_WHOISOPERATOR
+//{ 730, 731,
 //    return Task.CompletedTask;
 //});
 //events.AddEvent("313", (ctx) => // RPL_WHOISIDLE

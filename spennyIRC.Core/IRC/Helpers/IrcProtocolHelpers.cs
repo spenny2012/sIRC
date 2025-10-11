@@ -2,7 +2,7 @@
 
 namespace spennyIRC.Core.IRC.Helpers;
 
-public static class IrcHelpers
+public static class IrcProtocolHelpers
 {
     //public static string ExtractFullHost(this string line)
     //{
@@ -171,7 +171,6 @@ public static class IrcHelpers
         ReadOnlySpan<char> nickSpan = nick.AsSpan();
 
         int maxLength = nickSpan.Length < 5 ? nickSpan.Length : 5;
-
         for (int i = 0; i < maxLength; i++)
         {
             char currentChar = nickSpan[i];
@@ -209,12 +208,11 @@ public static class IrcHelpers
         // Extract the nick without access prefixes
         string resultNick = accessCount > 0 ? nickSpan[accessCount..].ToString() : nickSpan.ToString();
         IrcChannelAccessType[] resultAccess = accessSpan[..accessCount].ToArray();
-
         return (resultNick, resultAccess);
     }
 
     /// <summary>
-    /// This function is to be used for numeric 352 
+    /// This function is to be used for numeric 352
     /// </summary>
     ///
     public static IrcChannelAccessType[] ExtractAccessTypeFrom352(this string modes)
@@ -274,6 +272,7 @@ public static class IrcHelpers
             };
         }
     }
+
     public static IrcExtractedUserInfo ExtractUserInfoFrom352(this string[] lineParts)
     {
         string nick = lineParts[7];
@@ -293,8 +292,7 @@ public static class IrcHelpers
     public static Dictionary<string, string> ExtractNetworkSettingsFrom005(this string line)
     {
         Dictionary<string, string> dictionary = [];
-        const string pattern = @"(\S+)=([^\s]+)";
-        Regex regex = new(pattern);
+        Regex regex = new(@"(\S+)=([^\s]+)");
 
         MatchCollection matches = regex.Matches(line);
         foreach (Match match in matches)

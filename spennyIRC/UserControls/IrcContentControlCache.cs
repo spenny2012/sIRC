@@ -15,10 +15,14 @@ public static class IrcContentControlCache
         return ctrl;
     }
 
-    public static void RemoveControlAndKey(IChatWindow chatWindow)
+    public static void RemoveControlAndKey(IChatWindow window)
     {
-        if (Cache.TryGetValue(chatWindow, out _))
-            Cache.Remove(chatWindow);
+        if (Cache.TryGetValue(window, out UserControl? userControl))
+        {
+            userControl.DataContext = null;
+            window.Dispose();
+            Cache.Remove(window);
+        }
     }
 
     private static UserControl CreateControl(IChatWindow CacheKey)

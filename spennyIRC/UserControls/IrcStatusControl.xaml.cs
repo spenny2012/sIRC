@@ -16,12 +16,6 @@ public partial class IrcStatusControl : UserControl
     {
         InitializeComponent();
         InitializeChatDisplay();
-        PrintIntro();
-    }
-
-    private void PrintIntro()
-    {
-
     }
 
     private void InitializeChatDisplay()
@@ -33,7 +27,7 @@ public partial class IrcStatusControl : UserControl
 
     private void RegisterEcho()
     {
-        _vm.Session.Session.EchoService.DoEcho += (window, txt) =>
+        _vm.Session.EchoService.DoEcho += (window, txt) =>
         {
             if (window == _vm.Name || window == "All")
             {

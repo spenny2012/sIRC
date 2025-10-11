@@ -1,7 +1,8 @@
-﻿namespace spennyIRC.ViewModels.Messages.LocalUser
-{
+﻿using spennyIRC.Core.IRC;
 
-    public class OpenQueryMessage(ISpennyIrcInstance Instance) : MessageBase(Instance)
+namespace spennyIRC.ViewModels.Messages.LocalUser
+{
+    public class OpenQueryMessage(IIrcSession Instance) : MessageBase(Instance)
     {
         public string Nick { get; set; } = string.Empty;
     }

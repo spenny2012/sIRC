@@ -10,11 +10,29 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
     {
         events.AddEvent(ProtocolNumericConstants.RPL_WELCOME, (ctx) => // 001 - Welcome
         {
+            // :ircnet.hostsailor.com 001 sIK90lR :Welcome to the Internet Relay Network sIK90lR!~atEVT@185.202.221.94
             server.Connected = true;
             server.Host = ctx.LineParts[0][1..];
             return Task.CompletedTask;
         });
-        events.AddEvent(ProtocolNumericConstants.RPL_YOURHOST, static async (ctx) => { }); // 002 - Your Host
+        events.AddEvent(ProtocolNumericConstants.RPL_YOURHOST, static (ctx) => { return Task.CompletedTask; }); // 002 - Your Host
+        events.AddEvent(ProtocolNumericConstants.ERR_NICKNAMEINUSE, async (ctx) => // 433 - Nickname in use
+        {
+            // if not connected, change nick and store new credentials
+            if (!server.Connected)
+            {
+                // if nick is already changed to nick2 and is also invalid
+                if (localUser.Nick == localUser.Nick2)
+                {
+                    return;
+                }
+                // update local user nick
+                localUser.Nick = localUser.Nick2;
+
+                // change nick
+                await ctx.IrcClient.SendMessageAsync($"NICK {localUser.Nick2}");
+            }
+        });
         events.AddEvent(ProtocolNumericConstants.RPL_ISUPPORT, (ctx) => // 005 - I Support
         {
             Dictionary<string, string> settings = ctx.Line.ExtractNetworkSettingsFrom005();
@@ -40,7 +58,7 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
         events.AddEvent("NICK", (ctx) =>
         {
             if (ctx.Nick == localUser.Nick)
-                localUser.Nick = ctx.Trailing;
+                localUser.Nick = ctx.Trailing!;
             return Task.CompletedTask;
         });
         events.AddEvent("JOIN", (ctx) =>
@@ -54,29 +72,29 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
 
             return Task.CompletedTask;
         });
-        events.AddEvent("PART", async (ctx) =>
+        events.AddEvent("PART", (ctx) =>
         {
             if (ctx.Nick == localUser.Nick)
                 localUser.Channels.Remove(ctx.Recipient.TrimStart(':'));
+            return Task.CompletedTask;
         });
-        events.AddEvent("KICK", async (ctx) =>
+        events.AddEvent("KICK", (ctx) =>
         {
             bool localUserKicked = ctx.LineParts[3] == localUser.Nick;
             if (localUserKicked)
                 localUser.Channels.Remove(ctx.Recipient.TrimStart(':'));
+            return Task.CompletedTask;
         });
-        events.AddEvent("MODE", static async (ctx) =>
+        events.AddEvent("MODE", (ctx) =>
         {
             // TODO: handle modes
+            return Task.CompletedTask;
         });
         events.AddEvent("DISCONNECT", (ctx) =>
         {
-            server.Network = string.Empty;
-            server.NetworkId = string.Empty;
-            server.Port = string.Empty;
-            server.Host = string.Empty;
-            server.Connected = false;
-            server.Settings.Clear();
+            localUser.Away = false;
+            server.Clear();
+
             return Task.CompletedTask;
         });
         events.AddEvent("VERSION", static async (ctx) =>
@@ -86,8 +104,7 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
     }
 }
 
-
-/* 
+/*
 Fields to monitor:
     * 001 RPL_WELCOME (server info)       |   :irc.atw-inter.net 001 YourNick :Welcome to the Internet Relay Network YourNick!~Hello@45.13.235.55
     * 002 RPL_YOURHOST                    |   :irc.atw-inter.net 002 YourNick :Your host is irc.atw-inter.net, running version 2.11.2p3+0PNv1.06
@@ -97,7 +114,7 @@ Fields to monitor:
     * NICK (local user)                   |   :YourNick!~Hello@45.13.235.55 NICK :YourNick2
     * JOIN (local user)                   |   :YourNick!~Hello@45.13.235.55 JOIN :#test
     * MODE (local user)                   |   :YourNick MODE YourNick :+i
-    * PART (local user)                   |   
+    * PART (local user)                   |
     * QUIT (local user)                   |   ERROR :Closing Link: YourNick[~Hello@45.13.235.55] ("TEST")
-    * AWAY (local user)                   |   
+    * AWAY (local user)                   |
 */

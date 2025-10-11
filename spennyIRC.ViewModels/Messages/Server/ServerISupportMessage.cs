@@ -1,5 +1,7 @@
-﻿namespace spennyIRC.ViewModels.Messages.Server;
+﻿using spennyIRC.Core.IRC;
 
-public class ServerISupportMessage(ISpennyIrcInstance session) : MessageBase(session)
+namespace spennyIRC.ViewModels.Messages.Server;
+
+public class ServerISupportMessage(IIrcSession session) : MessageBase(session)
 {
 }

@@ -1,5 +1,7 @@
-﻿namespace spennyIRC.ViewModels.Messages.Server;
+﻿using spennyIRC.Core.IRC;
 
-public class ServerDisconnectedMessage(ISpennyIrcInstance session) : MessageBase(session)
+namespace spennyIRC.ViewModels.Messages.Server;
+
+public class ServerDisconnectedMessage(IIrcSession session) : MessageBase(session)
 {
 }

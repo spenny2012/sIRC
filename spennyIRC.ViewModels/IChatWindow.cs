@@ -1,15 +1,15 @@
-﻿using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using spennyIRC.Core.IRC;
 
 namespace spennyIRC.ViewModels;
 
-public interface IChatWindow
+public interface IChatWindow : IDisposable
 {
-    string Name { get; set; }
     string Caption { get; set; }
+    IAsyncRelayCommand ClearCommand { get; }
+    IAsyncRelayCommand ExecuteCommand { get; }
     bool IsSelected { get; set; }
+    string Name { get; set; }
+    IIrcSession Session { get; }
     string Text { get; set; }
-    ISpennyIrcInstance Session { get; set; }
-    ICommand ExecuteCommand { get; }
 }
-
-

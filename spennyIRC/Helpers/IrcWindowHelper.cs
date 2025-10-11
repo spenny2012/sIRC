@@ -29,6 +29,7 @@ public static class IrcWindowHelper
             richTextBox.Background = backgroundBrush;
         }
     }
+
     public static void SetBackground(this RichTextBox richTextBox, string resource)
     {
         Uri resourceLocater = new(resource, UriKind.Relative);

@@ -29,49 +29,40 @@ public partial class IrcChannelControl : UserControl
     }
 
     // TODO: handle all registerecho calls in a different control
-    private void RegisterEcho()
-    {
-        _vm.EchoService.DoEcho += (window, txt) =>
-        {
-            if (window == _vm.Name || window == "All")
-            {
-                WriteLine(txt);
-            }
-        };
-    }
 
     public void WriteLine(string text)
     {
         Dispatcher.Invoke(() =>
         {
             paragraph.Inlines.Add(new Run(text + Environment.NewLine));
-
             ChatDisplay.ScrollToEnd();
         });
     }
 
     private void UserControl_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
     {
-        if (DataContext == null)
+        if (e.NewValue == null)
         {
-            // Unbind
-
+            if (e.OldValue != null)
+            {
+                ChannelViewModel oldVm = (ChannelViewModel)e.OldValue;
+                oldVm.EchoService.DoEcho -= DoEcho;
+            }
             return;
         }
-
         _vm = (ChannelViewModel)DataContext;
+        _vm.EchoService.DoEcho += DoEcho;
+    }
 
-        RegisterEcho();
+    private void DoEcho(string window, string txt)
+    {
+        if (window == _vm.Name || window == "All")
+        {
+            WriteLine(txt);
+        }
     }
 
     private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
     {
-
-    }
-
-    private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-    {
-        if (e.IsDown && e.Key == System.Windows.Input.Key.Enter)
-            _vm.ExecuteCommand.Execute(null);
     }
 }
