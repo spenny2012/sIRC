@@ -1,15 +1,14 @@
 ﻿using System.Windows.Controls;
 
-namespace spennyIRC.UserControls
+namespace spennyIRC.UserControls;
+
+/// <summary>
+/// Interaction logic for IrcChatboxControl.xaml
+/// </summary>
+public partial class IrcChatboxControl : UserControl
 {
-    /// <summary>
-    /// Interaction logic for IrcChatboxControl.xaml
-    /// </summary>
-    public partial class IrcChatboxControl : UserControl
+    public IrcChatboxControl()
     {
-        public IrcChatboxControl()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

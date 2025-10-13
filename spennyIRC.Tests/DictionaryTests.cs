@@ -10,4 +10,10 @@ public class DictionaryTests
     {
         string dicks = WordLookupHelper.DefineAsync("fart").GetAwaiter().GetResult();
     }
+
+    [TestMethod]
+    public void TestDefine2()
+    {
+        string dicks = WordLookupHelper.UdLookupAsync("fart").GetAwaiter().GetResult();
+    }
 }

@@ -1,19 +1,18 @@
 ﻿using spennyIRC.Core.IRC;
 
-namespace spennyIRC.Scripting
+namespace spennyIRC.Scripting;
+
+//TODO: add help command
+public class IrcCommandsBinder(IIrcCommands commands) : IrcCommandsBinderBase(commands)
 {
-    //TODO: add help command
-    public class IrcCommandsBinder(IIrcCommands commands) : IrcCommandsBinderBase(commands)
+    public void Bind()
     {
-        public void Bind()
-        {
-            AddCommand("help", "lists commands", ListCommandsAsync);
+        AddCommand("help", "lists commands", ListCommandsAsync);
 
-            BindFoundCommands();
-        }
+        BindFoundCommands();
+    }
 
-        private async Task ListCommandsAsync(string parameters, IIrcSession session)
-        {
-        }
+    private async Task ListCommandsAsync(string parameters, IIrcSession session)
+    {
     }
 }

@@ -1,14 +1,13 @@
 ﻿using spennyIRC.Scripting;
 
-namespace spennyIRC.ViewModels
+namespace spennyIRC.ViewModels;
+
+public class UICommandsBinder(IIrcCommands commands) : IrcCommandsBinderBase(commands)
 {
-    public class UICommandsBinder(IIrcCommands commands) : IrcCommandsBinderBase(commands)
+    public void Bind()
     {
-        public void Bind()
-        {
-            // UI commands
-            //AddCommand("list", ViewModelCommandHelpers.ListAsync);
-            AddCommand("clear", "clears a chat window", ViewModelCommandHelpers.ClearAsync);
-        }
+        // UI commands
+        //AddCommand("list", ViewModelCommandHelpers.ListAsync);
+        AddCommand("clear", "clears a chat window", ViewModelCommandHelpers.ClearAsync);
     }
 }
