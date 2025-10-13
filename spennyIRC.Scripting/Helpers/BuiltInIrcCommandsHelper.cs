@@ -7,9 +7,15 @@ using System.Reflection;
 namespace spennyIRC.Scripting.Helpers
 {
     [IrcCommandClass("Basic Commands")]
-    public static class BuiltInIrcCommands
+    public static class BuiltInIrcCommandsHelper
     {
         private const int DEFAULT_IRC_PORT = 6697;
+
+        [IrcCommand("looks up a word from the dictionary")]
+        public static async Task DictAsync(string parameters, IIrcSession session)
+        {
+            session.EchoService.DoEcho(session.ActiveWindow, await WordLookupHelper.DefineAsync(parameters));
+        }
 
         [IrcCommand("bans a user")]
         public static async Task BanAsync(string parameters, IIrcSession session)

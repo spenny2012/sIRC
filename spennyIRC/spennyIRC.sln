@@ -10,6 +10,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spennyIRC.Tests", "..\spennyIRC.Tests\spennyIRC.Tests.csproj", "{0CEA98C9-33BC-4EFA-878A-78E4704CB7AF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5260A01E-D071-4E82-8614-63472055BCDB} = {5260A01E-D071-4E82-8614-63472055BCDB}
+		{C837A6DF-25B8-4831-AD01-6E691290AFAA} = {C837A6DF-25B8-4831-AD01-6E691290AFAA}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spennyIRC.ViewModels", "..\spennyIRC.ViewModels\spennyIRC.ViewModels.csproj", "{5260A01E-D071-4E82-8614-63472055BCDB}"

@@ -13,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\spennyIRC.Core\spennyIRC.Core.csproj" />
+	  <ProjectReference Include="..\spennyIRC.Core\spennyIRC.Core.csproj" />
+	  <ProjectReference Include="..\spennyIRC.Scripting\spennyIRC.Scripting.csproj" />
   </ItemGroup>
 
   <ItemGroup>
