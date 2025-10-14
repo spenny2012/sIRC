@@ -12,6 +12,8 @@ namespace spennyIRC.Scripting.Helpers
                 throw new ArgumentNullException(nameof(obj));
             }
 
+            session.EchoService.DoEcho(session.ActiveWindow, $"-");
+
             Type type = obj.GetType();
             IOrderedEnumerable<PropertyInfo> properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                                  .Where(p => p.CanRead)
@@ -29,6 +31,8 @@ namespace spennyIRC.Scripting.Helpers
                     session.EchoService.DoEcho(session.ActiveWindow, $"{property.Name}: [Error: {ex.Message}]");
                 }
             }
+
+            session.EchoService.DoEcho(session.ActiveWindow, $"-");
         }
 
         public static void PrintProperties(object obj, IIrcSession session)
