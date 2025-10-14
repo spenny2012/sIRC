@@ -27,6 +27,10 @@ public static class BuiltInIrcCommandsHelper
             UdDefinition firstDefinition = foundDefinition.First();
             PrintPropertiesHelper.BasicPrintProperties(firstDefinition, session);
         }
+        else
+        {
+            session.EchoService.DoEcho(session.ActiveWindow, $"-\r\nNo definitions found for {parameters}.\r\n-");
+        }
     }
 
     [IrcCommand("bans a user")]
@@ -123,8 +127,10 @@ public static class BuiltInIrcCommandsHelper
     public static Task SessionInfoAsync(string parameters, IIrcSession session)
     {
         session.EchoService.Echo(session.ActiveWindow, "-");
+
         PrintPropertiesHelper.PrintProperties(session.LocalUser, session);
         PrintPropertiesHelper.PrintProperties(session.Server, session);
+
         session.EchoService.Echo(session.ActiveWindow, "-");
 
         return Task.CompletedTask;
@@ -368,7 +374,9 @@ public static class BuiltInIrcCommandsHelper
     public static Task SetRealNameAsync(string parameters, IIrcSession session)
     {
         if (parameters == null) return Task.CompletedTask;
+
         session.EchoService.Echo(session.ActiveWindow, $"Real name set to: {session.LocalUser.Realname = parameters}");
+
         return Task.CompletedTask;
     }
 }
