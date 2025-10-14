@@ -9,12 +9,12 @@ public class DictionaryTests
     [TestMethod]
     public void TestDefine()
     {
-        string dicks = WordLookupHelper.DefineAsync("fart").GetAwaiter().GetResult();
+        string dicks = WordLookupHelper.DefineAsync("test").GetAwaiter().GetResult();
     }
 
     [TestMethod]
     public void TestDefine2()
     {
-        List<UdDefinition> definitions = UdLookupHelper.UdLookupAsync("NIGGER").GetAwaiter().GetResult();
+        List<UdDefinition> definitions = UdLookupHelper.UdLookupAsync("tttttt").GetAwaiter().GetResult();
     }
 }
