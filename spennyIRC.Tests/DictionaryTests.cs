@@ -1,4 +1,5 @@
 using spennyIRC.Scripting.Helpers;
+using spennyIRC.Scripting.Helpers.UrbanDictionary;
 
 namespace spennyIRC.Tests;
 
@@ -14,6 +15,6 @@ public class DictionaryTests
     [TestMethod]
     public void TestDefine2()
     {
-        List<UdDefinition> definitions = UdLookupHelper.UdLookupAsync("fart").GetAwaiter().GetResult();
+        List<UdDefinition> definitions = UdLookupHelper.UdLookupAsync("NIGGER").GetAwaiter().GetResult();
     }
 }

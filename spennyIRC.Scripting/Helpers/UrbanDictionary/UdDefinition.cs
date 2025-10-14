@@ -1,4 +1,4 @@
-﻿namespace spennyIRC.Scripting.Helpers;
+﻿namespace spennyIRC.Scripting.Helpers.UrbanDictionary;
 
 public class UdDefinition
 {
@@ -6,7 +6,5 @@ public class UdDefinition
     public DateTime? Date { get; set; }
     public string? Example { get; set; }
     public string? Meaning { get; set; }
-    public int ThumbsDown { get; set; }
-    public int ThumbsUp { get; set; }
     public string? Word { get; set; }
 }

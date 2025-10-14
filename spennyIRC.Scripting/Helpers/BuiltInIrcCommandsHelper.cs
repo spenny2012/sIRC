@@ -1,8 +1,8 @@
 ﻿using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
 using spennyIRC.Scripting.Attributes;
+using spennyIRC.Scripting.Helpers.UrbanDictionary;
 using System.Diagnostics;
-using System.Reflection;
 
 namespace spennyIRC.Scripting.Helpers;
 
@@ -11,10 +11,22 @@ public static class BuiltInIrcCommandsHelper
 {
     private const int DEFAULT_IRC_PORT = 6697;
 
-    [IrcCommand("looks up a word from the dictionary")]
+    [IrcCommand("looks up a word from the dictionary (dict.org)")]
     public static async Task DictAsync(string parameters, IIrcSession session)
     {
         session.EchoService.DoEcho(session.ActiveWindow, await WordLookupHelper.DefineAsync(parameters));
+    }
+
+    [IrcCommand("looks up a slang term from the UrbanDictionary")]
+    public static async Task UdAsync(string parameters, IIrcSession session)
+    {
+        List<UdDefinition> foundDefinition = await UdLookupHelper.UdLookupAsync(parameters);
+
+        if (foundDefinition.Count > 0)
+        {
+            UdDefinition firstDefinition = foundDefinition.First();
+            PrintPropertiesHelper.BasicPrintProperties(firstDefinition, session);
+        }
     }
 
     [IrcCommand("bans a user")]
@@ -111,8 +123,8 @@ public static class BuiltInIrcCommandsHelper
     public static Task SessionInfoAsync(string parameters, IIrcSession session)
     {
         session.EchoService.Echo(session.ActiveWindow, "-");
-        PrintClassProperties(session.LocalUser, session);
-        PrintClassProperties(session.Server, session);
+        PrintPropertiesHelper.PrintProperties(session.LocalUser, session);
+        PrintPropertiesHelper.PrintProperties(session.Server, session);
         session.EchoService.Echo(session.ActiveWindow, "-");
 
         return Task.CompletedTask;
@@ -238,28 +250,6 @@ public static class BuiltInIrcCommandsHelper
         string[] paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         string partMsg = parameters.GetTokenFrom(1);
         await session.Client.SendMessageAsync($"PART {paramParts[0]} :{partMsg}");
-    }
-
-    public static void PrintClassProperties(object obj, IIrcSession session)
-    {
-        Type type = obj.GetType();
-        session.EchoService.Echo(session.ActiveWindow, $"Properties of {type.Name}:");
-
-        PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-        foreach (PropertyInfo property in properties)
-        {
-            try
-            {
-                object? value = property.GetValue(obj);
-                string? valueString = value != null ? value.ToString() : "null";
-                session.EchoService.Echo(session.ActiveWindow, $"{property.Name}: {valueString}");
-            }
-            catch (Exception ex)
-            {
-                session.EchoService.Echo(session.ActiveWindow, $"{property.Name}: Error retrieving value ({ex.Message})");
-            }
-        }
     }
 
     [IrcCommand("quits a server")]

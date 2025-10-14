@@ -1,8 +1,13 @@
 ﻿using HtmlAgilityPack;
+using spennyIRC.Scripting.Helpers.UrbanDictionary;
+using System.Net;
 using System.Text.RegularExpressions;
 
 namespace spennyIRC.Scripting.Helpers;
 
+/// <summary>
+/// Look up slang term definitions from Urban Dictionary
+/// </summary>
 public static class UdLookupHelper
 {
     private static readonly HttpClient _httpClient = new()
@@ -38,7 +43,7 @@ public static class UdLookupHelper
         // Find all definition containers
         HtmlNodeCollection definitionNodes = doc.DocumentNode.SelectNodes("//div[contains(@class, 'definition')]");
 
-        if (definitionNodes == null || !definitionNodes.Any())
+        if (definitionNodes == null || definitionNodes.Count == 0)
             return definitions;
 
         foreach (HtmlNode defNode in definitionNodes)
@@ -81,6 +86,6 @@ public static class UdLookupHelper
             return string.Empty;
 
         // Remove excessive whitespace and trim
-        return Regex.Replace(text, @"\s+", " ").Trim();
+        return Regex.Replace(WebUtility.HtmlDecode(text), @"\s+", " ").Trim();
     }
 }
