@@ -14,6 +14,6 @@ public class DictionaryTests
     [TestMethod]
     public void TestDefine2()
     {
-        string dicks = WordLookupHelper.UdLookupAsync("fart").GetAwaiter().GetResult();
+        string dicks = Scripting.Helpers.UdLookupHelper.UdLookupAsync("fart").GetAwaiter().GetResult();
     }
 }

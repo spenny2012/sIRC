@@ -92,10 +92,4 @@ public static class WordLookupHelper
             return $"Error: {ex.Message}";
         }
     }
-
-    public static async Task<string> UdLookupAsync(string ud)
-    {
-        var httpClient = new HttpClient { BaseAddress = new Uri("http://urbandictionary.com/") };
-        return await (await httpClient.GetAsync($"define.php?term={ud}")).Content.ReadAsStringAsync();
-    }
 }
