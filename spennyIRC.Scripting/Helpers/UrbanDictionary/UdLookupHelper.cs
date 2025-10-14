@@ -1,7 +1,9 @@
 ﻿using HtmlAgilityPack;
 using spennyIRC.Scripting.Helpers.UrbanDictionary;
 using System.Net;
+using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace spennyIRC.Scripting.Helpers;
 
@@ -22,7 +24,8 @@ public static class UdLookupHelper
         try
         {
             string encodedTerm = Uri.EscapeDataString(ud);
-            HttpResponseMessage response = await _httpClient.GetAsync($"define.php?term={encodedTerm}");
+
+            HttpResponseMessage response = await _httpClient.GetAsync($"define.php?term={HttpUtility.UrlEncode(encodedTerm)}");
             response.EnsureSuccessStatusCode();
 
             string html = await response.Content.ReadAsStringAsync();
