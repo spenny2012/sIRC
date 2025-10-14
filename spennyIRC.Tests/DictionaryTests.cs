@@ -1,6 +1,6 @@
-namespace spennyIRC.Tests;
-
 using spennyIRC.Scripting.Helpers;
+
+namespace spennyIRC.Tests;
 
 [TestClass]
 public class DictionaryTests

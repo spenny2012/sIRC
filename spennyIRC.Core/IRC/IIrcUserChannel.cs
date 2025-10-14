@@ -2,5 +2,5 @@
 
 public interface IIrcUserChannel
 {
-    public List<IrcChannelAccessType> Access { get; set; }
+    List<IrcChannelAccessType> Access { get; set; }
 }

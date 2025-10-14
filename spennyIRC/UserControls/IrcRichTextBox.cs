@@ -77,7 +77,7 @@ public class IrcRichTextBox : RichTextBox
 
                 if (lastScrollableHeight > 0 && currentScrollableHeight > 0)
                 {
-                    double newPosition = (_lastVerticalOffset / lastScrollableHeight) * currentScrollableHeight;
+                    double newPosition = _lastVerticalOffset / lastScrollableHeight * currentScrollableHeight;
                     newPosition = Math.Clamp(newPosition, 0, currentScrollableHeight);
                     _scrollViewer.ScrollToVerticalOffset(newPosition);
                 }

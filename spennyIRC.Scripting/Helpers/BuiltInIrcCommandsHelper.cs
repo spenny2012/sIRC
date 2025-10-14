@@ -370,7 +370,7 @@ public static class BuiltInIrcCommandsHelper
     public static Task SetIdentAsync(string parameters, IIrcSession session)
     {
         if (parameters == null) return Task.CompletedTask;
-        session.EchoService.Echo(session.ActiveWindow, $"Ident set to: {(session.LocalUser.Ident = parameters.Split(' ')[0])}");
+        session.EchoService.Echo(session.ActiveWindow, $"Ident set to: {session.LocalUser.Ident = parameters.Split(' ')[0]}");
         return Task.CompletedTask;
     }
 
@@ -378,7 +378,7 @@ public static class BuiltInIrcCommandsHelper
     public static Task SetRealNameAsync(string parameters, IIrcSession session)
     {
         if (parameters == null) return Task.CompletedTask;
-        session.EchoService.Echo(session.ActiveWindow, $"Real name set to: {(session.LocalUser.Realname = parameters)}");
+        session.EchoService.Echo(session.ActiveWindow, $"Real name set to: {session.LocalUser.Realname = parameters}");
         return Task.CompletedTask;
     }
 }

@@ -2,5 +2,5 @@
 
 public interface IIrcRuntimeBinder
 {
-    public void Bind();
+    void Bind();
 }

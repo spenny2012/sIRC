@@ -7,5 +7,5 @@ public interface IIrcLocalUser
     string Nick2 { get; set; }
     string Realname { get; set; }
     bool Away { get; set; }
-    public Dictionary<string, IIrcChannel> Channels { get; set; }
+    Dictionary<string, IIrcChannel> Channels { get; set; }
 }

@@ -1,10 +1,9 @@
-﻿using System.Text;
+﻿using HtmlAgilityPack;
 using System.Text.RegularExpressions;
-using HtmlAgilityPack;
 
 namespace spennyIRC.Scripting.Helpers;
 
-public static partial class UdLookupHelper
+public static class UdLookupHelper
 {
     private static readonly HttpClient _httpClient = new()
     {
@@ -56,7 +55,7 @@ public static partial class UdLookupHelper
                 definition.Meaning = CleanText(meaningNode.InnerText);
             }
 
-            // Extract meaning - contained within .definition
+            // Extract example - contained within .definition
             HtmlNode exampleNode = defNode.SelectSingleNode("//div[contains(@class, 'example')]");
             if (exampleNode != null)
             {
