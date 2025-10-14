@@ -1,7 +1,5 @@
 ﻿using HtmlAgilityPack;
 using spennyIRC.Scripting.Helpers.UrbanDictionary;
-using System.Net;
-using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 using System.Web;
 
@@ -89,6 +87,6 @@ public static class UdLookupHelper
             return string.Empty;
 
         // Remove excessive whitespace and trim
-        return Regex.Replace(WebUtility.HtmlDecode(text), @"\s+", " ").Trim();
+        return Regex.Replace(HttpUtility.HtmlDecode(text), @"\s+", " ").Trim();
     }
 }

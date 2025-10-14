@@ -65,7 +65,6 @@ public static class IrcProtocolHelpers
     public static IrcExtractedUserInfo ExtractBasicUserInfo(this string fullNick)
     {
         ReadOnlySpan<char> fullNickSpan = fullNick.AsSpan();
-
         int nickEnd = fullNickSpan.IndexOf('!');
         if (nickEnd < 0)
         {
