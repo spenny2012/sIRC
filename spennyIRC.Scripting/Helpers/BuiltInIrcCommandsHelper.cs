@@ -14,12 +14,13 @@ public static class BuiltInIrcCommandsHelper
     [IrcCommand("looks up a word from the dictionary (dict.org)")]
     public static async Task DictAsync(string parameters, IIrcSession session)
     {
-        session.EchoService.DoEcho(session.ActiveWindow, await WordLookupHelper.DefineAsync(parameters));
+        session.EchoService.DoEcho(session.ActiveWindow, $"-\r\n{await DictLookupHelper.DefineAsync(parameters)}-\r\n");
     }
 
     [IrcCommand("looks up a slang term from the UrbanDictionary")]
     public static async Task UdAsync(string parameters, IIrcSession session)
     {
+        // TODO: find wrapped quotes, if no quotes, parse normally
         List<UdDefinition> foundDefinition = await UdLookupHelper.UdLookupAsync(parameters);
 
         if (foundDefinition.Count > 0)
@@ -29,7 +30,7 @@ public static class BuiltInIrcCommandsHelper
         }
         else
         {
-            session.EchoService.DoEcho(session.ActiveWindow, $"-\r\nNo definitions found for {parameters}.\r\n-");
+            session.EchoService.DoEcho(session.ActiveWindow, $"-\r\nNo definitions found for '{parameters}'\r\n-");
         }
     }
 

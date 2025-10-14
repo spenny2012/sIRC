@@ -9,7 +9,7 @@ public class DictionaryTests
     [TestMethod]
     public void TestDefine()
     {
-        string dicks = WordLookupHelper.DefineAsync("test").GetAwaiter().GetResult();
+        string dicks = DictLookupHelper.DefineAsync("test").GetAwaiter().GetResult();
     }
 
     [TestMethod]

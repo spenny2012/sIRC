@@ -3,7 +3,7 @@ using System.Text;
 
 namespace spennyIRC.Scripting.Helpers;
 
-public static class WordLookupHelper
+public static class DictLookupHelper
 {
     /// <summary>
     /// Look up a word definition from dict.org
