@@ -11,7 +11,7 @@ public static class ThreadSafeInvoker
     /// <param name="action">The action to execute</param>
     /// <param name="priority">The dispatcher priority (optional)</param>
     /// <returns>True if the action was executed; false if it couldn't be executed</returns>
-    public static bool InvokeIfNecessary(Action action, DispatcherPriority priority = DispatcherPriority.Normal)
+    public static bool Invoke(Action action, DispatcherPriority priority = DispatcherPriority.Normal)
     {
         ArgumentNullException.ThrowIfNull(nameof(action));
 
@@ -46,7 +46,7 @@ public static class ThreadSafeInvoker
     /// <param name="action">The action to execute</param>
     /// <param name="priority">The dispatcher priority (optional)</param>
     /// <returns>True if the action was queued; false if it couldn't be queued</returns>
-    public static bool BeginInvokeIfNecessary(Action action, DispatcherPriority priority = DispatcherPriority.Normal)
+    public static bool BeginInvoke(Action action, DispatcherPriority priority = DispatcherPriority.Normal)
     {
         ArgumentNullException.ThrowIfNull(nameof(action));
 

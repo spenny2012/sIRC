@@ -33,7 +33,7 @@ public class QueryViewModel : WindowViewModelBase
         WeakReferenceMessenger.Default.Register<LocalUserNickChangeMessage>(this, (r, m) =>
         {
             if (m.Session != _session || m.Nick != Name) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() => Name = Caption = m.NewNick);
+            ThreadSafeInvoker.Invoke(() => Name = Caption = m.NewNick);
         });
     }
 }

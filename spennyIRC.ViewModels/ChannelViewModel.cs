@@ -61,7 +61,7 @@ public class ChannelViewModel : WindowViewModelBase
         WeakReferenceMessenger.Default.Register<ServerDisconnectedMessage>(this, (r, m) =>
         {
             if (m.Session != _session) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() => NickList.Clear());
+            ThreadSafeInvoker.Invoke(() => NickList.Clear());
         });
 
         WeakReferenceMessenger.Default.Register<ChannelKickMessage>(this, (r, m) =>
@@ -69,14 +69,14 @@ public class ChannelViewModel : WindowViewModelBase
             if (m.Session != _session || m.Channel != Channel) return;
             if (m.KickedNick == _session.LocalUser.Nick)
             {
-                ThreadSafeInvoker.InvokeIfNecessary(() => NickList.Clear());
+                ThreadSafeInvoker.Invoke(() => NickList.Clear());
             }
         });
 
         WeakReferenceMessenger.Default.Register<ChannelJoinMessage>(this, (r, m) =>
         {
             if (m.Session != _session || m.Channel != Channel) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() =>
+            ThreadSafeInvoker.Invoke(() =>
             {
                 NickList.Add(m.Nick);
                 SortNickList();
@@ -86,19 +86,19 @@ public class ChannelViewModel : WindowViewModelBase
         WeakReferenceMessenger.Default.Register<ChannelTopicChangeMessage>(this, (r, m) =>
         {
             if (m.Session != _session || m.Channel != Channel) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() => ChannelTopic = m.Topic);
+            ThreadSafeInvoker.Invoke(() => ChannelTopic = m.Topic);
         });
 
         WeakReferenceMessenger.Default.Register<ChannelTopicMessage>(this, (r, m) =>
         {
             if (m.Session != _session || m.Channel != Channel) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() => ChannelTopic = m.Topic);
+            ThreadSafeInvoker.Invoke(() => ChannelTopic = m.Topic);
         });
 
         WeakReferenceMessenger.Default.Register<ChannelAddNicksMessage>(this, (r, m) =>
         {
             if (m.Session != _session || m.Channel != Channel) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() =>
+            ThreadSafeInvoker.Invoke(() =>
             {
                 for (int i = 0; i < m.Nicks.Length; i++)
                 {
@@ -114,7 +114,7 @@ public class ChannelViewModel : WindowViewModelBase
             if (m.Session != _session || m.Channel != Channel) return;
             string? foundNick = FindNick(m.Nick);
             if (foundNick == null) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() => NickList.Remove(foundNick));
+            ThreadSafeInvoker.Invoke(() => NickList.Remove(foundNick));
         });
 
         WeakReferenceMessenger.Default.Register<UserQuitMessage>(this, (r, m) =>
@@ -122,20 +122,20 @@ public class ChannelViewModel : WindowViewModelBase
             if (m.Session != _session) return;
             string? foundNick = FindNick(m.Nick);
             if (foundNick == null) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() => NickList.Remove(foundNick));
+            ThreadSafeInvoker.Invoke(() => NickList.Remove(foundNick));
             _session.EchoService.Echo(Channel, $"»» {m.Nick} ({m.Host}) has quit IRC ({m.Message})");
         });
 
         WeakReferenceMessenger.Default.Register<LocalUserNickChangeMessage>(this, (r, m) =>
         {
             if (m.Session != _session || FindNick(m.Nick) == null) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() => ChangeNick(m.Nick, m.NewNick));
+            ThreadSafeInvoker.Invoke(() => ChangeNick(m.Nick, m.NewNick));
         });
 
         WeakReferenceMessenger.Default.Register<NickChangedMessage>(this, (r, m) =>
         {
             if (m.Session != _session || FindNick(m.Nick) == null) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() => ChangeNick(m.Nick, m.NewNick));
+            ThreadSafeInvoker.Invoke(() => ChangeNick(m.Nick, m.NewNick));
         });
     }
 

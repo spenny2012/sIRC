@@ -41,7 +41,7 @@ public class ServerViewModel : WindowViewModelBase
             if (m.Session != _session || m.Nick != _localUser.Nick || !FindWindowByName(Channels, m.Channel, out ChannelViewModel channel))
                 return;
 
-            ThreadSafeInvoker.InvokeIfNecessary(() => Channels.Remove(channel));
+            ThreadSafeInvoker.Invoke(() => Channels.Remove(channel));
         });
 
         WeakReferenceMessenger.Default.Register<ChannelAddMessage>(this, (r, m) =>
@@ -53,7 +53,7 @@ public class ServerViewModel : WindowViewModelBase
                 return;
             }
 
-            ThreadSafeInvoker.InvokeIfNecessary(() =>
+            ThreadSafeInvoker.Invoke(() =>
             {
                 ChannelViewModel channel = new(_session, _commands, m.Channel);
                 Channels.Add(channel);
@@ -65,13 +65,13 @@ public class ServerViewModel : WindowViewModelBase
         WeakReferenceMessenger.Default.Register<ServerDisconnectedMessage>(this, (r, m) =>
         {
             if (m.Session != _session) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() => Caption = "(No Network)");
+            ThreadSafeInvoker.Invoke(() => Caption = "(No Network)");
         });
 
         WeakReferenceMessenger.Default.Register<QueryMessage>(this, (r, m) =>
         {
             if (m.Session != _session || FindWindowByName(Channels, m.Nick, out QueryViewModel _)) return;
-            ThreadSafeInvoker.InvokeIfNecessary(() =>
+            ThreadSafeInvoker.Invoke(() =>
             {
                 Channels.Add(new QueryViewModel(_session, _commands, m.Nick));
                 Channels.AlphaNumericSort();
