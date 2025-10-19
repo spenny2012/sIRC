@@ -9,7 +9,7 @@ namespace spennyIRC;
 /// </summary>
 public partial class IrcChannelControl : UserControl
 {
-    private Paragraph paragraph;
+    private Paragraph _paragraph;
     private ChannelViewModel _vm;
 
     public IrcChannelControl()
@@ -20,12 +20,12 @@ public partial class IrcChannelControl : UserControl
 
     private void InitializeChatDisplay()
     {
-        paragraph = new Paragraph
+        _paragraph = new Paragraph
         {
             TextAlignment = System.Windows.TextAlignment.Justify
         };
         ChatDisplay.Document.Blocks.Clear();
-        ChatDisplay.Document.Blocks.Add(paragraph);
+        ChatDisplay.Document.Blocks.Add(_paragraph);
     }
 
     // TODO: handle all registerecho calls in a different control
@@ -34,7 +34,7 @@ public partial class IrcChannelControl : UserControl
     {
         Dispatcher.Invoke(() =>
         {
-            paragraph.Inlines.Add(new Run(text + Environment.NewLine));
+            _paragraph.Inlines.Add(new Run(text + Environment.NewLine));
             ChatDisplay.ScrollToEnd();
         });
     }
@@ -69,6 +69,8 @@ public partial class IrcChannelControl : UserControl
         if (window == _vm.Name || window == "All")
         {
             ChatDisplay.Document.Blocks.Clear();
+            _paragraph.Inlines.Clear();
+            ChatDisplay.Document.Blocks.Add(_paragraph);
         }
     }
 
