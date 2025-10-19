@@ -16,7 +16,7 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
     private const string StatusWindow = "Status";
     private const string AllWindows = "All";
     private readonly IIrcLocalUser _user = session.LocalUser;
-    private readonly IWindowService _echoSvc = session.EchoService;
+    private readonly IWindowService _echoSvc = session.WindowService;
     private readonly IIrcEvents _events = session.Events;
     private readonly IIrcServer _server = session.Server;
 

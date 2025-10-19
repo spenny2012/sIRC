@@ -14,7 +14,7 @@ public static class BuiltInIrcCommandsHelper
     [IrcCommand("looks up a word from the dictionary (dict.org)")]
     public static async Task DictAsync(string parameters, IIrcSession session)
     {
-        session.EchoService.DoEcho(session.ActiveWindow, $"-\r\n{await DictLookupHelper.DefineAsync(parameters)}-\r\n");
+        session.WindowService.DoEcho(session.ActiveWindow, $"-\r\n{await DictLookupHelper.DefineAsync(parameters)}-\r\n");
     }
 
     [IrcCommand("looks up a slang term from the UrbanDictionary")]
@@ -30,7 +30,7 @@ public static class BuiltInIrcCommandsHelper
         }
         else
         {
-            session.EchoService.DoEcho(session.ActiveWindow, $"-\r\nNo definitions found for '{parameters}'\r\n-");
+            session.WindowService.DoEcho(session.ActiveWindow, $"-\r\nNo definitions found for '{parameters}'\r\n-");
         }
     }
 
@@ -58,7 +58,7 @@ public static class BuiltInIrcCommandsHelper
                 await session.ClientManager.QuitAsync();
             }
 
-            session.EchoService.Echo("Status", $"*** Connecting to {serverInfo}...");
+            session.WindowService.Echo("Status", $"*** Connecting to {serverInfo}...");
 
             string[]? paramsParts = serverInfo.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             string server = paramsParts![0];
@@ -85,11 +85,11 @@ public static class BuiltInIrcCommandsHelper
         catch (Exception e)
         {
 #if DEBUG
-            session.EchoService.Echo("Status", $"ERROR: {e}");
+            session.WindowService.Echo("Status", $"ERROR: {e}");
             Debug.WriteLine($"ERROR: {e}");
 #endif
 #if RELEASE
-            session.EchoService.Echo("Status", $"ERROR: {e.Message}");
+            session.WindowService.Echo("Status", $"ERROR: {e.Message}");
 #endif
             session.Server.Clear();
         }
@@ -127,12 +127,12 @@ public static class BuiltInIrcCommandsHelper
     [IrcCommand("for debug purposes.  shows user session info")]
     public static Task SessionInfoAsync(string parameters, IIrcSession session)
     {
-        session.EchoService.Echo(session.ActiveWindow, "-");
+        session.WindowService.Echo(session.ActiveWindow, "-");
 
         PrintPropertiesHelper.PrintProperties(session.LocalUser, session);
         PrintPropertiesHelper.PrintProperties(session.Server, session);
 
-        session.EchoService.Echo(session.ActiveWindow, "-");
+        session.WindowService.Echo(session.ActiveWindow, "-");
 
         return Task.CompletedTask;
     }
@@ -152,7 +152,7 @@ public static class BuiltInIrcCommandsHelper
     {
         if (!session.Server.Connected)
         {
-            session.EchoService.Echo(session.ActiveWindow, $"*** Not connected to server");
+            session.WindowService.Echo(session.ActiveWindow, $"*** Not connected to server");
         }
         return session.Server.Connected;
     }
@@ -195,7 +195,7 @@ public static class BuiltInIrcCommandsHelper
         if (!IsConnected(session)) return;
 
         await session.Client.SendMessageAsync($"PRIVMSG {session.ActiveWindow} :\u0001ACTION {parameters}\u0001");
-        session.EchoService.Echo(session.ActiveWindow, $"* {session.LocalUser.Nick} {parameters}");
+        session.WindowService.Echo(session.ActiveWindow, $"* {session.LocalUser.Nick} {parameters}");
     }
 
     public static Task ModeAsync(string parameters, IIrcSession session)
@@ -213,7 +213,7 @@ public static class BuiltInIrcCommandsHelper
         string msg = parameters.GetTokenFrom(1);
 
         await session.Client.SendMessageAsync($"PRIVMSG {paramParts[0]} :{msg}");
-        session.EchoService.Echo(session.ActiveWindow, $"*{paramParts[0]}* {msg}");
+        session.WindowService.Echo(session.ActiveWindow, $"*{paramParts[0]}* {msg}");
     }
 
     [IrcCommand("performs names")]
@@ -230,7 +230,7 @@ public static class BuiltInIrcCommandsHelper
         if (!session.Server.Connected)
         {
             string nick = session.LocalUser.Nick = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0];
-            session.EchoService.Echo(session.ActiveWindow, $"*** You are now known as {nick}");
+            session.WindowService.Echo(session.ActiveWindow, $"*** You are now known as {nick}");
             return;
         }
 
@@ -246,7 +246,7 @@ public static class BuiltInIrcCommandsHelper
         string msg = parameters.GetTokenFrom(1);
 
         await session.Client.SendMessageAsync($"NOTICE {paramParts[0]} :{msg}");
-        session.EchoService.Echo(session.ActiveWindow, $"-{paramParts[0]}- {msg}");
+        session.WindowService.Echo(session.ActiveWindow, $"-{paramParts[0]}- {msg}");
     }
 
     [IrcCommand("parts a channel")]
@@ -288,7 +288,7 @@ public static class BuiltInIrcCommandsHelper
     {
         if (!IsConnected(session)) return;
 
-        session.EchoService.Echo(session.ActiveWindow, $"Rejoining {session.ActiveWindow}...");
+        session.WindowService.Echo(session.ActiveWindow, $"Rejoining {session.ActiveWindow}...");
         await session.Client.SendMessageAsync($"PART {session.ActiveWindow}\r\nJOIN {session.ActiveWindow}");
     }
 
@@ -300,7 +300,7 @@ public static class BuiltInIrcCommandsHelper
         session.LocalUser.Ident = MiscHelpers.GenerateRandomString(5);
         session.LocalUser.Realname = MiscHelpers.GenerateRandomString(10);
 
-        session.EchoService.Echo(session.ActiveWindow, $"Reset user info:\r\n Nick: {session.LocalUser.Nick}\r\n Ident: {session.LocalUser.Ident}\r\n Real Name: {session.LocalUser.Realname}");
+        session.WindowService.Echo(session.ActiveWindow, $"Reset user info:\r\n Nick: {session.LocalUser.Nick}\r\n Ident: {session.LocalUser.Ident}\r\n Real Name: {session.LocalUser.Realname}");
 
         return Task.CompletedTask;
     }
@@ -311,7 +311,7 @@ public static class BuiltInIrcCommandsHelper
         if (!IsConnected(session)) return;
 
         await session.Client.SendMessageAsync($"PRIVMSG {session.ActiveWindow} :{parameters}");
-        session.EchoService.Echo(session.ActiveWindow, $"[{session.LocalUser.Nick}] {parameters}");
+        session.WindowService.Echo(session.ActiveWindow, $"[{session.LocalUser.Nick}] {parameters}");
     }
 
     [IrcCommand("changes topic of a channel")]
@@ -367,7 +367,7 @@ public static class BuiltInIrcCommandsHelper
     public static Task SetIdentAsync(string parameters, IIrcSession session)
     {
         if (parameters == null) return Task.CompletedTask;
-        session.EchoService.Echo(session.ActiveWindow, $"Ident set to: {session.LocalUser.Ident = parameters.Split(' ')[0]}");
+        session.WindowService.Echo(session.ActiveWindow, $"Ident set to: {session.LocalUser.Ident = parameters.Split(' ')[0]}");
         return Task.CompletedTask;
     }
 
@@ -376,7 +376,7 @@ public static class BuiltInIrcCommandsHelper
     {
         if (parameters == null) return Task.CompletedTask;
 
-        session.EchoService.Echo(session.ActiveWindow, $"Real name set to: {session.LocalUser.Realname = parameters}");
+        session.WindowService.Echo(session.ActiveWindow, $"Real name set to: {session.LocalUser.Realname = parameters}");
 
         return Task.CompletedTask;
     }

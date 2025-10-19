@@ -5,7 +5,7 @@ public interface IIrcSession
     string ActiveWindow { get; set; }
     IIrcClient Client { get; }
     IIrcClientManager ClientManager { get; }
-    IWindowService EchoService { get; }
+    IWindowService WindowService { get; }
     IIrcEvents Events { get; }
     IIrcInternalAddressList Ial { get; }
     IIrcLocalUser LocalUser { get; }

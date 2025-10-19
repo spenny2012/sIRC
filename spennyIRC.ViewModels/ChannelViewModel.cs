@@ -22,7 +22,7 @@ public class ChannelViewModel : WindowViewModelBase
 
     public ChannelViewModel(IIrcSession session, IIrcCommands commands, string channel) : base(session, commands)
     {
-        _echoSvc = session.EchoService;
+        _echoSvc = session.WindowService;
         Name = Channel = Caption = channel;
     }
 
@@ -123,7 +123,7 @@ public class ChannelViewModel : WindowViewModelBase
             string? foundNick = FindNick(m.Nick);
             if (foundNick == null) return;
             ThreadSafeInvoker.Invoke(() => NickList.Remove(foundNick));
-            _session.EchoService.Echo(Channel, $"»» {m.Nick} ({m.Host}) has quit IRC ({m.Message})");
+            _session.WindowService.Echo(Channel, $"»» {m.Nick} ({m.Host}) has quit IRC ({m.Message})");
         });
 
         WeakReferenceMessenger.Default.Register<LocalUserNickChangeMessage>(this, (r, m) =>

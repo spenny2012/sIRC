@@ -13,7 +13,7 @@ public class QueryViewModel : WindowViewModelBase
     public QueryViewModel(IIrcSession session, IIrcCommands commands, string name) : base(session, commands)
     {
         Name = Caption = name;
-        _echoSvc = session.EchoService;
+        _echoSvc = session.WindowService;
     }
 
     public IWindowService EchoService
@@ -27,7 +27,7 @@ public class QueryViewModel : WindowViewModelBase
         WeakReferenceMessenger.Default.Register<UserQuitMessage>(this, (r, m) =>
         {
             if (m.Session != _session || m.Nick != Name) return;
-            _session.EchoService.Echo(Name, $"»» {m.Nick} ({m.Host}) has quit IRC ({m.Message})");
+            _session.WindowService.Echo(Name, $"»» {m.Nick} ({m.Host}) has quit IRC ({m.Message})");
         });
 
         WeakReferenceMessenger.Default.Register<LocalUserNickChangeMessage>(this, (r, m) =>

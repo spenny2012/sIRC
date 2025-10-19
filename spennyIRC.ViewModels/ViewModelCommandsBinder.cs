@@ -2,7 +2,7 @@
 
 namespace spennyIRC.ViewModels;
 
-public class UICommandsBinder(IIrcCommands commands) : IrcCommandsBinderBase(commands)
+public class ViewModelCommandsBinder(IIrcCommands commands) : IrcCommandsBinderBase(commands)
 {
     public void Bind()
     {

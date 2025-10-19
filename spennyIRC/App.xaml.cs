@@ -47,7 +47,9 @@ public partial class App : Application
 
         IIrcCommands commands = _serviceProvider.GetRequiredService<IIrcCommands>();
         IrcCommandsBinder cmdBinder = new(commands);
+        ViewModelCommandsBinder modelCmdBinder = new(commands);
         cmdBinder.Bind();
+        modelCmdBinder.Bind();
 
         DispatcherUnhandledException += App_DispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -91,10 +93,10 @@ public partial class App : Application
             // TODO: replace code belode with fields from settings
             return new IrcLocalUser
             {
-                Nick = "s" + MiscHelpers.GenerateRandomString(6),
-                Nick2 = "YourNick2",
+                Nick = "blackamoor",
+                Nick2 = "blackamoor2",
                 Ident = MiscHelpers.GenerateRandomString(5),
-                Realname = MiscHelpers.GenerateRandomString(3)
+                Realname = MiscHelpers.GenerateRandomString(7)
             };
         });
         services.AddScoped<IIrcEvents, IrcEvents>();

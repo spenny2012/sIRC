@@ -47,11 +47,13 @@ public partial class IrcChannelControl : UserControl
             {
                 ChannelViewModel oldVm = (ChannelViewModel)e.OldValue;
                 oldVm.EchoService.DoEcho -= DoEcho;
+                oldVm.EchoService.DoClear -= DoClear;
             }
             return;
         }
         _vm = (ChannelViewModel)DataContext;
         _vm.EchoService.DoEcho += DoEcho;
+        _vm.EchoService.DoClear += DoClear;
     }
 
     private void DoEcho(string window, string txt)
@@ -59,6 +61,14 @@ public partial class IrcChannelControl : UserControl
         if (window == _vm.Name || window == "All")
         {
             WriteLine(txt);
+        }
+    }
+
+    private void DoClear(string window)
+    {
+        if (window == _vm.Name || window == "All")
+        {
+            ChatDisplay.Document.Blocks.Clear();
         }
     }
 
