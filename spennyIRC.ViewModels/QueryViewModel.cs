@@ -16,7 +16,7 @@ public class QueryViewModel : WindowViewModelBase
         _echoSvc = session.WindowService;
     }
 
-    public IWindowService EchoService
+    public IWindowService WindowService
     {
         get => _echoSvc;
         set => SetProperty(ref _echoSvc, value);

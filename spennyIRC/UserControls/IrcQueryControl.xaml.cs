@@ -27,7 +27,7 @@ public partial class IrcQueryControl : UserControl
 
     private void RegisterEcho()
     {
-        _vm.EchoService.DoEcho += DoEcho;
+        _vm.WindowService.DoEcho += DoEcho;
     }
 
     private void DoEcho(string window, string text)
@@ -52,8 +52,8 @@ public partial class IrcQueryControl : UserControl
         if (e.NewValue == null && e.OldValue != null)
         {
             QueryViewModel vm = (QueryViewModel)e.OldValue;
-            if (vm.EchoService.DoEcho != null)
-                vm.EchoService.DoEcho -= DoEcho;
+            if (vm.WindowService.DoEcho != null)
+                vm.WindowService.DoEcho -= DoEcho;
         }
 
         _vm = (QueryViewModel)DataContext;

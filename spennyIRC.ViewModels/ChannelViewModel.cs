@@ -139,11 +139,7 @@ public class ChannelViewModel : WindowViewModelBase
         });
     }
 
-    /// <summary>
-    /// Find a nick in the nick list and return the full nick with status char if found
-    /// </summary>
-    /// <param name="nick">Nick without status char.</param>
-    /// <returns>The full nick with status char if found</returns>
+    /// <returns>The full nick with status char if found, otherwise null</returns>
     public string? FindNick(string nick)
     {
         for (int i = 0; i < NickList.Count; i++)
@@ -157,6 +153,11 @@ public class ChannelViewModel : WindowViewModelBase
 
         return null;
     }
+
+    //public string? ChangeNickAccess(string nick)
+    //{
+    //  var
+    //}
 
     private void ChangeNick(string oldNick, string newNick)
     {
