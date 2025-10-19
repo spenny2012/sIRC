@@ -74,7 +74,17 @@ public class ServerViewModel : WindowViewModelBase
             ThreadSafeInvoker.Invoke(() =>
             {
                 Channels.Add(new QueryViewModel(_session, _commands, m.Nick));
-                Channels.AlphaNumericSort();
+            });
+        });
+
+        WeakReferenceMessenger.Default.Register<OpenQueryMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session || FindWindowByName(Channels, m.Nick, out QueryViewModel _)) return;
+            ThreadSafeInvoker.Invoke(() =>
+            {
+                QueryViewModel qvm = new(_session, _commands, m.Nick);
+                Channels.Add(qvm);
+                qvm.IsSelected = true;
             });
         });
         WeakReferenceMessenger.Default.Register<NickChangedMessage>(this, (r, m) =>

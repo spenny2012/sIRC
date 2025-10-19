@@ -11,5 +11,6 @@ public class ViewModelCommandsBinder(IIrcCommands commands) : IrcCommandsBinderB
         //AddCommand("list", ViewModelCommandHelpers.ListAsync);
         BindFoundCommands();
         AddCommand("clear", "clears a chat window", ViewModelCommandHelpers.ClearAsync);
+        AddCommand("query", "opens a new query window", ViewModelCommandHelpers.QueryAsync);
     }
 }

@@ -16,7 +16,7 @@ public class IrcCommandsBinder(IIrcCommands _commands) : IrcCommandsBinderBase(_
     {
         session.WindowService.Echo(session.ActiveWindow, "-\r\nList of commands:");
 
-        foreach (var command in _commands.Commands)
+        foreach (KeyValuePair<string, IIrcCommand> command in _commands.Commands)
         {
             session.WindowService.Echo(session.ActiveWindow, $"* {command.Value.Name} - {command.Value.Description}");
         }

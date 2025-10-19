@@ -70,6 +70,11 @@ public partial class IrcChannelControl : UserControl
         {
             ChatDisplay.Document.Blocks.Clear();
             _paragraph.Inlines.Clear();
+            _paragraph = null!;
+            _paragraph = new Paragraph
+            {
+                TextAlignment = System.Windows.TextAlignment.Justify
+            };
             ChatDisplay.Document.Blocks.Add(_paragraph);
         }
     }
