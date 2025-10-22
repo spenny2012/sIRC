@@ -80,6 +80,7 @@ public class ServerViewModel : WindowViewModelBase
         WeakReferenceMessenger.Default.Register<OpenQueryMessage>(this, (r, m) =>
         {
             if (m.Session != _session || FindWindowByName(Channels, m.Nick, out QueryViewModel _)) return;
+
             ThreadSafeInvoker.Invoke(() =>
             {
                 QueryViewModel qvm = new(_session, _commands, m.Nick);
@@ -110,7 +111,7 @@ public class ServerViewModel : WindowViewModelBase
         where T : IChatWindow
     {
         value = default!;
-        if (windows.FirstOrDefault(c => c.Name == name) is T channel)
+        if (windows.FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) is T channel)
         {
             value = channel;
             return true;

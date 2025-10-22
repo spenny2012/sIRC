@@ -32,7 +32,7 @@ public partial class IrcQueryControl : UserControl
 
     private void DoEcho(string window, string text)
     {
-        if (window == _vm.Name || window == "All")
+        if (window.Equals(_vm.Name, StringComparison.OrdinalIgnoreCase) || window == "All")
         {
             WriteLine(text);
         }

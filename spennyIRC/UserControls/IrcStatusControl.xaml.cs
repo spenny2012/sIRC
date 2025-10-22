@@ -29,7 +29,7 @@ public partial class IrcStatusControl : UserControl
     {
         _vm.Session.WindowService.DoEcho += (window, txt) =>
         {
-            if (window == _vm.Name || window == "All")
+            if (window.Equals(_vm.Name, StringComparison.OrdinalIgnoreCase) || window == "All")
             {
                 WriteLine(txt);
             }
