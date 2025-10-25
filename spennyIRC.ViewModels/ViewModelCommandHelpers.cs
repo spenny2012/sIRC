@@ -18,7 +18,9 @@ public class ViewModelCommandHelpers
     [IrcCommand("Opens a new query")]
     public static Task QueryAsync(string parameters, IIrcSession session)
     {
-        WeakReferenceMessenger.Default.Send(new OpenQueryMessage(session) { Nick = parameters });
+        string name = parameters.Split(' ')[0];
+        // TODO: strip invalid chars or don't allow
+        WeakReferenceMessenger.Default.Send(new OpenQueryMessage(session) { Nick = name });
         return Task.CompletedTask;
     }
 }

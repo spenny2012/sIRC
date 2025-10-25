@@ -88,6 +88,7 @@ public class ServerViewModel : WindowViewModelBase
                 qvm.IsSelected = true;
             });
         });
+
         WeakReferenceMessenger.Default.Register<NickChangedMessage>(this, (r, m) =>
         {
             if (m.Session != _session || !FindWindowByName(Channels, m.Nick, out QueryViewModel qvm)) return;
