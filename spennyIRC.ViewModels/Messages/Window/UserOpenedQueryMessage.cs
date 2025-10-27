@@ -2,7 +2,7 @@
 
 namespace spennyIRC.ViewModels.Messages.Window;
 
-public class OpenQueryMessage(IIrcSession session) : MessageBase(session)
+public class UserOpenedQueryMessage(IIrcSession session) : MessageBase(session)
 {
     public string Nick { get; set; }
 }

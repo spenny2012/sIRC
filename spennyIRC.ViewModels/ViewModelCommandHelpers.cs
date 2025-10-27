@@ -22,7 +22,7 @@ public class ViewModelCommandHelpers
         if (name == null) return Task.CompletedTask;
 
         // TODO: strip invalid chars or don't allow
-        WeakReferenceMessenger.Default.Send(new OpenQueryMessage(session) { Nick = name });
+        WeakReferenceMessenger.Default.Send(new UserOpenedQueryMessage(session) { Nick = name });
         return Task.CompletedTask;
     }
 }

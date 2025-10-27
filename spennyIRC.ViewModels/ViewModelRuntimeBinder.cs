@@ -93,7 +93,7 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
             bool isDm = ctx.Recipient == _user.Nick;
             if (isDm) // handle query
             {
-                WeakReferenceMessenger.Default.Send(new QueryMessage(session)
+                WeakReferenceMessenger.Default.Send(new ServerOpenedQueryMessage(session)
                 {
                     Nick = ctx.Nick!,
                     Message = ctx.Trailing!

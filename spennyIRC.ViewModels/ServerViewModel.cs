@@ -68,7 +68,7 @@ public class ServerViewModel : WindowViewModelBase
             ThreadSafeInvoker.Invoke(() => Caption = "(No Network)");
         });
 
-        WeakReferenceMessenger.Default.Register<QueryMessage>(this, (r, m) =>
+        WeakReferenceMessenger.Default.Register<ServerOpenedQueryMessage>(this, (r, m) =>
         {
             if (m.Session != _session) return;
 
@@ -88,7 +88,7 @@ public class ServerViewModel : WindowViewModelBase
             });
         });
 
-        WeakReferenceMessenger.Default.Register<OpenQueryMessage>(this, (r, m) =>
+        WeakReferenceMessenger.Default.Register<UserOpenedQueryMessage>(this, (r, m) =>
         {
             if (m.Session != _session || FindWindowByName(Channels, m.Nick, out QueryViewModel _)) return;
 
