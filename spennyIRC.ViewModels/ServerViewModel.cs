@@ -70,7 +70,18 @@ public class ServerViewModel : WindowViewModelBase
 
         WeakReferenceMessenger.Default.Register<QueryMessage>(this, (r, m) =>
         {
-            if (m.Session != _session || FindWindowByName(Channels, m.Nick, out QueryViewModel _)) return;
+            if (m.Session != _session) return;
+
+            if (FindWindowByName(Channels, m.Nick, out QueryViewModel qvm))
+            {
+                if (qvm.Name != m.Nick) // TODO: test this
+                {
+                    qvm.Name = m.Nick;
+                }
+
+                return;
+            }
+
             ThreadSafeInvoker.Invoke(() =>
             {
                 Channels.Add(new QueryViewModel(_session, _commands, m.Nick));
@@ -82,11 +93,11 @@ public class ServerViewModel : WindowViewModelBase
             if (m.Session != _session || FindWindowByName(Channels, m.Nick, out QueryViewModel _)) return;
 
             ThreadSafeInvoker.Invoke(() =>
-            {
-                QueryViewModel qvm = new(_session, _commands, m.Nick);
-                Channels.Add(qvm);
-                qvm.IsSelected = true;
-            });
+                    {
+                        QueryViewModel qvm = new(_session, _commands, m.Nick);
+                        Channels.Add(qvm);
+                        qvm.IsSelected = true;
+                    });
         });
 
         WeakReferenceMessenger.Default.Register<NickChangedMessage>(this, (r, m) =>

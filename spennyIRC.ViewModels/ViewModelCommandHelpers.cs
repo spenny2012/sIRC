@@ -19,7 +19,6 @@ public class ViewModelCommandHelpers
     public static Task QueryAsync(string parameters, IIrcSession session)
     {
         string? name = parameters.Split(' ').FirstOrDefault();
-
         if (name == null) return Task.CompletedTask;
 
         // TODO: strip invalid chars or don't allow
