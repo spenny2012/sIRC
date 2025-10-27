@@ -1,6 +1,6 @@
 ﻿using spennyIRC.Core.IRC;
 
-namespace spennyIRC.Scripting;
+namespace spennyIRC.Scripting.Commands;
 
 public class IrcCommand : IIrcCommand
 {

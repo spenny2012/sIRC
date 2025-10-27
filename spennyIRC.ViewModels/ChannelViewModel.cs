@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using spennyIRC.Core.IRC;
-using spennyIRC.Scripting;
+using spennyIRC.Scripting.Commands;
 using spennyIRC.ViewModels.Helpers;
 using spennyIRC.ViewModels.Messages;
 using spennyIRC.ViewModels.Messages.Channel;

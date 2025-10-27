@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using spennyIRC.Core;
 using spennyIRC.Core.IRC;
-using spennyIRC.Scripting;
+using spennyIRC.Scripting.Commands;
 using System.Collections.ObjectModel;
 
 namespace spennyIRC.ViewModels;

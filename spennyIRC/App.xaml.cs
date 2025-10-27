@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
-using spennyIRC.Scripting;
+using spennyIRC.Scripting.Commands;
 using spennyIRC.ViewModels;
 using System.Diagnostics;
 using System.Windows;

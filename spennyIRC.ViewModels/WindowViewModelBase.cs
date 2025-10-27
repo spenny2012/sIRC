@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
-using spennyIRC.Scripting;
+using spennyIRC.Scripting.Commands;
 
 namespace spennyIRC.ViewModels;
 

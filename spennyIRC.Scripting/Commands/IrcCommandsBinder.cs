@@ -1,6 +1,6 @@
 ﻿using spennyIRC.Core.IRC;
 
-namespace spennyIRC.Scripting;
+namespace spennyIRC.Scripting.Commands;
 
 //TODO: add help command
 public class IrcCommandsBinder(IIrcCommands _commands) : IrcCommandsBinderBase(_commands)

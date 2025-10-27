@@ -1,8 +1,7 @@
-﻿using spennyIRC.UserControls;
-using spennyIRC.ViewModels;
+﻿using spennyIRC.ViewModels;
 using System.Windows.Controls;
 
-namespace spennyIRC;
+namespace spennyIRC.UserControls;
 
 public static class IrcContentControlCache
 {

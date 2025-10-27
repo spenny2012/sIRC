@@ -1,7 +1,8 @@
-﻿using spennyIRC.Core.IRC.Constants;
+﻿using spennyIRC.Core.IRC;
+using spennyIRC.Core.IRC.Constants;
 using spennyIRC.Core.IRC.Helpers;
 
-namespace spennyIRC.Core.IRC;
+namespace spennyIRC.Core;
 
 public class IalRuntimeBinder(IIrcEvents events, IIrcInternalAddressList ial) : IIrcRuntimeBinder
 {

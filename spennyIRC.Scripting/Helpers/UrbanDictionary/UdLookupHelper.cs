@@ -1,9 +1,8 @@
 ﻿using HtmlAgilityPack;
-using spennyIRC.Scripting.Helpers.UrbanDictionary;
 using System.Text.RegularExpressions;
 using System.Web;
 
-namespace spennyIRC.Scripting.Helpers;
+namespace spennyIRC.Scripting.Helpers.UrbanDictionary;
 
 /// <summary>
 /// Look up slang term definitions from Urban Dictionary

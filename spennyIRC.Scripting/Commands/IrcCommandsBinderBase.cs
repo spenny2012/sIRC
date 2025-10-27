@@ -2,7 +2,7 @@
 using spennyIRC.Scripting.Attributes;
 using System.Reflection;
 
-namespace spennyIRC.Scripting;
+namespace spennyIRC.Scripting.Commands;
 
 public abstract class IrcCommandsBinderBase(IIrcCommands commands)
 {

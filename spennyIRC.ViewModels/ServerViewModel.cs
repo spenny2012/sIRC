@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using spennyIRC.Core.IRC;
-using spennyIRC.Scripting;
+using spennyIRC.Scripting.Commands;
 using spennyIRC.ViewModels.Helpers;
 using spennyIRC.ViewModels.Messages.Channel;
 using spennyIRC.ViewModels.Messages.LocalUser;
@@ -74,7 +74,7 @@ public class ServerViewModel : WindowViewModelBase
 
             if (FindWindowByName(Channels, m.Nick, out QueryViewModel qvm))
             {
-                if (qvm.Name != m.Nick) // TODO: test this
+                if (qvm.Name != m.Nick) // TODO: test this; this is meant to change nick capitalization when necessary
                 {
                     qvm.Name = m.Nick;
                 }
