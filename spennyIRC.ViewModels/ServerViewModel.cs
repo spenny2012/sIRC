@@ -70,17 +70,7 @@ public class ServerViewModel : WindowViewModelBase
 
         WeakReferenceMessenger.Default.Register<ServerOpenedQueryMessage>(this, (r, m) =>
         {
-            if (m.Session != _session) return;
-
-            if (FindWindowByName(Channels, m.Nick, out QueryViewModel qvm))
-            {
-                if (qvm.Name != m.Nick) // TODO: test this; this is meant to change nick capitalization when necessary
-                {
-                    qvm.Name = m.Nick;
-                }
-
-                return;
-            }
+            if (m.Session != _session || FindWindowByName(Channels, m.Nick, out QueryViewModel _)) return;
 
             ThreadSafeInvoker.Invoke(() =>
             {

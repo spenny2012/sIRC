@@ -35,5 +35,12 @@ public class QueryViewModel : WindowViewModelBase
             if (m.Session != _session || m.Nick != Name) return;
             ThreadSafeInvoker.Invoke(() => Name = Caption = m.NewNick);
         });
+
+        // TODO: test this
+        WeakReferenceMessenger.Default.Register<ServerOpenedQueryMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session || (m.Nick != Name && m.Nick.Equals(Name, StringComparison.OrdinalIgnoreCase))) return;
+            Name = m.Nick;
+        });
     }
 }
