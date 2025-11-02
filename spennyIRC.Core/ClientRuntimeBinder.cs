@@ -97,7 +97,7 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
 
             return Task.CompletedTask;
         });
-        events.AddEvent("VERSION", static async (ctx) => await ctx.IrcClient.SendMessageAsync($"NOTICE {ctx.Nick} :\u0001[sIRC] v0.1\u0001"));
+        events.AddEvent("VERSION", static async (ctx) => await ctx.IrcClient.SendMessageAsync($"NOTICE {ctx.Nick} :\u0001{IrcClientConstants.VERSION_REPLY}\u0001"));
     }
 }
 
