@@ -23,6 +23,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
     private readonly ReaderWriterLockSlim _cacheLock = new();
     private readonly CSharpCompilationOptions _compilationOptions;
     private readonly ConcurrentDictionary<uint, CompiledScript> _compiledScripts = new();
+    private readonly ConcurrentDictionary<uint, AssemblyLoadContext> _loadContexts = new();
     private readonly CSharpParseOptions _parseOptions;
     private readonly MetadataReference[] _references;
 
@@ -116,6 +117,26 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
         return new ValueTask<T?>(Task.Run(() => ExecuteScript<T>(scriptPath)));
     }
 
+    /// <summary>
+    /// Unloads all loaded scripts
+    /// </summary>
+    public void UnloadAllScripts()
+    {
+        uint[] hashes = _compiledScripts.Keys.ToArray();
+        foreach (uint hash in hashes)
+        {
+            UnloadScriptByHash(hash);
+        }
+    }
+
+    /// <summary>
+    /// Unloads a specific script by path
+    /// </summary>
+    public void UnloadScript(string scriptPath)
+    {
+        uint hash = ComputeFileHash(scriptPath);
+        UnloadScriptByHash(hash);
+    }
     private static MetadataReference[] CreateReferences()
     {
         string[] refs =
@@ -162,6 +183,17 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
 
         // Use compiled lambda for fastest instantiation
         return (T?) Activator.CreateInstance(targetType);
+    }
+
+    private static FrozenDictionary<string, ReportDiagnostic> GetDiagnosticOptions()
+    {
+        // Suppress warnings for performance
+        return new Dictionary<string, ReportDiagnostic>
+        {
+            ["CS1701"] = ReportDiagnostic.Suppress, // Assembly reference mismatch
+            ["CS1702"] = ReportDiagnostic.Suppress,
+            ["CS1591"] = ReportDiagnostic.Suppress  // Missing XML comments
+        }.ToFrozenDictionary();
     }
 
     private Assembly CompileAndCache(string scriptPath, uint hash)
@@ -238,17 +270,6 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private string GetCachePath(uint hash) => Path.Combine(_cacheDirectory, $"{hash:X8}.dll");
 
-    private static FrozenDictionary<string, ReportDiagnostic> GetDiagnosticOptions()
-    {
-        // Suppress warnings for performance
-        return new Dictionary<string, ReportDiagnostic>
-        {
-            ["CS1701"] = ReportDiagnostic.Suppress, // Assembly reference mismatch
-            ["CS1702"] = ReportDiagnostic.Suppress,
-            ["CS1591"] = ReportDiagnostic.Suppress  // Missing XML comments
-        }.ToFrozenDictionary();
-    }
-
     private Assembly? LoadFromDiskCache(string cachePath, uint hash)
     {
         _cacheLock.EnterReadLock();
@@ -271,7 +292,6 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
                 AssemblyLoadContext context = new(null, isCollectible: true);
                 Assembly assembly = context.LoadFromStream(ms);
 
-                // Cache in memory
                 _compiledScripts[hash] = new CompiledScript(assembly, hash, mmf, fileInfo.Length);
 
                 return assembly;
@@ -355,6 +375,19 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
         return false;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void UnloadScriptByHash(uint hash)
+    {
+        if (_compiledScripts.TryRemove(hash, out CompiledScript script))
+        {
+            script.MappedFile?.Dispose();
+        }
+
+        if (_loadContexts.TryRemove(hash, out AssemblyLoadContext? context))
+        {
+            context.Unload();
+        }
+    }
     private void WarmUp()
     {
         // JIT warm-up with a minimal script
