@@ -15,7 +15,7 @@ namespace spennyIRC.Scripting.Engine;
 /// <summary>
 /// High-performance script manager optimized for speed and low memory usage
 /// </summary>
-public sealed class CSharpScriptManager : IDisposable, ICSharpScriptManager
+public sealed class CSharpScriptManager : ICSharpScriptManager
 {
     private const int MaxScriptSize = 1024 * 1024;
     private readonly ArrayPool<byte> _bytePool = ArrayPool<byte>.Shared;
@@ -53,6 +53,9 @@ public sealed class CSharpScriptManager : IDisposable, ICSharpScriptManager
         WarmUp();
     }
 
+    /// <summary>
+    /// Clears cache from the script cache directory
+    /// </summary>
     public void ClearCache()
     {
         _cacheLock.EnterWriteLock();
@@ -94,7 +97,6 @@ public sealed class CSharpScriptManager : IDisposable, ICSharpScriptManager
         if (!File.Exists(scriptPath))
             throw new FileNotFoundException($"Script not found: {scriptPath}");
 
-        // Fast path: Check memory cache first
         uint hash = ComputeFileHash(scriptPath);
 
         if (TryGetCachedAssembly(hash, out Assembly? cachedAssembly))
@@ -102,7 +104,6 @@ public sealed class CSharpScriptManager : IDisposable, ICSharpScriptManager
             return FastCreateInstance<T>(cachedAssembly);
         }
 
-        // Slow path: Compile and cache
         Assembly assembly = CompileAndCache(scriptPath, hash);
         return FastCreateInstance<T>(assembly);
     }
@@ -117,7 +118,6 @@ public sealed class CSharpScriptManager : IDisposable, ICSharpScriptManager
 
     private static MetadataReference[] CreateReferences()
     {
-        // Pre-resolve all assemblies
         string[] refs =
         [
             typeof(object).Assembly.Location,                          // System.Private.CoreLib
