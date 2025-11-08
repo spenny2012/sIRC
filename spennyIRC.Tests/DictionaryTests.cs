@@ -7,14 +7,16 @@ namespace spennyIRC.Tests;
 public class DictionaryTests
 {
     [TestMethod]
-    public void TestDefine()
+    public void DictDotOrgLookup()
     {
         string dicks = DictLookupHelper.DefineAsync("test").GetAwaiter().GetResult();
+        // TODO: add tests
     }
 
     [TestMethod]
-    public void TestDefine2()
+    public void UrbanDictionaryLookup()
     {
         List<UdDefinition> definitions = UdLookupHelper.UdLookupAsync("tttttt").GetAwaiter().GetResult();
+        Assert.IsTrue(definitions.Count > 0);
     }
 }
