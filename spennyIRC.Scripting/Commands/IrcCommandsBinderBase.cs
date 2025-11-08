@@ -48,7 +48,7 @@ public abstract class IrcCommandsBinderBase(IIrcCommands commands)
 
                 string commandDescription = attribute.Description;
 
-                Func<string, IIrcSession, Task> func = (Func<string, IIrcSession, Task>)Delegate.CreateDelegate(
+                Func<string, IIrcSession, Task> func = (Func<string, IIrcSession, Task>) Delegate.CreateDelegate(
                     typeof(Func<string, IIrcSession, Task>),
                     method);
 
