@@ -12,7 +12,28 @@ public class IrcCommands : IIrcCommands
         {
             return false;
         }
-        Commands[name] = command;
+        else
+        {
+            Commands[name] = command;
+
+            return true;
+        }
+    }
+
+    public bool AddCommand(string name, string description, Func<string, IIrcSession, Task> command)
+    {
+        if (Commands.TryGetValue(name, out _))
+        {
+            return false;
+        }
+
+        Commands[name] = new IrcCommand
+        {
+            Name = name,
+            Command = command,
+            Description = description
+        };
+
         return true;
     }
 
@@ -24,13 +45,3 @@ public class IrcCommands : IIrcCommands
         }
     }
 }
-
-//public bool AddCommand(string name, IIrcCommand command)
-//{
-//    if (Commands.TryGetValue(name, out _))
-//    {
-//        return false;
-//    }
-//    Commands[name] = command;
-//    return true;
-//}
