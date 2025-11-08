@@ -12,9 +12,6 @@ using System.Runtime.Loader;
 
 namespace spennyIRC.Scripting.Engine;
 
-/// <summary>
-/// High-performance script manager optimized for speed and low memory usage
-/// </summary>
 public sealed class CSharpScriptManager : ICSharpScriptManager
 {
     private const int MaxScriptSize = 1024 * 1024;
@@ -32,10 +29,8 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
         _cacheDirectory = cacheDirectory ?? Path.Combine(Path.GetTempPath(), "IRCScriptCache");
         Directory.CreateDirectory(_cacheDirectory);
 
-        // Pre-create all references once
         _references = CreateReferences();
 
-        // Optimized compilation options
         _compilationOptions = new CSharpCompilationOptions(
             OutputKind.DynamicallyLinkedLibrary,
             optimizationLevel: OptimizationLevel.Release,
@@ -50,7 +45,6 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
             .WithLanguageVersion(LanguageVersion.Latest)
             .WithKind(SourceCodeKind.Regular);
 
-        // Pre-warm JIT
         WarmUp();
     }
 
@@ -95,6 +89,8 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T? ExecuteScript<T>(string scriptPath) where T : class
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(scriptPath, nameof(scriptPath));
+
         if (!File.Exists(scriptPath))
             throw new FileNotFoundException($"Script not found: {scriptPath}");
 
@@ -114,6 +110,8 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
     /// </summary>
     public ValueTask<T?> ExecuteScriptAsync<T>(string scriptPath) where T : class
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(scriptPath, nameof(scriptPath));
+
         return new ValueTask<T?>(Task.Run(() => ExecuteScript<T>(scriptPath)));
     }
 
@@ -134,6 +132,8 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
     /// </summary>
     public void UnloadScript(string scriptPath)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(scriptPath, nameof(scriptPath));
+
         uint hash = ComputeFileHash(scriptPath);
         UnloadScriptByHash(hash);
     }
@@ -142,10 +142,10 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
     {
         string[] refs =
         [
-            typeof(object).Assembly.Location,                          // System.Private.CoreLib
-            typeof(Console).Assembly.Location,                         // System.Console
-            typeof(ICSharpScript).Assembly.Location,                   // Script interface
-            typeof(IIrcSession).Assembly.Location,                     // IRC types
+            typeof(object).Assembly.Location,               // System.Private.CoreLib
+            typeof(Console).Assembly.Location,              // System.Console
+            typeof(ICSharpScript).Assembly.Location,       // Script interface
+            typeof(IIrcSession).Assembly.Location,          // IRC types
             Assembly.Load("System.Runtime").Location,
             Assembly.Load("System.Collections").Location,
             Assembly.Load("System.Windows").Location,
@@ -166,7 +166,6 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
     {
         if (assembly == null) return null;
 
-        // Find type without LINQ allocation
         Type? targetType = null;
         Type interfaceType = typeof(T);
 
@@ -182,13 +181,11 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
         if (targetType == null)
             throw new InvalidOperationException($"No implementation of {typeof(T).Name} found");
 
-        // Use compiled lambda for fastest instantiation
         return (T?) Activator.CreateInstance(targetType);
     }
 
     private static FrozenDictionary<string, ReportDiagnostic> GetDiagnosticOptions()
     {
-        // Suppress warnings for performance
         return new Dictionary<string, ReportDiagnostic>
         {
             ["CS1701"] = ReportDiagnostic.Suppress, // Assembly reference mismatch
@@ -199,14 +196,12 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
 
     private Assembly CompileAndCache(string scriptPath, uint hash)
     {
-        // Read source code
         ReadOnlySpan<char> sourceCode;
         using (StreamReader reader = new(scriptPath))
         {
             sourceCode = reader.ReadToEnd().AsSpan();
         }
 
-        // Fast compile
         SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(
             sourceCode.ToString(),
             _parseOptions,
@@ -229,12 +224,10 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
         byte[] assemblyBytes = ms.ToArray();
         SaveToCache(hash, assemblyBytes);
 
-        // Load assembly
         ms.Position = 0;
         AssemblyLoadContext context = new(null, isCollectible: true);
         Assembly assembly = context.LoadFromStream(ms);
 
-        // Create memory-mapped file
         MemoryMappedFile mmf = MemoryMappedFile.CreateFromFile(
             GetCachePath(hash),
             FileMode.Open,
@@ -351,7 +344,6 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
     {
         assembly = null;
 
-        // Check in-memory cache
         if (_compiledScripts.TryGetValue(hash, out CompiledScript cached))
         {
             if (cached.AssemblyRef.Target is Assembly asm)
@@ -360,12 +352,10 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
                 return true;
             }
 
-            // Assembly was GC'd, reload from memory-mapped file
             assembly = LoadFromMemoryMappedFile(cached);
             return assembly != null;
         }
 
-        // Check disk cache
         string cachePath = GetCachePath(hash);
         if (File.Exists(cachePath))
         {
@@ -392,7 +382,6 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
 
     private void WarmUp()
     {
-        // JIT warm-up with a minimal script
         try
         {
             const string warmupCode = "public class W : spennyIRC.Scripting.Engine.ICSharpScript { public string Name => \"W\"; public string Version => \"1\"; public string Author => \"W\"; public string Description => \"W\"; public void Initialize() { } public void Execute() { } public void Shutdown() { } }";
