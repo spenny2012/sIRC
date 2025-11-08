@@ -1,6 +1,6 @@
 ﻿namespace spennyIRC.Core.IRC.Constants;
 
-public class CharacterConstants
+public class ProtocolCharacterConstants
 {
     public const char BOLD_CHAR = '\u0002';
     public const char COLOR_CHAR = '\u000F';

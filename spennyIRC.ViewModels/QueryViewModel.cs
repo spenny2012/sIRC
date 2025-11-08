@@ -3,6 +3,7 @@ using spennyIRC.Core.IRC;
 using spennyIRC.Scripting.Commands;
 using spennyIRC.ViewModels.Messages;
 using spennyIRC.ViewModels.Messages.LocalUser;
+using spennyIRC.ViewModels.Messages.Window;
 
 namespace spennyIRC.ViewModels;
 
@@ -34,6 +35,13 @@ public class QueryViewModel : WindowViewModelBase
         {
             if (m.Session != _session || m.Nick != Name) return;
             ThreadSafeInvoker.Invoke(() => Name = Caption = m.NewNick);
+        });
+
+
+        WeakReferenceMessenger.Default.Register<NickChangedMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session || m.Nick != Name) return;
+            ThreadSafeInvoker.Invoke(() => Caption = Name = m.NewNick);
         });
 
         // TODO: test this

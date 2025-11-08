@@ -50,10 +50,10 @@ public static class IrcReceivedContextFactory
         ctx.Nick = index == -1 ? firstPart[1..].ToString() : firstPart[1..index].ToString();
 
         // if is ctcp
-        if (ctx.Event == "PRIVMSG" && trailing[..1][0] == CharacterConstants.CTCP_CHAR)
+        if (ctx.Event == "PRIVMSG" && trailing[..1][0] == ProtocolCharacterConstants.CTCP_CHAR)
         {
             string ctcpType = trailing[1..];
-            if (ctcpType[^1..][0] == CharacterConstants.CTCP_CHAR)
+            if (ctcpType[^1..][0] == ProtocolCharacterConstants.CTCP_CHAR)
                 ctcpType = ctcpType[..^1];
             ctx.Event = ctcpType;
         }

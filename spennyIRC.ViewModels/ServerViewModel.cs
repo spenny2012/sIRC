@@ -47,7 +47,7 @@ public class ServerViewModel : WindowViewModelBase
         WeakReferenceMessenger.Default.Register<ChannelAddMessage>(this, (r, m) =>
         {
             if (m.Session != _session) return;
-            if (FindWindowByName(Channels, m.Channel, out ChannelViewModel channel))
+            if (FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) // TODO: remove potential useless functionality
             {
                 channel.IsSelected = true;
                 return;
@@ -86,12 +86,6 @@ public class ServerViewModel : WindowViewModelBase
                 Channels.Add(qvm);
                 qvm.IsSelected = true;
             });
-        });
-
-        WeakReferenceMessenger.Default.Register<NickChangedMessage>(this, (r, m) =>
-        {
-            if (m.Session != _session || !FindWindowByName(Channels, m.Nick, out QueryViewModel qvm)) return;
-            qvm.Caption = qvm.Name = m.NewNick;
         });
 
         WeakReferenceMessenger.Default.Register<ServerISupportMessage>(this, (r, m) =>
