@@ -122,7 +122,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
     /// </summary>
     public void UnloadAllScripts()
     {
-        uint[] hashes = _compiledScripts.Keys.ToArray();
+        uint[] hashes = [.. _compiledScripts.Keys];
         foreach (uint hash in hashes)
         {
             UnloadScriptByHash(hash);
