@@ -40,7 +40,7 @@ public class IrcContentControl : ContentControl
             return;
         }
 
-        IChatWindow key = (IChatWindow)CacheKey;
+        IChatWindow key = (IChatWindow) CacheKey;
 
         if (IrcContentControlCache.Cache.TryGetValue(key, out UserControl? cachedContent))
             Content = cachedContent;

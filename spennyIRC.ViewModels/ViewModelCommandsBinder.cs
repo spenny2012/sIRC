@@ -1,5 +1,4 @@
-﻿using spennyIRC.Scripting.Attributes;
-using spennyIRC.Scripting.Commands;
+﻿using spennyIRC.Scripting.Commands;
 
 namespace spennyIRC.ViewModels;
 

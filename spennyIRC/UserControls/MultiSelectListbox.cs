@@ -18,7 +18,7 @@ public class MultiSelectListbox : ListBox
 
     public IList SelectedItemsList
     {
-        get { return (IList)GetValue(SelectedItemsListProperty); }
+        get { return (IList) GetValue(SelectedItemsListProperty); }
         set { SetValue(SelectedItemsListProperty, value); }
     }
 

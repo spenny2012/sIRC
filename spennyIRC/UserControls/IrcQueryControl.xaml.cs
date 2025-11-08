@@ -51,12 +51,12 @@ public partial class IrcQueryControl : UserControl
     {
         if (e.NewValue == null && e.OldValue != null)
         {
-            QueryViewModel vm = (QueryViewModel)e.OldValue;
+            QueryViewModel vm = (QueryViewModel) e.OldValue;
             if (vm.WindowService.DoEcho != null)
                 vm.WindowService.DoEcho -= DoEcho;
         }
 
-        _vm = (QueryViewModel)DataContext;
+        _vm = (QueryViewModel) DataContext;
 
         RegisterEcho();
     }

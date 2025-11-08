@@ -53,11 +53,11 @@ public class IrcTreeServerTreeView : TreeView
 
     protected virtual void OnItemAdded(object newItem)
     {
-        IrcContentControlCache.AddControlAndKey((IChatWindow)newItem);
+        IrcContentControlCache.AddControlAndKey((IChatWindow) newItem);
     }
 
     protected virtual void OnItemRemoved(object oldItem)
     {
-        IrcContentControlCache.RemoveControlAndKey((IChatWindow)oldItem);
+        IrcContentControlCache.RemoveControlAndKey((IChatWindow) oldItem);
     }
 }

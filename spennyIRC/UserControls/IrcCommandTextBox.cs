@@ -22,7 +22,7 @@ public class IrcCommandTextBox : TextBox
         {
             string command = Text;
 
-            ((IChatWindow)DataContext).ExecuteCommand.Execute(null);
+            ((IChatWindow) DataContext).ExecuteCommand.Execute(null);
 
             if (!string.IsNullOrWhiteSpace(command))
             {

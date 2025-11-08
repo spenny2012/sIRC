@@ -45,13 +45,13 @@ public partial class IrcChannelControl : UserControl
         {
             if (e.OldValue != null)
             {
-                ChannelViewModel oldVm = (ChannelViewModel)e.OldValue;
+                ChannelViewModel oldVm = (ChannelViewModel) e.OldValue;
                 oldVm.EchoService.DoEcho -= DoEcho;
                 oldVm.EchoService.DoClear -= DoClear;
             }
             return;
         }
-        _vm = (ChannelViewModel)DataContext;
+        _vm = (ChannelViewModel) DataContext;
         _vm.EchoService.DoEcho += DoEcho;
         _vm.EchoService.DoClear += DoClear;
     }

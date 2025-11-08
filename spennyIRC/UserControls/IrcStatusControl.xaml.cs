@@ -54,7 +54,7 @@ public partial class IrcStatusControl : UserControl
             return;
         }
 
-        _vm = (ServerViewModel)DataContext;
+        _vm = (ServerViewModel) DataContext;
 
         RegisterEcho();
     }
