@@ -7,7 +7,7 @@ public class IrcCommandsBinder(IIrcCommands _commands) : IrcCommandsBinderBase(_
 {
     public void Bind()
     {
-        AddCommand("help", "lists commands", ListCommandsAsync);
+        _commands.AddCommand("help", "lists commands", ListCommandsAsync);
 
         BindFoundCommands();
     }

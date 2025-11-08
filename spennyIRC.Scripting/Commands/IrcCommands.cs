@@ -37,11 +37,13 @@ public class IrcCommands : IIrcCommands
         return true;
     }
 
-    public async Task ExecuteCommand(string name, string? parameters, IIrcSession session)
+    public Task ExecuteCommand(string name, string? parameters, IIrcSession session)
     {
         if (Commands.TryGetValue(name, out IIrcCommand? foundCommand))
         {
-            await foundCommand.Command.Invoke(parameters!, session);
+            return foundCommand.Command(parameters!, session);
         }
+
+        return Task.CompletedTask;
     }
 }

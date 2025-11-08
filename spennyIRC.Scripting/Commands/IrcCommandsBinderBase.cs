@@ -6,16 +6,6 @@ namespace spennyIRC.Scripting.Commands;
 
 public abstract class IrcCommandsBinderBase(IIrcCommands commands)
 {
-    protected void AddCommand(string name, string description, Func<string, IIrcSession, Task> func)
-    {
-        commands.AddCommand(name, description, new IrcCommand
-        {
-            Name = name,
-            Description = description,
-            Command = func,
-        });
-    }
-
     protected void BindFoundCommands()
     {
         IEnumerable<Type> types = Assembly.GetExecutingAssembly()
@@ -52,7 +42,7 @@ public abstract class IrcCommandsBinderBase(IIrcCommands commands)
                     typeof(Func<string, IIrcSession, Task>),
                     method);
 
-                AddCommand(commandName, commandDescription, func);
+                commands.AddCommand(commandName, commandDescription, func);
             }
         }
     }
