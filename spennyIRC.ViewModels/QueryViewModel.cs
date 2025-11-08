@@ -37,7 +37,6 @@ public class QueryViewModel : WindowViewModelBase
             ThreadSafeInvoker.Invoke(() => Name = Caption = m.NewNick);
         });
 
-
         WeakReferenceMessenger.Default.Register<NickChangedMessage>(this, (r, m) =>
         {
             if (m.Session != _session || m.Nick != Name) return;

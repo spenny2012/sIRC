@@ -8,6 +8,5 @@
 #if DEBUG
         public static string VERSION_REPLY = "Bleh";
 #endif
-
     }
 }

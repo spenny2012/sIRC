@@ -137,6 +137,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
         uint hash = ComputeFileHash(scriptPath);
         UnloadScriptByHash(hash);
     }
+
     private static MetadataReference[] CreateReferences()
     {
         string[] refs =
@@ -388,6 +389,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
             context.Unload();
         }
     }
+
     private void WarmUp()
     {
         // JIT warm-up with a minimal script
