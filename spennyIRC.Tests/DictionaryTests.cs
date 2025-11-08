@@ -16,7 +16,7 @@ public class DictionaryTests
     [TestMethod]
     public void UrbanDictionaryLookup()
     {
-        List<UdDefinition> definitions = UdLookupHelper.UdLookupAsync("tttttt").GetAwaiter().GetResult();
+        List<UdDefinition> definitions = UdLookupHelper.UdLookupAsync("test").GetAwaiter().GetResult();
         Assert.IsTrue(definitions.Count > 0);
     }
 }
