@@ -1,3 +1,5 @@
+using Moq;
+using spennyIRC.Scripting.Commands;
 using spennyIRC.Scripting.Engine;
 
 namespace spennyIRC.Tests.ScriptingTests;
@@ -10,7 +12,9 @@ public class CSharpScriptManagerTests
     [TestMethod]
     public void TestScriptLoading()
     {
-        CSharpScriptManager csScriptMgr = new();
+        Mock<IIrcCommands> mockCommands = new();
+        CSharpScriptManager csScriptMgr = new(mockCommands.Object);
+
         ICSharpScript? script = csScriptMgr.ExecuteScript<ICSharpScript>(SCRIPT_PATH);
         script?.Initialize();
         Assert.IsNotNull(script);

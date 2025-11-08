@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using spennyIRC.Core.IRC;
+using spennyIRC.Scripting.Commands;
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
@@ -16,6 +17,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
 {
     private const int MaxScriptSize = 1024 * 1024;
     private readonly ArrayPool<byte> _bytePool = ArrayPool<byte>.Shared;
+    private readonly IIrcCommands _commands;
     private readonly string _cacheDirectory;
     private readonly ReaderWriterLockSlim _cacheLock = new();
     private readonly CSharpCompilationOptions _compilationOptions;
@@ -24,9 +26,11 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
     private readonly CSharpParseOptions _parseOptions;
     private readonly MetadataReference[] _references;
 
-    public CSharpScriptManager(string? cacheDirectory = null)
+    public CSharpScriptManager(IIrcCommands commands)
     {
-        _cacheDirectory = cacheDirectory ?? Path.Combine(Path.GetTempPath(), "IRCScriptCache");
+        _commands = commands;
+        _cacheDirectory = Path.Combine(Path.GetTempPath(), "sIRCScriptCache");
+
         Directory.CreateDirectory(_cacheDirectory);
 
         _references = CreateReferences();
