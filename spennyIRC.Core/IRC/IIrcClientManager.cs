@@ -6,6 +6,4 @@ public interface IIrcClientManager
 
     // TODO: introduce constant
     Task QuitAsync(string quitMsg = "Test");
-
-    void SetSession(IIrcSession session);
 }
