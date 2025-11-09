@@ -22,7 +22,7 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
             if (!server.Connected)
             {
                 // if nick is already changed to nick2 and is also invalid
-                if (localUser.Nick == localUser.Nick2)
+                if (localUser.Nick.Equals(localUser.Nick2, StringComparison.OrdinalIgnoreCase))
                 {
                     return;
                 }
