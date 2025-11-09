@@ -2,7 +2,7 @@
 
 public record struct IrcReceivedContext : IIrcReceivedContext
 {
-    public IIrcClient IrcClient { get; set; }
+    public IIrcSession Session { get; set; }
     public string Line { get; set; }
     public string[] LineParts { get; set; }
     public string Event { get; set; }

@@ -22,6 +22,9 @@ namespace spennyIRC.Scripting.Engine
         public virtual void TriggerEvent(IIrcReceivedContext ctx)
         {
             var evt  = ctx.Event;
+            switch (evt)
+            {
+            }
         }
     }
 }

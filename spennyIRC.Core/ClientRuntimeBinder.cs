@@ -30,7 +30,7 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
                 localUser.Nick = localUser.Nick2;
 
                 // change nick
-                await ctx.IrcClient.SendMessageAsync($"NICK {localUser.Nick2}");
+                await ctx.Session.Client.SendMessageAsync($"NICK {localUser.Nick2}");
             }
         });
         events.AddEvent(ProtocolNumericConstants.RPL_ISUPPORT, (ctx) => // 005 - I Support
@@ -97,7 +97,7 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
 
             return Task.CompletedTask;
         });
-        events.AddEvent("VERSION", static async (ctx) => await ctx.IrcClient.SendMessageAsync($"NOTICE {ctx.Nick} :\u0001{IrcClientConstants.VERSION_REPLY}\u0001"));
+        events.AddEvent("VERSION", static async (ctx) => await ctx.Session.Client.SendMessageAsync($"NOTICE {ctx.Nick} :\u0001{IrcClientConstants.VERSION_REPLY}\u0001"));
     }
 }
 

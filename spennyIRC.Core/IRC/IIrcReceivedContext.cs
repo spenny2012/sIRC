@@ -2,7 +2,7 @@
 
 public interface IIrcReceivedContext
 {
-    IIrcClient IrcClient { get; set; }
+    IIrcSession Session { get; set; }
     string Line { get; set; }
     string[] LineParts { get; set; }
     string Event { get; set; }

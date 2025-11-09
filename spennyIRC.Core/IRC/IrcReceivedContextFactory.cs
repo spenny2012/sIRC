@@ -7,11 +7,11 @@ public static class IrcReceivedContextFactory
 {
     private const string DISCONNECT = "DISCONNECT";
 
-    public static IIrcReceivedContext CreateDisconnect(IIrcClient client, string line)
+    public static IIrcReceivedContext CreateDisconnect(IIrcSession session, string line)
     {
         IrcReceivedContext ctx = new()
         {
-            IrcClient = client,
+            Session = session,
             Line = line,
             LineParts = { },
             Event = DISCONNECT,
@@ -20,12 +20,12 @@ public static class IrcReceivedContextFactory
         return ctx;
     }
 
-    public static IIrcReceivedContext Create(IIrcClient client, string line, string[] lineParts)
+    public static IIrcReceivedContext Create(IIrcSession session, string line, string[] lineParts)
     {
         // create basic context
         IrcReceivedContext ctx = new()
         {
-            IrcClient = client,
+            Session = session,
             Line = line,
             LineParts = lineParts,
             Event = lineParts.Length > 1 ? lineParts[1] : "UNKNOWN",

@@ -5,12 +5,13 @@ public class IrcSession(IIrcEvents events,
     IIrcServer server,
     IIrcLocalUser user,
     IIrcInternalAddressList addressList,
-    IIrcClientManager ircClientManager,
     IWindowService echoService) : IIrcSession
 {
+    private IrcClientManager? _clientManger;
+
     public string ActiveWindow { get; set; } = "Status";
     public IIrcClient Client => client;
-    public IIrcClientManager ClientManager => ircClientManager;
+    public IIrcClientManager ClientManager => _clientManger ??= new IrcClientManager(this);
     public IWindowService WindowService => echoService;
     public IIrcEvents Events => events;
     public IIrcInternalAddressList Ial => addressList;

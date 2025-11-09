@@ -9,11 +9,12 @@ public class IrcClientManager : IIrcClientManager, IDisposable
     private bool isDisposed;
     private IIrcSession? _session;
 
-    public IrcClientManager(IIrcClient client, IIrcEvents events, IIrcLocalUser user)
+    public IrcClientManager(IIrcSession session)
     {
-        _user = user;
-        _ircClient = client;
-        _ircClientEvents = events;
+        _session = session;
+        _user = session.LocalUser;
+        _ircClient = session.Client;
+        _ircClientEvents = session.Events;
         _ircClient.OnDataReceivedHandler += OnMessageReceived;
         _ircClient.OnDisconnectedHandler += OnDisconnected;
     }
@@ -59,7 +60,7 @@ public class IrcClientManager : IIrcClientManager, IDisposable
 
     private async Task OnDisconnected(string message)
     {
-        IIrcReceivedContext ircContext = IrcReceivedContextFactory.CreateDisconnect(_ircClient, message);
+        IIrcReceivedContext ircContext = IrcReceivedContextFactory.CreateDisconnect(_session, message);
         await _ircClientEvents.TryExecute(ircContext.Event, ircContext);
     }
 
@@ -74,7 +75,7 @@ public class IrcClientManager : IIrcClientManager, IDisposable
             return;
         }
 
-        IIrcReceivedContext ircContext = IrcReceivedContextFactory.Create(_ircClient, message, lineParts);
+        IIrcReceivedContext ircContext = IrcReceivedContextFactory.Create(_session, message, lineParts);
         await _ircClientEvents.TryExecute(ircContext.Event, ircContext);
     }
 }
