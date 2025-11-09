@@ -150,6 +150,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
             typeof(Console).Assembly.Location,              // System.Console
             typeof(ICSharpScript).Assembly.Location,       // Script interface
             typeof(IIrcSession).Assembly.Location,          // IRC types
+            Assembly.Load("System").Location,
             Assembly.Load("System.Runtime").Location,
             Assembly.Load("System.Collections").Location,
             Assembly.Load("System.Windows").Location,

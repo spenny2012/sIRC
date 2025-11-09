@@ -1,21 +1,28 @@
 using spennyIRC.Scripting.Engine;
-
-public class HelloWorldScript : ICSharpScript
+using System;
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable CA1050 // Remove declare types in namespace
+public class HelloWorldScript : SircScript
 {
-    public string Name => "Hello World Script";
-    public string Version => "1.0";
-    public string Author => "SK";
-    public string Description => "A simple test script.";
+    public override string Name => "Hello World Script"; // Required
+    //public override string Version => "1.0";
+    //public override string Author => "SK";
+    //public override string Description => "A simple test script.";
 
-    public void Initialize()
+    public override void Initialize()
     {
     }
 
-    public void Execute()
+    public override void Execute()
     {
     }
 
-    public void Shutdown()
+    public override void Shutdown()
     {
+    }
+
+    public override void Dispose()
+    {
+        GC.SuppressFinalize(this);
     }
 }

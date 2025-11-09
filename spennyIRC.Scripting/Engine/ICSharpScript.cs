@@ -4,8 +4,8 @@ public interface ICSharpScript
 {
     string Name { get; }
     string Version { get; }
-
-    void Execute();
+    string Author { get; }
+    string Description { get; }
 
     void Initialize();
 
