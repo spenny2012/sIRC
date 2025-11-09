@@ -1,7 +1,7 @@
 using spennyIRC.Scripting.Engine;
 using System;
 #pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CA1050 // Remove declare types in namespace
+#pragma warning disable CA1050  // Remove declare types in namespace
 public class HelloWorldScript : SircScript
 {
     public override string Name => "Hello World Script"; // Required
@@ -23,6 +23,7 @@ public class HelloWorldScript : SircScript
 
     public override void Dispose()
     {
+        // Add resource cleanup here
         GC.SuppressFinalize(this);
     }
 }
