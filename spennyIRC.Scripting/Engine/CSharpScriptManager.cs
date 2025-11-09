@@ -80,10 +80,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
 
     public void Dispose()
     {
-        foreach (CompiledScript script in _compiledScripts.Values)
-        {
-            script.MappedFile?.Dispose();
-        }
+        UnloadAllScripts();
         _cacheLock?.Dispose();
     }
 
@@ -229,9 +226,9 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
         byte[] assemblyBytes = ms.ToArray();
         SaveToCache(hash, assemblyBytes);
 
-        ms.Position = 0;
         AssemblyLoadContext context = new(null, isCollectible: true);
         Assembly assembly = context.LoadFromStream(ms);
+        _loadContexts[hash] = context; 
 
         MemoryMappedFile mmf = MemoryMappedFile.CreateFromFile(
             GetCachePath(hash),
@@ -291,6 +288,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
                 AssemblyLoadContext context = new(null, isCollectible: true);
                 Assembly assembly = context.LoadFromStream(ms);
 
+                _loadContexts[hash] = context; 
                 _compiledScripts[hash] = new CompiledScript(assembly, hash, mmf, fileInfo.Length);
 
                 return assembly;
@@ -317,7 +315,9 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
                 accessor.ReadArray(0, buffer, 0, (int) cached.Size);
                 using MemoryStream ms = new(buffer, 0, (int) cached.Size, false);
                 AssemblyLoadContext context = new(null, isCollectible: true);
-                return context.LoadFromStream(ms);
+                var assembly = context.LoadFromStream(ms);
+                _loadContexts[cached.Hash] = context;
+                return assembly;
             }
             finally
             {

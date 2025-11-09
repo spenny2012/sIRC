@@ -1,6 +1,6 @@
 ﻿namespace spennyIRC.Scripting.Engine;
 
-public interface ICSharpScript
+public interface ICSharpScript : IDisposable
 {
     string Name { get; }
     string Version { get; }
