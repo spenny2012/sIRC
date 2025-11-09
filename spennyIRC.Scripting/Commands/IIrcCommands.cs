@@ -1,10 +1,12 @@
 ﻿using spennyIRC.Core.IRC;
+using System.Runtime.CompilerServices;
 
 namespace spennyIRC.Scripting.Commands;
 
 public interface IIrcCommands
 {
     Dictionary<string, IIrcCommand> Commands { get; }
+    IIrcCommand this[string index] { get; }
 
     bool AddCommand(string name, string description, IIrcCommand command);
     bool AddCommand(string name, string description, Func<string, IIrcSession, Task> command);

@@ -1,9 +1,12 @@
-﻿using spennyIRC.Core.IRC;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using spennyIRC.Core.IRC;
 
 namespace spennyIRC.Scripting.Commands;
 
 public class IrcCommands : IIrcCommands
 {
+    public IIrcCommand this[string index] => Commands[index];
+
     public Dictionary<string, IIrcCommand> Commands { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
 
     public bool AddCommand(string name, string description, IIrcCommand command)
