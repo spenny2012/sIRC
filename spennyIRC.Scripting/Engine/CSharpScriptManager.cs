@@ -144,8 +144,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
         string[] refs =
         [
             typeof(object).Assembly.Location,               // System.Private.CoreLib
-            typeof(Console).Assembly.Location,              // System.Console
-            typeof(ICSharpScript).Assembly.Location,       // Script interface
+            typeof(ICSharpScript).Assembly.Location,        // Script interface
             typeof(IIrcSession).Assembly.Location,          // IRC types
             Assembly.Load("System").Location,
             Assembly.Load("System.Runtime").Location,
@@ -164,7 +163,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static T? FastCreateInstance<T>(Assembly? assembly) where T : class
+    private T? FastCreateInstance<T>(Assembly? assembly) where T : class
     {
         if (assembly == null) return null;
 
@@ -183,7 +182,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
         if (targetType == null)
             throw new InvalidOperationException($"No implementation of {typeof(T).Name} found");
 
-        return (T?) Activator.CreateInstance(targetType);
+        return (T?) Activator.CreateInstance(targetType, _commands);
     }
 
     private static FrozenDictionary<string, ReportDiagnostic> GetDiagnosticOptions()
@@ -315,7 +314,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
                 accessor.ReadArray(0, buffer, 0, (int) cached.Size);
                 using MemoryStream ms = new(buffer, 0, (int) cached.Size, false);
                 AssemblyLoadContext context = new(null, isCollectible: true);
-                var assembly = context.LoadFromStream(ms);
+                Assembly assembly = context.LoadFromStream(ms);
                 _loadContexts[cached.Hash] = context;
                 return assembly;
             }

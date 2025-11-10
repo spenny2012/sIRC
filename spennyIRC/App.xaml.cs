@@ -75,9 +75,7 @@ public partial class App : Application
     {
         MainWindow mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.ShowDialog();
-#if DEBUG
         Debug.WriteLine("Closing Application\r\n");
-#endif
     }
 
     private static void ConfigureServices(IServiceCollection services)
@@ -101,7 +99,6 @@ public partial class App : Application
         });
         services.AddScoped<IIrcEvents, IrcEvents>();
         services.AddScoped<IIrcServer, IrcServerInfo>();
-        services.AddScoped<IIrcClientManager, IrcClientManager>();
         services.AddScoped<IWindowService, WindowService>();
     }
 }

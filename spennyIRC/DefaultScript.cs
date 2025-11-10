@@ -21,10 +21,4 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
     public override void Shutdown()
     {
     }
-
-    public override void Dispose()
-    {
-        // Add resource cleanup here
-        GC.SuppressFinalize(this);
-    }
 }

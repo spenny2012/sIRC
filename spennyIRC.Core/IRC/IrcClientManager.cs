@@ -17,6 +17,7 @@ public class IrcClientManager : IIrcClientManager, IDisposable
         _user = session.LocalUser;
         _ircClient = session.Client;
         _ircClientEvents = session.Events;
+
         _ircClient.OnDataReceivedHandler += OnMessageReceived;
         _ircClient.OnDisconnectedHandler += OnDisconnected;
     }
