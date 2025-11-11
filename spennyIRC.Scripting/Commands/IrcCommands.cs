@@ -5,23 +5,7 @@ namespace spennyIRC.Scripting.Commands;
 
 public class IrcCommands : IIrcCommands
 {
-    public IIrcCommand this[string index] => Commands[index];
-
     public Dictionary<string, IIrcCommand> Commands { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
-
-    public bool AddCommand(string name, string description, IIrcCommand command)
-    {
-        if (Commands.TryGetValue(name, out _))
-        {
-            return false;
-        }
-        else
-        {
-            Commands[name] = command;
-
-            return true;
-        }
-    }
 
     public bool AddCommand(string name, string description, Func<string, IIrcSession, Task> command)
     {
@@ -38,6 +22,16 @@ public class IrcCommands : IIrcCommands
         };
 
         return true;
+    }
+    public bool RemoveCommand(string name)
+    {
+        if (Commands.TryGetValue(name, out _))
+        {
+            Commands.Remove(name);
+            return true;
+        }
+
+        return false;
     }
 
     public Task ExecuteCommand(string name, string? parameters, IIrcSession session)

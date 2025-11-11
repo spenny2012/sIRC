@@ -24,21 +24,32 @@ namespace spennyIRC.Scripting.Engine
 
         protected void AddCommand(string name, string description, Func<string, IIrcSession, Task> command)
         {
+            if (_registeredCommands.ContainsKey(name) || _commands.Commands.ContainsKey(name))
+            {
+                return;
+            }
+
             if (_commands.AddCommand(name, description, command))
                 _registeredCommands[name] = command;
         }
 
         protected void AddEvent(string eventName, Func<IIrcReceivedContext, Task> handler)
         {
+            if (_events.ContainsKey(eventName))
+            {
+                _events[eventName] += handler;
+                return;
+            } 
+
             _events[eventName] = handler;
         }
 
-        //protected void RemoveAllCommands()
-        //{
-        //    foreach (var cmd in _registeredCommands.Keys)
-        //        _commands.RemoveCommand(cmd);
-        //    _registeredCommands.Clear();
-        //}
+        protected void RemoveAllCommands()
+        {
+            foreach (var cmd in _registeredCommands.Keys)
+                _commands.RemoveCommand(cmd);
+            _registeredCommands.Clear();
+        }
 
         protected void RemoveAllEvents()
         {
