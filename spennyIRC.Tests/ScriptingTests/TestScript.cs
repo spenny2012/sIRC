@@ -1,6 +1,7 @@
 using spennyIRC.Scripting.Commands;
 using spennyIRC.Scripting.Engine;
 using System;
+using System.Threading.Tasks;
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CA1050  // Remove declare types in namespace
 public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
@@ -12,19 +13,18 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
 
     public override void Initialize()
     {
+        AddCommand("hello", "say hello", (p, session) =>
+        {
+            //session.Client.SendMessageAsync("PRIVMSG"
+            for (int i = 0; i < 10; i++)
+            {
+                _commands.ExecuteCommand("say", "HELLO!!!", session);
+            }
+            return Task.CompletedTask;
+        });
     }
 
     public override void Execute()
     {
-    }
-
-    public override void Shutdown()
-    {
-    }
-
-    public override void Dispose()
-    {
-        // Add resource cleanup here
-        GC.SuppressFinalize(this);
     }
 }

@@ -29,7 +29,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
     public CSharpScriptManager(IIrcCommands commands)
     {
         _commands = commands;
-        _cacheDirectory = Path.Combine(Path.GetTempPath(), "sIRCScriptCache");
+        _cacheDirectory = Path.Combine(Path.GetTempPath(), "sIRC Cache");
 
         Directory.CreateDirectory(_cacheDirectory);
 
@@ -150,7 +150,9 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
             Assembly.Load("System.Runtime").Location,
             Assembly.Load("System.Collections").Location,
             Assembly.Load("System.Windows").Location,
-            Assembly.Load("System.Linq").Location
+            Assembly.Load("System.Linq").Location,
+            Assembly.Load("System.Threading.Tasks").Location,
+            Assembly.Load("netstandard").Location
         ];
 
         MetadataReference[] references = new MetadataReference[refs.Length];

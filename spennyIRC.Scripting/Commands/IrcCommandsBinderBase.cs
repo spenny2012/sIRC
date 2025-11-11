@@ -1,10 +1,11 @@
 ﻿using spennyIRC.Core.IRC;
 using spennyIRC.Scripting.Attributes;
+using spennyIRC.Scripting.Engine;
 using System.Reflection;
 
 namespace spennyIRC.Scripting.Commands;
 
-public abstract class IrcCommandsBinderBase(IIrcCommands commands)
+public abstract class IrcCommandsBinderBase(IIrcCommands commands, ICSharpScriptManager scriptManager)
 {
     protected void BindFoundCommands()
     {

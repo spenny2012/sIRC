@@ -2,6 +2,7 @@
 using spennyIRC.Core.IRC;
 using spennyIRC.Core.IRC.Helpers;
 using spennyIRC.Scripting.Commands;
+using spennyIRC.Scripting.Engine;
 using spennyIRC.ViewModels;
 using System.Diagnostics;
 using System.Windows;
@@ -46,8 +47,9 @@ public partial class App : Application
         _serviceProvider = serviceCollection.BuildServiceProvider();
 
         IIrcCommands commands = _serviceProvider.GetRequiredService<IIrcCommands>();
-        IrcCommandsBinder cmdBinder = new(commands);
-        ViewModelCommandsBinder modelCmdBinder = new(commands);
+        ICSharpScriptManager scriptManager = _serviceProvider.GetRequiredService<ICSharpScriptManager>();
+        IrcCommandsBinder cmdBinder = new(commands, scriptManager);
+        ViewModelCommandsBinder modelCmdBinder = new(commands, scriptManager);
         cmdBinder.Bind();
         modelCmdBinder.Bind();
 
@@ -83,6 +85,7 @@ public partial class App : Application
         services.AddSingleton<MainWindowViewModel>();
         services.AddTransient<MainWindow>();
         services.AddSingleton<IIrcCommands, IrcCommands>();
+        services.AddSingleton<ICSharpScriptManager, CSharpScriptManager>();
         services.AddScoped<IIrcInternalAddressList, IrcInternalAddressList>();
         services.AddScoped<IIrcSession, IrcSession>();
         services.AddScoped<IIrcClient, IrcClient>();

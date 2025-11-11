@@ -12,13 +12,15 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
 
     public override void Initialize()
     {
+        AddCommand("hello", "say hello", (p, session) =>
+        {
+            //session.Client.SendMessageAsync("PRIVMSG"
+            _commands.ExecuteCommand("say", "HELLO!!!", session);
+            return Task.CompletedTask;
+        });
     }
 
     public override void Execute()
-    {
-    }
-
-    public override void Shutdown()
     {
     }
 }

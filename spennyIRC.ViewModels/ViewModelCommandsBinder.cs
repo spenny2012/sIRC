@@ -1,8 +1,9 @@
 ﻿using spennyIRC.Scripting.Commands;
+using spennyIRC.Scripting.Engine;
 
 namespace spennyIRC.ViewModels;
 
-public class ViewModelCommandsBinder(IIrcCommands commands) : IrcCommandsBinderBase(commands)
+public class ViewModelCommandsBinder(IIrcCommands commands, ICSharpScriptManager scriptManager) : IrcCommandsBinderBase(commands, scriptManager)
 {
     public void Bind()
     {

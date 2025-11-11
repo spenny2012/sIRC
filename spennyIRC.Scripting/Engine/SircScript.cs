@@ -20,16 +20,14 @@ namespace spennyIRC.Scripting.Engine
 
         public abstract void Execute();
         public abstract void Initialize();
-        public abstract void Shutdown();
+        public virtual void Shutdown()
+        {
+            RemoveAllCommands();
+        }
 
         protected void AddCommand(string name, string description, Func<string, IIrcSession, Task> command)
         {
-            if (_registeredCommands.ContainsKey(name) || _commands.Commands.ContainsKey(name))
-            {
-                return;
-            }
-
-            if (_commands.AddCommand(name, description, command))
+            if (!_registeredCommands.ContainsKey(name) && _commands.AddCommand(name, description, command))
                 _registeredCommands[name] = command;
         }
 
@@ -48,6 +46,7 @@ namespace spennyIRC.Scripting.Engine
         {
             foreach (var cmd in _registeredCommands.Keys)
                 _commands.RemoveCommand(cmd);
+
             _registeredCommands.Clear();
         }
 
@@ -56,7 +55,7 @@ namespace spennyIRC.Scripting.Engine
             _events.Clear();
         }
 
-        protected async Task TriggerEvents(string eventName, IIrcReceivedContext context)
+        public async Task TriggerEvents(string eventName, IIrcReceivedContext context)
         {
             if (_events.TryGetValue(eventName, out var handler))
                 await handler(context);

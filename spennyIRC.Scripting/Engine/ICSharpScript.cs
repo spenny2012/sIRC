@@ -1,4 +1,6 @@
-﻿namespace spennyIRC.Scripting.Engine;
+﻿using spennyIRC.Core.IRC;
+
+namespace spennyIRC.Scripting.Engine;
 
 public interface ICSharpScript
 {
@@ -8,6 +10,6 @@ public interface ICSharpScript
     string Description { get; }
 
     void Initialize();
-
     void Shutdown();
+    Task TriggerEvents(string eventName, IIrcReceivedContext context);
 }
