@@ -75,7 +75,7 @@ public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
         if (Text[0] != '/')
         {
             if (!Name.Equals("Status"))
-                _commands.ExecuteCommand("say", Text, _session).GetAwaiter().GetResult();
+               await _commands.ExecuteCommand("say", Text, _session);
             Text = string.Empty;
             return;
         }
