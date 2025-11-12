@@ -14,9 +14,7 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
     {
         AddCommand("hello", "say hello", (p, session) =>
         {
-            //session.Client.SendMessageAsync("PRIVMSG"
-            _commands.ExecuteCommand("say", "HELLO!!!", session);
-            return Task.CompletedTask;
+            return _commands.ExecuteCommand("say", "HELLO!!!", session);
         });
     }
 

@@ -38,4 +38,8 @@
     <Resource Include="Images\sIRC logo.png" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy &quot;$(ProjectDir)DefaultScript.cs&quot; &quot;$(TargetDir)&quot; /Y /I&#xD;&#xA;" />
+  </Target>
+
 </Project>

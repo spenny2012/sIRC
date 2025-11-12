@@ -13,12 +13,14 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
 
     public override void Initialize()
     {
-        AddCommand("hello", "say hello", (p, session) =>
+        AddCommand("rpt", "repeat yourself", (p, session) =>
         {
-            //session.Client.SendMessageAsync("PRIVMSG"
-            for (int i = 0; i < 10; i++)
+            var pParts = p.Split(' ');
+            if (pParts.Length <= 0) return Task.CompletedTask;
+
+            for (int i = 0; i < 20; i++)
             {
-                _commands.ExecuteCommand("say", "HELLO!!!", session);
+                _commands.ExecuteCommand("msg", $"{pParts[1]} HELLO !!!", session);
             }
             return Task.CompletedTask;
         });

@@ -8,25 +8,35 @@ public class IrcCommandsBinder(IIrcCommands commands, ICSharpScriptManager scrip
     public void Bind()
     {
         commands.AddCommand("help", "lists commands", ListCommandsAsync);
-        commands.AddCommand("load", "", LoadScriptAsync);
+        commands.AddCommand("load", "loads a C# script", LoadScriptAsync);
 
         BindFoundCommands();
     }
 
-    private async Task LoadScriptAsync(string arg1, IIrcSession session)
+    private Task LoadScriptAsync(string parameters, IIrcSession session)
     {
-        if (!Path.Exists(arg1))
+        if (!Path.Exists(parameters))
         {
-            session.WindowService.Echo(session.ActiveWindow, $"*** Invalid path '{arg1}'");
-            return;
+            session.WindowService.Echo(session.ActiveWindow, $"*** Invalid path '{parameters}'");
+            return Task.CompletedTask;
         }
-        var script = scriptManager.ExecuteScript<ICSharpScript>(arg1);
-        script?.Initialize();
 
-        session.WindowService.Echo(session.ActiveWindow, $"*** Loaded script '{script.Name}' ({arg1})");
+        try
+        {
+            var script = scriptManager.ExecuteScript<ICSharpScript>(parameters);
+            script?.Initialize();
+
+            session.WindowService.Echo(session.ActiveWindow, $"*** Loaded script '{script.Name}' ({parameters})");
+        }
+        catch (Exception ex)
+        {
+            session.WindowService.Echo(session.ActiveWindow, $"*** Error loading script '({parameters})': {ex}");
+        }
+
+        return Task.CompletedTask;
     }
 
-    private async Task ListCommandsAsync(string parameters, IIrcSession session)
+    private Task ListCommandsAsync(string parameters, IIrcSession session)
     {
         session.WindowService.Echo(session.ActiveWindow, "-\r\nList of commands:");
 
@@ -36,5 +46,7 @@ public class IrcCommandsBinder(IIrcCommands commands, ICSharpScriptManager scrip
         }
 
         session.WindowService.Echo(session.ActiveWindow, "-");
+
+        return Task.CompletedTask;
     }
 }
