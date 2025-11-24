@@ -23,16 +23,6 @@ public class IrcCommands : IIrcCommands
 
         return true;
     }
-    public bool RemoveCommand(string name)
-    {
-        if (Commands.TryGetValue(name, out _))
-        {
-            Commands.Remove(name);
-            return true;
-        }
-
-        return false;
-    }
 
     public Task ExecuteCommand(string name, string? parameters, IIrcSession session)
     {
@@ -42,5 +32,16 @@ public class IrcCommands : IIrcCommands
         }
 
         return Task.CompletedTask;
+    }
+
+    public bool RemoveCommand(string name)
+    {
+        if (Commands.TryGetValue(name, out _))
+        {
+            Commands.Remove(name);
+            return true;
+        }
+
+        return false;
     }
 }

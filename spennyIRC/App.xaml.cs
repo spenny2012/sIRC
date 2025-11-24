@@ -59,7 +59,7 @@ public partial class App : Application
 
     private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
-        MessageBox.Show("ERROR", e.ExceptionObject.ToString());
+        MessageBox.Show("Unhandled Exception", e.ExceptionObject.ToString());
 #if DEBUG
         Debug.WriteLine(e.ExceptionObject.ToString());
 #endif
@@ -67,7 +67,7 @@ public partial class App : Application
 
     private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
     {
-        MessageBox.Show("ERROR", e.Exception.ToString());
+        MessageBox.Show("Unhandled Exception", e.Exception.ToString());
 #if DEBUG
         Debug.WriteLine(e.Exception.ToString());
 #endif
@@ -96,7 +96,7 @@ public partial class App : Application
             {
                 Nick = "chuck",
                 Nick2 = "chuck2",
-                Ident = MiscHelpers.GenerateRandomString(5),
+                Ident = MiscHelpers.GenerateRandomString(Random.Shared.Next(3, 9)),
                 Realname = MiscHelpers.GenerateRandomString(7)
             };
         });

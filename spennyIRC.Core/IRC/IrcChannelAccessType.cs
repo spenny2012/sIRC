@@ -11,3 +11,4 @@ public enum IrcChannelAccessType // TODO: reconsider redoing this logic
     SOP,
     FOUNDER
 }
+

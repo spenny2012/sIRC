@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
 {
     public override string Name => "Hello World Script"; // Required
+    //public override string Version => "1.0";
+    //public override string Author => "SK";
+    //public override string Description => "A simple test script.";
 
     public override void Initialize()
     {
