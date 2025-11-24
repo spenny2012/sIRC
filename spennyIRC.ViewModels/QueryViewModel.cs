@@ -46,7 +46,7 @@ public class QueryViewModel : WindowViewModelBase
         // TODO: test this
         WeakReferenceMessenger.Default.Register<ServerOpenedQueryMessage>(this, (r, m) =>
         {
-            if (m.Session != _session || (m.Nick != Name && m.Nick.Equals(Name, StringComparison.OrdinalIgnoreCase))) return;
+            if (m.Session != _session || (m.Nick != Name && !m.Nick.Equals(Name, StringComparison.OrdinalIgnoreCase))) return;
             Name = m.Nick;
         });
     }

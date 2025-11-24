@@ -25,14 +25,9 @@ public static class CommandHelpers
             parameters);
     }
 
-    public static IrcCommandParametersInfo ExtractCommandParametersInfo(this IrcCommandInfo commands)
-    {
-        return new IrcCommandParametersInfo(commands.Parameters, commands.Parameters?.Split(' ', StringSplitOptions.TrimEntries));
-    }
-
     public static IrcCommandParametersInfo ExtractCommandParametersInfo(this string parameters)
     {
-        return new IrcCommandParametersInfo(parameters, parameters.Split(' ', StringSplitOptions.TrimEntries));
+        return new IrcCommandParametersInfo(parameters, parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries));
     }
 }
 

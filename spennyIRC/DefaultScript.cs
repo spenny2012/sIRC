@@ -21,8 +21,6 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
         {
             IrcCommandParametersInfo cmdParams = p.ExtractCommandParametersInfo();
 
-            PrintPropertiesHelper.BasicPrintProperties(cmdParams, session);
-
             if (cmdParams.LineParts == null || !int.TryParse(cmdParams.LineParts[0], out int times)) return Task.CompletedTask;
 
             string? sentence = cmdParams.Parameters?.TrimStart(cmdParams.LineParts[0].ToCharArray()).Trim();
