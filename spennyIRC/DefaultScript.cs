@@ -1,6 +1,11 @@
-﻿using spennyIRC.Scripting.Commands;
+﻿using spennyIRC.Core.IRC;
+using spennyIRC.Core.IRC.Helpers;
+using spennyIRC.Scripting.Commands;
 using spennyIRC.Scripting.Engine;
+using spennyIRC.Scripting.Helpers;
 using System;
+using System.Text;
+using System.Threading.Tasks;
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CA1050  // Remove declare types in namespace
 public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
@@ -12,13 +17,31 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
 
     public override void Initialize()
     {
-        AddCommand("hello", "say hello", (p, session) =>
+        AddCommand("repeat", "repeat yourself", (p, session) =>
         {
-            return _commands.ExecuteCommand("say", "HELLO!!!", session);
+            IrcCommandParametersInfo cmdParams = p.ExtractCommandParametersInfo();
+
+            PrintPropertiesHelper.BasicPrintProperties(cmdParams, session);
+
+            if (cmdParams.LineParts == null || !int.TryParse(cmdParams.LineParts[0], out int times)) return Task.CompletedTask;
+
+            string? sentence = cmdParams.Parameters?.TrimStart(cmdParams.LineParts[0].ToCharArray()).Trim();
+
+            return Repeat(session, sentence, times);
         });
     }
 
     public override void Execute()
     {
+    }
+
+    private async Task Repeat(IIrcSession session, string? sentence, int times)
+    {
+        if (string.IsNullOrWhiteSpace(sentence)) return;
+
+        for (int i = 0; i < times; i++)
+        {
+            await _commands.ExecuteCommand("say", sentence, session); //session.Client.SendMessageAsync($"PRIVMSG {session.ActiveWindow} :{sentence}");
+        }
     }
 }

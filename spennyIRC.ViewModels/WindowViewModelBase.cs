@@ -80,8 +80,8 @@ public abstract class WindowViewModelBase : ViewModelBase, IChatWindow
             return;
         }
 
-        ExtractedCommandInfo commandInfo = Text.ExtractCommandAndParams();
+        IrcCommandInfo commandInfo = Text[1..].ExtractCommandInfo();
         Text = string.Empty;
-        await _commands.ExecuteCommand(commandInfo.ParsedCmd, commandInfo.CmdParameters, _session);
+        await _commands.ExecuteCommand(commandInfo.Command, commandInfo.Parameters, _session);
     }
 }

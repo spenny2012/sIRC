@@ -44,7 +44,7 @@ namespace spennyIRC.Scripting.Engine
 
         protected void RemoveAllCommands()
         {
-            foreach (var cmd in _registeredCommands.Keys)
+            foreach (string cmd in _registeredCommands.Keys)
                 _commands.RemoveCommand(cmd);
 
             _registeredCommands.Clear();
@@ -57,7 +57,7 @@ namespace spennyIRC.Scripting.Engine
 
         public async Task TriggerEvents(string eventName, IIrcReceivedContext context)
         {
-            if (_events.TryGetValue(eventName, out var handler))
+            if (_events.TryGetValue(eventName, out Func<IIrcReceivedContext, Task>? handler))
                 await handler(context);
         }
     }

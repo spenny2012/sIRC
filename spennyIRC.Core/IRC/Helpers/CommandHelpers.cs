@@ -1,33 +1,40 @@
 ﻿namespace spennyIRC.Core.IRC.Helpers;
 
+// TODO: redo this concept
 public static class CommandHelpers
 {
-    public static ExtractedCommandInfo ExtractCommandAndParams(this string command)
+    public static IrcCommandInfo ExtractCommandInfo(this string command)
     {
-        int firstSpaceIndex = command.IndexOf(' ');
+        ArgumentException.ThrowIfNullOrWhiteSpace(command, nameof(command));
 
-        if (firstSpaceIndex == -1)
-            return new ExtractedCommandInfo(command[1..], null);
+        ReadOnlySpan<char> commandSpan = command.AsSpan();
+        int spaceIndex = commandSpan.IndexOf(' ');
 
-        string parsedCmd = command[1..firstSpaceIndex];
-        ReadOnlySpan<char> paramSpan = command.AsSpan(firstSpaceIndex + 1);
-        int start = 0;
+        if (spaceIndex == -1)
+        {
+            return new IrcCommandInfo(
+                command,
+                null);
+        }
 
-        while (start < paramSpan.Length && char.IsWhiteSpace(paramSpan[start]))
-            start++;
+        string parsedCmd = commandSpan[..spaceIndex].ToString();
+        string parameters = commandSpan[(spaceIndex + 1)..].Trim().ToString();
 
-        int end = paramSpan.Length - 1;
+        return new IrcCommandInfo(
+            parsedCmd,
+            parameters);
+    }
 
-        while (end >= start && char.IsWhiteSpace(paramSpan[end]))
-            end--;
+    public static IrcCommandParametersInfo ExtractCommandParametersInfo(this IrcCommandInfo commands)
+    {
+        return new IrcCommandParametersInfo(commands.Parameters, commands.Parameters?.Split(' ', StringSplitOptions.TrimEntries));
+    }
 
-        string? cmdParameters = null;
-
-        if (start <= end)
-            cmdParameters = paramSpan.Slice(start, end - start + 1).ToString();
-
-        return new ExtractedCommandInfo(parsedCmd, cmdParameters);
+    public static IrcCommandParametersInfo ExtractCommandParametersInfo(this string parameters)
+    {
+        return new IrcCommandParametersInfo(parameters, parameters.Split(' ', StringSplitOptions.TrimEntries));
     }
 }
 
-public readonly record struct ExtractedCommandInfo(string ParsedCmd, string? CmdParameters);
+public readonly record struct IrcCommandInfo(string Command, string? Parameters);
+public readonly record struct IrcCommandParametersInfo(string? Parameters, string[]? LineParts);

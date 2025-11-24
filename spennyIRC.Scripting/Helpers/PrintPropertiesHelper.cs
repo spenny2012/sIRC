@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace spennyIRC.Scripting.Helpers
 {
-    internal static class PrintPropertiesHelper
+    public static class PrintPropertiesHelper
     {
         public static void BasicPrintProperties<T>(T obj, IIrcSession session)
         {

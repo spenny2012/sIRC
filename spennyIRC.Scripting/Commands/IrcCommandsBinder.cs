@@ -21,16 +21,18 @@ public class IrcCommandsBinder(IIrcCommands commands, ICSharpScriptManager scrip
             return Task.CompletedTask;
         }
 
+        string fullScriptPath = Path.GetFullPath(parameters);
+
         try
         {
-            var script = scriptManager.ExecuteScript<ICSharpScript>(parameters);
+            ICSharpScript? script = scriptManager.ExecuteScript<ICSharpScript>(parameters);
             script?.Initialize();
 
-            session.WindowService.Echo(session.ActiveWindow, $"*** Loaded script '{script.Name}' ({parameters})");
+            session.WindowService.Echo(session.ActiveWindow, $"*** Loaded script '{script!.Name}' ({fullScriptPath})");
         }
         catch (Exception ex)
         {
-            session.WindowService.Echo(session.ActiveWindow, $"*** Error loading script '({parameters})': {ex}");
+            session.WindowService.Echo(session.ActiveWindow, $"*** Error loading script '({fullScriptPath})': {ex}");
         }
 
         return Task.CompletedTask;
