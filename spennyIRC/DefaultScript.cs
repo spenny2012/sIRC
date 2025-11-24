@@ -41,7 +41,7 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
 
         for (int i = 0; i < times; i++)
         {
-            await _commands.ExecuteCommand("say", sentence, session); //session.Client.SendMessageAsync($"PRIVMSG {session.ActiveWindow} :{sentence}");
+            await _commands.ExecuteCommand("say", sentence, session); 
         }
     }
 }

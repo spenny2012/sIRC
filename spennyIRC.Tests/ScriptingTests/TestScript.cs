@@ -11,23 +11,18 @@ using System.Threading.Tasks;
 public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
 {
     public override string Name => "Hello World Script"; // Required
-    //public override string Version => "1.0";
-    //public override string Author => "SK";
-    //public override string Description => "A simple test script.";
 
     public override void Initialize()
     {
         AddCommand("repeat", "repeat yourself", (p, session) =>
         {
-            var cmd = p.ExtractCommandInfo();
-            var cmdParams = cmd.ExtractCommandParametersInfo();
-
-            PrintPropertiesHelper.BasicPrintProperties(cmd, session);
-            PrintPropertiesHelper.BasicPrintProperties(cmdParams, session);
+            IrcCommandParametersInfo cmdParams = p.ExtractCommandParametersInfo();
 
             if (cmdParams.LineParts == null || !int.TryParse(cmdParams.LineParts[0], out int times)) return Task.CompletedTask;
 
-            return Repeat(session, cmdParams.Parameters?.TrimStart(cmdParams.LineParts[0].ToCharArray()).Trim(), times);
+            string? sentence = cmdParams.Parameters?.TrimStart(cmdParams.LineParts[0].ToCharArray()).Trim();
+
+            return Repeat(session, sentence, times);
         });
     }
 
@@ -41,7 +36,7 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
 
         for (int i = 0; i < times; i++)
         {
-            await _commands.ExecuteCommand("say", sentence, session); //session.Client.SendMessageAsync($"PRIVMSG {session.ActiveWindow} :{sentence}");
+            await _commands.ExecuteCommand("say", sentence, session);
         }
     }
 }
