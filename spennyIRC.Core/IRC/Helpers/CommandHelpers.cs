@@ -1,9 +1,8 @@
 ﻿namespace spennyIRC.Core.IRC.Helpers;
 
-// TODO: redo this concept
 public static class CommandHelpers
 {
-    public static IrcCommandInfo ExtractCommandInfo(this string command)
+    public static IrcCommandInfo ExtractCommand(this string command)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(command, nameof(command));
 
@@ -25,11 +24,20 @@ public static class CommandHelpers
             parameters);
     }
 
-    public static IrcCommandParametersInfo ExtractCommandParametersInfo(this string parameters)
+    public static IrcCommandParametersInfo ExtractCommandParameters(this string? parameters)
     {
-        return new IrcCommandParametersInfo(parameters, parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+        return new IrcCommandParametersInfo(parameters, parameters?.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+    }
+
+    public static IrcCommandParametersInfo ExtractCommandParameters(this IrcCommandInfo commandInfo)
+    {
+        return ExtractCommandParameters(commandInfo.Parameters);
     }
 }
 
 public readonly record struct IrcCommandInfo(string Command, string? Parameters);
+
 public readonly record struct IrcCommandParametersInfo(string? Parameters, string[]? LineParts);
+//{
+//    public bool HasParams() { return Parameters != null && LineParts != null && LineParts.Length > 0; }
+//}

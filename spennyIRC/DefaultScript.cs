@@ -17,15 +17,26 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
 
     public override void Initialize()
     {
-        AddCommand("repeat", "repeat yourself", (p, session) =>
+        AddCommand("rsay", "repeat say", (p, session) =>
         {
-            IrcCommandParametersInfo cmdParams = p.ExtractCommandParametersInfo();
+            IrcCommandParametersInfo cmdParams = p.ExtractCommandParameters();
 
-            if (cmdParams.LineParts == null || !int.TryParse(cmdParams.LineParts[0], out int times)) return Task.CompletedTask;
+            if (cmdParams.LineParts == null || !int.TryParse(cmdParams.LineParts[0], out int times))
+                return Task.CompletedTask;
 
             string? sentence = cmdParams.Parameters?.TrimStart(cmdParams.LineParts[0].ToCharArray()).Trim();
 
-            return Repeat(session, sentence, times);
+            return RepeatAsync(session, sentence, times);
+        });
+
+        AddCommand("rcmd", "repeat command", (p, session) =>
+        {
+            IrcCommandParametersInfo cmdParams = p.ExtractCommandParameters();
+
+            if (cmdParams.LineParts == null || !int.TryParse(cmdParams.LineParts[0], out int times))
+                return Task.CompletedTask;
+
+            return RepeatRawAsync(session, cmdParams.Parameters.GetTokenFrom(1), times);
         });
     }
 
@@ -33,13 +44,42 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
     {
     }
 
-    private async Task Repeat(IIrcSession session, string? sentence, int times)
+    private async Task RepeatAsync(IIrcSession session, string? sentence, int times = 20)
     {
         if (string.IsNullOrWhiteSpace(sentence)) return;
 
         for (int i = 0; i < times; i++)
         {
-            await _commands.ExecuteCommand("say", sentence, session); 
+            await _commands.ExecuteCommand("say", sentence, session);
         }
     }
+    private async Task RepeatRawAsync(IIrcSession session, string command, int times = 20)
+    {
+        ArgumentNullException.ThrowIfNull(command, nameof(command));
+
+        IrcCommandInfo cmdParams = command.ExtractCommand();
+
+        for (int i = 0; i < times; i++)
+        {
+            await _commands.ExecuteCommand(
+                cmdParams.Command,
+                cmdParams.Parameters,
+                session);
+        }
+    }
+
+    //private async Task RepeatRawAsync(IIrcSession session, Func<string> eval, int? times = 20)
+    //{
+    //    ArgumentNullException.ThrowIfNull(eval, nameof(eval));
+
+    //    for (int i = 0; i < times; i++)
+    //    {
+    //        IrcCommandInfo cmdParams = eval().ExtractCommand();
+
+    //        await _commands.ExecuteCommand(
+    //            cmdParams.Command,
+    //            cmdParams.Parameters,
+    //            session);
+    //    }
+    //}
 }

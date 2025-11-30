@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using spennyIRC.Core.IRC;
+﻿using spennyIRC.Core.IRC;
 
 namespace spennyIRC.Scripting.Commands;
 

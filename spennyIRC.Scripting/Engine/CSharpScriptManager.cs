@@ -229,6 +229,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
 
         AssemblyLoadContext context = new(null, isCollectible: true);
         Assembly assembly = context.LoadFromStream(ms);
+
         _loadContexts[hash] = context; 
 
         MemoryMappedFile mmf = MemoryMappedFile.CreateFromFile(
@@ -282,9 +283,11 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
 
             using MemoryMappedViewAccessor accessor = mmf.CreateViewAccessor(0, fileInfo.Length, MemoryMappedFileAccess.Read);
             byte[] buffer = _bytePool.Rent((int) fileInfo.Length);
+
             try
             {
                 accessor.ReadArray(0, buffer, 0, (int) fileInfo.Length);
+
                 using MemoryStream ms = new(buffer, 0, (int) fileInfo.Length, false);
                 AssemblyLoadContext context = new(null, isCollectible: true);
                 Assembly assembly = context.LoadFromStream(ms);

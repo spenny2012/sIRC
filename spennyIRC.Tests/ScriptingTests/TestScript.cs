@@ -19,7 +19,7 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
     {
         AddCommand("repeat", "repeat yourself", (p, session) =>
         {
-            IrcCommandParametersInfo cmdParams = p.ExtractCommandParametersInfo();
+            IrcCommandParametersInfo cmdParams = p.ExtractCommandParameters();
 
             if (cmdParams.LineParts == null || !int.TryParse(cmdParams.LineParts[0], out int times)) return Task.CompletedTask;
 

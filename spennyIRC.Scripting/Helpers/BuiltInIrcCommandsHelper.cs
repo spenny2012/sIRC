@@ -375,9 +375,7 @@ public static class BuiltInIrcCommandsHelper
     public static Task SetRealNameAsync(string parameters, IIrcSession session)
     {
         if (parameters == null) return Task.CompletedTask;
-
         session.WindowService.Echo(session.ActiveWindow, $"Real name set to: {session.LocalUser.Realname = parameters}");
-
         return Task.CompletedTask;
     }
 }
