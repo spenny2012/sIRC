@@ -16,6 +16,14 @@ public class ExtractCommandTests
     {
         const string MY_COMMAND = "/test  10    HELLO WORLD!";
         var cmd = MY_COMMAND.AsSpan(1).ToString().ExtractCommand();
+    }
+
+    [TestMethod]
+    public void ExtractCommandParametersTest()
+    {
+        const string MY_COMMAND = "/test  10    HELLO WORLD!";
+        var cmd = MY_COMMAND.AsSpan(1).ToString().ExtractCommand();
         var prms = cmd.Parameters?.ExtractCommandParameters();
+        var getArgs = prms.Value.GetParam<int>(0);
     }
 }

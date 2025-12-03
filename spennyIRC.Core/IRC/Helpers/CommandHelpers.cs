@@ -33,11 +33,31 @@ public static class CommandHelpers
     {
         return ExtractCommandParameters(commandInfo.Parameters);
     }
+    public static T? GetParam<T>(this IrcCommandParametersInfo commandInfo, int arg)
+    {
+        if (commandInfo.Parameters == null ||
+            commandInfo.LineParts == null ||
+            commandInfo.LineParts.Length == 0 ||
+            arg < 0 ||
+            arg > commandInfo.LineParts.Length - 1)
+            return default;
+
+        string raw = commandInfo.LineParts[arg];
+
+        if (string.IsNullOrWhiteSpace(raw))
+            return default;
+
+        try
+        {
+            return (T?) Convert.ChangeType(raw, typeof(T));
+        }
+        catch
+        {
+            return default;
+        }
+    }
 }
 
 public readonly record struct IrcCommandInfo(string Command, string? Parameters);
 
 public readonly record struct IrcCommandParametersInfo(string? Parameters, string[]? LineParts);
-//{
-//    public bool HasParams() { return Parameters != null && LineParts != null && LineParts.Length > 0; }
-//}

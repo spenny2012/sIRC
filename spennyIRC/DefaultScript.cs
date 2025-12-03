@@ -15,45 +15,24 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
     //public override string Author => "SK";
     //public override string Description => "A simple test script.";
 
-    public override void Initialize()
-    {
-        AddCommand("rsay", "repeat say", (p, session) =>
-        {
-            IrcCommandParametersInfo cmdParams = p.ExtractCommandParameters();
-
-            if (cmdParams.LineParts == null || !int.TryParse(cmdParams.LineParts[0], out int times))
-                return Task.CompletedTask;
-
-            string? sentence = cmdParams.Parameters?.TrimStart(cmdParams.LineParts[0].ToCharArray()).Trim();
-
-            return RepeatAsync(session, sentence, times);
-        });
-
-        AddCommand("rcmd", "repeat command", (p, session) =>
-        {
-            IrcCommandParametersInfo cmdParams = p.ExtractCommandParameters();
-
-            if (cmdParams.LineParts == null || !int.TryParse(cmdParams.LineParts[0], out int times))
-                return Task.CompletedTask;
-
-            return RepeatRawAsync(session, cmdParams.Parameters.GetTokenFrom(1), times);
-        });
-    }
-
     public override void Execute()
     {
     }
 
-    private async Task RepeatAsync(IIrcSession session, string? sentence, int times = 20)
+    public override void Initialize()
     {
-        if (string.IsNullOrWhiteSpace(sentence)) return;
-
-        for (int i = 0; i < times; i++)
+        AddCommand("rcmd", "repeat command", (p, session) =>
         {
-            await _commands.ExecuteCommand("say", sentence, session);
-        }
+            IrcCommandParametersInfo cmdParams = p.ExtractCommandParameters();
+            
+            int times = cmdParams.GetParam<int>(0);
+            if (times == 0) return Task.CompletedTask;
+
+            return RepeatCmdAsync(session, cmdParams.Parameters!.GetTokenFrom(1), times);
+        });
     }
-    private async Task RepeatRawAsync(IIrcSession session, string command, int times = 20)
+
+    private async Task RepeatCmdAsync(IIrcSession session, string command, int times = 20)
     {
         ArgumentNullException.ThrowIfNull(command, nameof(command));
 
@@ -67,19 +46,9 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
                 session);
         }
     }
-
-    //private async Task RepeatRawAsync(IIrcSession session, Func<string> eval, int? times = 20)
-    //{
-    //    ArgumentNullException.ThrowIfNull(eval, nameof(eval));
-
-    //    for (int i = 0; i < times; i++)
-    //    {
-    //        IrcCommandInfo cmdParams = eval().ExtractCommand();
-
-    //        await _commands.ExecuteCommand(
-    //            cmdParams.Command,
-    //            cmdParams.Parameters,
-    //            session);
-    //    }
-    //}
 }
+
+//using spennyIRC.Scripting.Helpers;
+//using System;
+//using System.Text;
+//using System.Threading.Tasks;
