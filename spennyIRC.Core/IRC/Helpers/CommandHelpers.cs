@@ -33,6 +33,7 @@ public static class CommandHelpers
     {
         return ExtractCommandParameters(commandInfo.Parameters);
     }
+
     public static T? GetParam<T>(this IrcCommandParametersInfo commandInfo, int arg)
     {
         if (commandInfo.Parameters == null ||
@@ -49,7 +50,9 @@ public static class CommandHelpers
 
         try
         {
-            return (T?) Convert.ChangeType(raw, typeof(T));
+            Type mainType = typeof(T);
+            Type u = Nullable.GetUnderlyingType(mainType) ?? mainType; 
+            return (T?) Convert.ChangeType(raw, u);
         }
         catch
         {

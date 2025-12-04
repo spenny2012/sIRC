@@ -1,29 +1,30 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using spennyIRC.Core.IRC.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using spennyIRC.Core.IRC.Helpers;
 
 namespace spennyIRC.Tests.CommandTests;
 
 [TestClass]
 public class ExtractCommandTests
 {
+    const string MY_COMMAND = "/test  10    HELLO WORLD!";
+
     [TestMethod]
     public void ExtractCommandTest()
     {
-        const string MY_COMMAND = "/test  10    HELLO WORLD!";
-        var cmd = MY_COMMAND.AsSpan(1).ToString().ExtractCommand();
+        IrcCommandInfo cmd = MY_COMMAND.AsSpan(1).ToString().ExtractCommand();
+        Assert.IsNotNull(cmd.Parameters);
     }
 
     [TestMethod]
     public void ExtractCommandParametersTest()
     {
-        const string MY_COMMAND = "/test  10    HELLO WORLD!";
-        var cmd = MY_COMMAND.AsSpan(1).ToString().ExtractCommand();
-        var prms = cmd.Parameters?.ExtractCommandParameters();
-        var getArgs = prms.Value.GetParam<int>(0);
+        IrcCommandInfo cmd = MY_COMMAND.AsSpan(1).ToString().ExtractCommand();
+        Assert.IsNotNull(cmd.Parameters);
+
+        IrcCommandParametersInfo? prms = cmd.Parameters?.ExtractCommandParameters();
+        Assert.IsNotNull(prms);
+        Assert.IsNotNull(prms.Value.Parameters);
+
+        int? getArgs = prms.Value.GetParam<int?>(0);
+        Assert.AreEqual(10, getArgs);
     }
 }
