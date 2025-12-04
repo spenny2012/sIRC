@@ -35,6 +35,68 @@ public static class IrcProtocolHelpers
         return span[currentIndex..].ToString();
     }
 
+    public static string GetTokenFrom(this string line, int startTokenIndex, int endTokenIndex, char delimiter = ' ')
+    {
+        if (startTokenIndex < 0 || endTokenIndex < startTokenIndex)
+        {
+            return string.Empty;
+        }
+
+        ReadOnlySpan<char> span = line.AsSpan();
+        int currentIndex = 0;
+        int tokenCount = 0;
+        int tokenStartPos = -1;
+        int tokenEndPos = -1;
+
+        // Find the start position of the startTokenIndex
+        while (tokenCount < startTokenIndex && currentIndex < span.Length)
+        {
+            int delimiterIndex = span[currentIndex..].IndexOf(delimiter);
+            if (delimiterIndex == -1)
+            {
+                return string.Empty; // Not enough tokens
+            }
+            currentIndex += delimiterIndex + 1;
+            tokenCount++;
+        }
+
+        if (currentIndex >= span.Length)
+        {
+            return string.Empty; // Start token doesn't exist
+        }
+
+        tokenStartPos = currentIndex;
+
+        // Find the end position after the endTokenIndex
+        while (tokenCount <= endTokenIndex && currentIndex < span.Length)
+        {
+            int delimiterIndex = span[currentIndex..].IndexOf(delimiter);
+            if (delimiterIndex == -1)
+            {
+                // We've reached the end of the string
+                tokenEndPos = span.Length;
+                break;
+            }
+            currentIndex += delimiterIndex;
+
+            if (tokenCount == endTokenIndex)
+            {
+                tokenEndPos = currentIndex;
+                break;
+            }
+
+            currentIndex++; // Move past the delimiter
+            tokenCount++;
+        }
+
+        if (tokenEndPos == -1)
+        {
+            return string.Empty; // End token doesn't exist
+        }
+
+        return span[tokenStartPos..tokenEndPos].ToString();
+    }
+
     public static string ExtractTrailing(this string line, int startIndex) // TODO: make this less weird
     {
         ReadOnlySpan<char> span = line.AsSpan();

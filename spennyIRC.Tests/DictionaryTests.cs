@@ -9,8 +9,8 @@ public class DictionaryTests
     [TestMethod]
     public void DictDotOrgLookup()
     {
-        string dicks = DictLookupHelper.DefineAsync("test").GetAwaiter().GetResult();
-        // TODO: add tests
+        string dict = DictLookupHelper.DefineAsync("test").GetAwaiter().GetResult();
+        Assert.IsFalse(string.IsNullOrWhiteSpace(dict));
     }
 
     [TestMethod]

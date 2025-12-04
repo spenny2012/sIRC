@@ -124,7 +124,7 @@ public static class BuiltInIrcCommandsHelper
         await session.Client.SendMessageAsync(message);
     }
 
-    [IrcCommand("for debug purposes.  shows user session info")]
+    [IrcCommand("for debug purposes. shows user session info")]
     public static Task SessionInfoAsync(string parameters, IIrcSession session)
     {
         session.WindowService.Echo(session.ActiveWindow, "-");
