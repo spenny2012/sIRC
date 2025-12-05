@@ -7,6 +7,25 @@ public class ExtractCommandTests
 {
     const string WORKING_COMMAND = "/test  10    HELLO      WORLD!";
     const string BROKEN_COMMAND = "/test    HELLO   WORLD!";
+    const string DATE_COMMAND = "/test             12/4/2024";
+
+    [TestMethod]
+    public void ExtractCommandWithDateTest()
+    {
+        IrcCommandInfo cmd = DATE_COMMAND.AsSpan(1).ToString().ExtractCommand();
+        Assert.IsNotNull(cmd.Parameters);
+
+        IrcCommandParametersInfo prms = cmd.ExtractCommandParameters();
+        Assert.IsNotNull(prms.Parameters);
+
+        // Test nullable int
+        DateTime? getArgs = prms.GetParam<DateTime?>(0);
+
+        Assert.IsNotNull(getArgs);
+        Assert.AreEqual(12, getArgs.Value.Month);
+        Assert.AreEqual(4, getArgs.Value.Day);
+        Assert.AreEqual(2025, getArgs.Value.Year);
+    }
 
     [TestMethod]
     public void ExtractCommandTest()
