@@ -101,7 +101,7 @@ public partial class App : Application
             };
         });
         services.AddScoped<IIrcEvents, IrcEvents>();
-        services.AddScoped<IIrcServer, IrcServerInfo>();
+        services.AddScoped<IIrcServer, IrcServer>();
         services.AddScoped<IWindowService, WindowService>();
     }
 }

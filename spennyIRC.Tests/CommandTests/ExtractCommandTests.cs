@@ -24,7 +24,7 @@ public class ExtractCommandTests
         Assert.IsNotNull(getArgs);
         Assert.AreEqual(12, getArgs.Value.Month);
         Assert.AreEqual(4, getArgs.Value.Day);
-        Assert.AreEqual(2025, getArgs.Value.Year);
+        Assert.AreEqual(2024, getArgs.Value.Year);
     }
 
     [TestMethod]

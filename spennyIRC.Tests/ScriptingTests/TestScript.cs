@@ -4,16 +4,23 @@ using spennyIRC.Scripting.Commands;
 using spennyIRC.Scripting.Engine;
 using spennyIRC.Scripting.Helpers; // Do not remove
 using System;                      // Do not remove
+using System.IO;
 using System.Text;                 // Do not remove
+using System.Threading;
 using System.Threading.Tasks;      // Do not remove
 #pragma warning disable IDE0079    // Remove unnecessary suppression
 #pragma warning disable CA1050     // Remove declare types in namespace
 public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
 {
     public override string Name => "Hello World Script"; // Required
+
+    private static CancellationTokenSource? _playCancellationTokenSource;
+    private bool _isPlaying;
+
     //public override string Version => "1.0";
     //public override string Author => "SK";
     //public override string Description => "A simple test script.";
+
 
     public override void Execute()
     {
@@ -26,9 +33,38 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
             IrcCommandParametersInfo cmdParams = p.ExtractCommandParameters();
 
             int? times = cmdParams.GetParam<int?>(0);
-            if (!times.HasValue || times == 0) return Task.CompletedTask;
+            if (!times.HasValue || times <= 0) return Task.CompletedTask;
 
             return RepeatCmdAsync(session, cmdParams.Parameters!.GetTokenFrom(1), times.Value);
+        });
+
+        AddCommand("play", "play a .txt file", async (p, session) =>
+        {
+            IrcCommandParametersInfo cmdParams = p.ExtractCommandParameters();
+
+            string? path = cmdParams.GetParam<string?>(0);
+            int? delay = cmdParams.GetParam<int?>(1);
+
+            if (path?.Equals("stop", StringComparison.OrdinalIgnoreCase) == true && _playCancellationTokenSource != null)
+            {
+                await _playCancellationTokenSource.CancelAsync();
+                _playCancellationTokenSource = null;
+                _isPlaying = false;
+                return;
+            }
+
+            if (!delay.HasValue || delay <= 0 || string.IsNullOrWhiteSpace(path))
+                return;
+
+            if (_isPlaying)
+            {
+                session.WindowService.Echo(session.ActiveWindow, $"* Another file is already playing. Type `/play stop` to halt it.");
+                return;
+            }
+
+            _isPlaying = true;
+            _playCancellationTokenSource = new();
+            await PlayAsync(session, path, _playCancellationTokenSource.Token, delay.Value);
         });
     }
 
@@ -45,6 +81,34 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
                 cmdParams.Parameters,
                 session);
         }
+    }
+
+    private async Task PlayAsync(IIrcSession session, string filePath, CancellationToken cancellationToken, int delay = 5)
+    {
+        ArgumentNullException.ThrowIfNull(filePath, nameof(filePath));
+
+        if (!Path.Exists(filePath))
+        {
+            // TODO: add echo msg
+            return;
+        }
+
+        session.WindowService.Echo(session.ActiveWindow, $"* Playing {filePath}");
+
+        string[] lines = File.ReadAllLines(filePath);
+
+        foreach (string line in lines)
+        {
+            await _commands.ExecuteCommand("say", line, session);
+
+            if (delay == 0) continue;
+
+            await Task.Delay(TimeSpan.FromSeconds(delay)); // TODO: change to ms
+
+            if (cancellationToken.IsCancellationRequested) break;
+        }
+
+        session.WindowService.Echo(session.ActiveWindow, $"* Finished playing '{filePath}'");
     }
 }
 

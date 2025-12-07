@@ -1,6 +1,6 @@
 ﻿namespace spennyIRC.Core.IRC;
 
-public class IrcServerInfo : IIrcServer
+public class IrcServer : IIrcServer
 {
     public bool Connected { get; set; }
     public string Host { get; set; } = string.Empty;

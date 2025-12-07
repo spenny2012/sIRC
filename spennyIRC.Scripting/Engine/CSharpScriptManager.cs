@@ -151,6 +151,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
             Assembly.Load("System.Collections").Location,
             Assembly.Load("System.Windows").Location,
             Assembly.Load("System.Linq").Location,
+            Assembly.Load("System.Threading").Location,
             Assembly.Load("System.Threading.Tasks").Location,
             Assembly.Load("netstandard").Location
         ];
