@@ -101,9 +101,14 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
 
             if (delay == 0) continue;
 
-            await Task.Delay(TimeSpan.FromSeconds(delay)); // TODO: change to ms
-
-            if (cancellationToken.IsCancellationRequested) break;
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(delay), cancellationToken); // TODO: change to ms
+            }
+            catch
+            {
+                break;
+            }
         }
 
         session.WindowService.Echo(session.ActiveWindow, $"* Finished playing '{filePath}'");
