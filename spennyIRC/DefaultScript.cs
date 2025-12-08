@@ -47,15 +47,13 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
             if (path?.Equals("stop", StringComparison.OrdinalIgnoreCase) == true && _playCancellationTokenSource != null)
             {
                 await _playCancellationTokenSource.CancelAsync();
-                _playCancellationTokenSource = null;
-                _isPlaying = false;
                 return;
             }
 
-            if (!delay.HasValue || delay <= 0 || string.IsNullOrWhiteSpace(path))
+            else if (!delay.HasValue || delay <= 0 || string.IsNullOrWhiteSpace(path))
                 return;
 
-            if (_isPlaying)
+            else if (_isPlaying)
             {
                 session.WindowService.Echo(session.ActiveWindow, $"* Another file is already playing. Type `/play stop` to halt it.");
                 return;
@@ -64,6 +62,7 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
             _isPlaying = true;
             _playCancellationTokenSource = new();
             await PlayAsync(session, path, _playCancellationTokenSource.Token, delay.Value);
+            _isPlaying = false;
         });
     }
 
@@ -88,11 +87,11 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
 
         if (!Path.Exists(filePath))
         {
-            // TODO: add echo msg
+            session.WindowService.Echo(session.ActiveWindow, $"* File not found '{filePath}'");
             return;
         }
 
-        session.WindowService.Echo(session.ActiveWindow, $"* Playing '{filePath}'");
+        session.WindowService.Echo(session.ActiveWindow, $"* Playing '{filePath}' with a {delay} second delay.");
 
         string[] lines = File.ReadAllLines(filePath);
 
