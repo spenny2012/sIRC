@@ -9,7 +9,7 @@ namespace spennyIRC;
 /// </summary>
 public partial class IrcStatusControl : UserControl
 {
-    private Paragraph paragraph;
+    private Paragraph _paragraph;
     private ServerViewModel _vm;
 
     public IrcStatusControl()
@@ -20,46 +20,66 @@ public partial class IrcStatusControl : UserControl
 
     private void InitializeChatDisplay()
     {
-        paragraph = new Paragraph();
+        _paragraph = new Paragraph
+        {
+            TextAlignment = System.Windows.TextAlignment.Justify
+        };
         ChatDisplay.Document.Blocks.Clear();
-        ChatDisplay.Document.Blocks.Add(paragraph);
+        ChatDisplay.Document.Blocks.Add(_paragraph);
     }
 
-    private void RegisterEcho()
-    {
-        _vm.Session.WindowService.DoEcho += (window, txt) =>
-        {
-            if (window.Equals(_vm.Name, StringComparison.OrdinalIgnoreCase) || window == "All")
-            {
-                WriteLine(txt);
-            }
-        };
-    }
+    // TODO: handle all registerecho calls in a different control
 
     public void WriteLine(string text)
     {
         Dispatcher.Invoke(() =>
         {
-            paragraph.Inlines.Add(new Run(text + Environment.NewLine));
+            _paragraph.Inlines.Add(new Run(text + Environment.NewLine));
             ChatDisplay.ScrollToEnd();
         });
     }
 
     private void UserControl_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
     {
-        if (DataContext == null)
+        if (e.NewValue == null)
         {
-            // Unbind
-
+            if (e.OldValue != null)
+            {
+                ChannelViewModel oldVm = (ChannelViewModel) e.OldValue;
+                oldVm.EchoService.DoEcho -= DoEcho;
+                oldVm.EchoService.DoClear -= DoClear;
+            }
             return;
         }
-
         _vm = (ServerViewModel) DataContext;
-
-        RegisterEcho();
+        _vm.Session.WindowService.DoEcho += DoEcho;
+        _vm.Session.WindowService.DoClear += DoClear;
     }
 
-    private void UserControl_LayoutUpdated(object sender, EventArgs e)
+    private void DoEcho(string window, string txt)
+    {
+        if (window.Equals(_vm.Name, StringComparison.OrdinalIgnoreCase) || window == "All")
+        {
+            WriteLine(txt);
+        }
+    }
+
+    private void DoClear(string window)
+    {
+        if (window == _vm.Name || window == "All")
+        {
+            ChatDisplay.Document.Blocks.Clear();
+            _paragraph.Inlines.Clear();
+            _paragraph = null!;
+            _paragraph = new Paragraph
+            {
+                TextAlignment = System.Windows.TextAlignment.Justify
+            };
+            ChatDisplay.Document.Blocks.Add(_paragraph);
+        }
+    }
+
+    private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
     {
     }
 }

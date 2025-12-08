@@ -315,13 +315,17 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
         {
             using MemoryMappedViewAccessor accessor = cached.MappedFile.CreateViewAccessor(0, cached.Size, MemoryMappedFileAccess.Read);
             byte[] buffer = _bytePool.Rent((int) cached.Size);
+
             try
             {
                 accessor.ReadArray(0, buffer, 0, (int) cached.Size);
+
                 using MemoryStream ms = new(buffer, 0, (int) cached.Size, false);
                 AssemblyLoadContext context = new(null, isCollectible: true);
                 Assembly assembly = context.LoadFromStream(ms);
+
                 _loadContexts[cached.Hash] = context;
+
                 return assembly;
             }
             finally

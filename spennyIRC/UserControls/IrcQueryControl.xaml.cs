@@ -10,7 +10,7 @@ namespace spennyIRC.UserControls;
 public partial class IrcQueryControl : UserControl
 {
     private QueryViewModel _vm;
-    private Paragraph paragraph;
+    private Paragraph _paragraph;
 
     public IrcQueryControl()
     {
@@ -20,44 +20,66 @@ public partial class IrcQueryControl : UserControl
 
     private void InitializeChatDisplay()
     {
-        paragraph = new Paragraph();
-        ChatDisplay.Document.Blocks.Clear();
-        ChatDisplay.Document.Blocks.Add(paragraph);
-    }
-
-    private void RegisterEcho()
-    {
-        _vm.WindowService.DoEcho += DoEcho;
-    }
-
-    private void DoEcho(string window, string text)
-    {
-        if (window.Equals(_vm.Name, StringComparison.OrdinalIgnoreCase) || window == "All")
+        _paragraph = new Paragraph
         {
-            WriteLine(text);
-        }
+            TextAlignment = System.Windows.TextAlignment.Justify
+        };
+        ChatDisplay.Document.Blocks.Clear();
+        ChatDisplay.Document.Blocks.Add(_paragraph);
     }
+
+    // TODO: handle all registerecho calls in a different control
 
     public void WriteLine(string text)
     {
         Dispatcher.Invoke(() =>
         {
-            paragraph.Inlines.Add(new Run(text + Environment.NewLine));
+            _paragraph.Inlines.Add(new Run(text + Environment.NewLine));
             ChatDisplay.ScrollToEnd();
         });
     }
 
     private void UserControl_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
     {
-        if (e.NewValue == null && e.OldValue != null)
+        if (e.NewValue == null)
         {
-            QueryViewModel vm = (QueryViewModel) e.OldValue;
-            if (vm.WindowService.DoEcho != null)
-                vm.WindowService.DoEcho -= DoEcho;
+            if (e.OldValue != null)
+            {
+                ChannelViewModel oldVm = (ChannelViewModel) e.OldValue;
+                oldVm.EchoService.DoEcho -= DoEcho;
+                oldVm.EchoService.DoClear -= DoClear;
+            }
+            return;
         }
-
         _vm = (QueryViewModel) DataContext;
+        _vm.Session.WindowService.DoEcho += DoEcho;
+        _vm.Session.WindowService.DoClear += DoClear;
+    }
 
-        RegisterEcho();
+    private void DoEcho(string window, string txt)
+    {
+        if (window.Equals(_vm.Name, StringComparison.OrdinalIgnoreCase) || window == "All")
+        {
+            WriteLine(txt);
+        }
+    }
+
+    private void DoClear(string window)
+    {
+        if (window == _vm.Name || window == "All")
+        {
+            ChatDisplay.Document.Blocks.Clear();
+            _paragraph.Inlines.Clear();
+            _paragraph = null!;
+            _paragraph = new Paragraph
+            {
+                TextAlignment = System.Windows.TextAlignment.Justify
+            };
+            ChatDisplay.Document.Blocks.Add(_paragraph);
+        }
+    }
+
+    private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+    {
     }
 }

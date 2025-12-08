@@ -11,6 +11,7 @@ using System.Windows;
 /* BUG - Fix nick change bug during connect
  * BUG - Fix chat nick bug where name stays through user disconnect
 
+ * Feature - Make a named dialog system
  * Feature - Add context menus
  * Feature - Ensure disposal of chanel viewmodel means controls are being disposed too
  * Feature - Color windows when new message is added
