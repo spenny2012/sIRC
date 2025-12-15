@@ -2,12 +2,9 @@
 
 public static class CommandHelpers
 {
-    public static IrcCommandInfo ExtractCommand(this string command)
-    {
-        return IrcCommandInfo.Create(command);
-    }
+    public static IrcCommandInfo CreateCommandInfo(this string command) => IrcCommandInfo.Create(command);
 
-    public static IrcCommandParametersInfo ExtractCommandParameters(this string? parameters)
+    public static IrcCommandParametersInfo CreateCommandParameters(this string? parameters)
     {
         return new IrcCommandParametersInfo(parameters, parameters?.Split(' ', StringSplitOptions.RemoveEmptyEntries));
     }
@@ -17,10 +14,7 @@ public readonly record struct IrcCommandInfo(string Command, string? Parameters)
 {
     public bool HasParameters => !string.IsNullOrWhiteSpace(Parameters);
 
-    public IrcCommandParametersInfo ExtractCommandParameters()
-    {
-        return Parameters.ExtractCommandParameters();
-    }
+    public IrcCommandParametersInfo CreateParameters() => Parameters.CreateCommandParameters();
 
     public static IrcCommandInfo Create(string command)
     {

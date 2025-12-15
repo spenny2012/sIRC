@@ -18,11 +18,11 @@ namespace spennyIRC.Scripting.Engine
         public virtual string Author { get; } = "Unspecified";
         public virtual string Description { get; } = string.Empty;
 
-        public abstract void Execute();
         public abstract void Initialize();
         public virtual void Shutdown()
         {
             RemoveAllCommands();
+            // TODO: add remove context menus
         }
 
         protected void AddCommand(string name, string description, Func<string, IIrcSession, Task> command)
