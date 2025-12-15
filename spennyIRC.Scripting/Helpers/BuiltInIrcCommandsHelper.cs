@@ -297,7 +297,7 @@ public static class BuiltInIrcCommandsHelper
     {
         session.LocalUser.Nick = "s" + MiscHelpers.GenerateRandomString(7);
         session.LocalUser.Nick2 = "s" + MiscHelpers.GenerateRandomString(7);
-        session.LocalUser.Ident = MiscHelpers.GenerateRandomString(Random.Shared.Next(3, 8));
+        session.LocalUser.Ident = MiscHelpers.GenerateRandomString(Random.Shared.Next(5, 11));
         session.LocalUser.Realname = MiscHelpers.GenerateRandomString(Random.Shared.Next(5, 16));
 
         session.WindowService.Echo(session.ActiveWindow, $"Reset user info:\r\n Nick: {session.LocalUser.Nick}\r\n Ident: {session.LocalUser.Ident}\r\n Real Name: {session.LocalUser.Realname}");

@@ -4,7 +4,27 @@ public static class CommandHelpers
 {
     public static IrcCommandInfo ExtractCommand(this string command)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(command, nameof(command));
+        return IrcCommandInfo.Create(command);
+    }
+
+    public static IrcCommandParametersInfo ExtractCommandParameters(this string? parameters)
+    {
+        return new IrcCommandParametersInfo(parameters, parameters?.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+    }
+}
+
+public readonly record struct IrcCommandInfo(string Command, string? Parameters)
+{
+    public bool HasParameters => !string.IsNullOrWhiteSpace(Parameters);
+
+    public IrcCommandParametersInfo ExtractCommandParameters()
+    {
+        return Parameters.ExtractCommandParameters();
+    }
+
+    public static IrcCommandInfo Create(string command)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(command, nameof(command)); 
 
         ReadOnlySpan<char> commandSpan = command.AsSpan();
         int spaceIndex = commandSpan.IndexOf(' ');
@@ -16,34 +36,27 @@ public static class CommandHelpers
                 null);
         }
 
-        string parsedCmd = commandSpan[..spaceIndex].ToString();
+        string cmd = commandSpan[..spaceIndex].ToString();
         string parameters = commandSpan[(spaceIndex + 1)..].Trim().ToString();
 
         return new IrcCommandInfo(
-            parsedCmd,
+            cmd,
             parameters);
     }
+}
 
-    public static IrcCommandParametersInfo ExtractCommandParameters(this string? parameters)
-    {
-        return new IrcCommandParametersInfo(parameters, parameters?.Split(' ', StringSplitOptions.RemoveEmptyEntries));
-    }
+public readonly record struct IrcCommandParametersInfo(string? Parameters, string[]? LineParts)
+{
+    public bool HasParameters => !string.IsNullOrWhiteSpace(Parameters) && LineParts?.Length > 0;
 
-    public static IrcCommandParametersInfo ExtractCommandParameters(this IrcCommandInfo commandInfo)
+    public T? GetParam<T>(int arg)
     {
-        return ExtractCommandParameters(commandInfo.Parameters);
-    }
-
-    public static T? GetParam<T>(this IrcCommandParametersInfo commandInfo, int arg)
-    {
-        if (commandInfo.Parameters == null ||
-            commandInfo.LineParts == null ||
-            commandInfo.LineParts.Length == 0 ||
+        if (LineParts == null ||
             arg < 0 ||
-            arg > commandInfo.LineParts.Length - 1)
+            arg > LineParts.Length - 1)
             return default;
 
-        string raw = commandInfo.LineParts[arg];
+        string raw = LineParts[arg];
 
         if (string.IsNullOrWhiteSpace(raw))
             return default;
@@ -51,7 +64,7 @@ public static class CommandHelpers
         try
         {
             Type mainType = typeof(T);
-            Type u = Nullable.GetUnderlyingType(mainType) ?? mainType; 
+            Type u = Nullable.GetUnderlyingType(mainType) ?? mainType;
             return (T?) Convert.ChangeType(raw, u);
         }
         catch
@@ -59,8 +72,21 @@ public static class CommandHelpers
             return default;
         }
     }
+
+    public string? GetParams(int startArg)
+    {
+        return Parameters?.GetTokenFrom(startArg);
+    }
 }
+//public bool TryExtractCommandParameters(out IrcCommandParametersInfo? commandParamatersInfo)
+//{
+//    commandParamatersInfo = null;
 
-public readonly record struct IrcCommandInfo(string Command, string? Parameters);
+//    if (string.IsNullOrWhiteSpace(Parameters)) return false;
 
-public readonly record struct IrcCommandParametersInfo(string? Parameters, string[]? LineParts);
+//    var parameters = Parameters.ExtractCommandParameters();
+//    if (!parameters.HasParameters) return false;
+
+//    commandParamatersInfo = parameters; 
+//    return true;
+//}

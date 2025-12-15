@@ -10,9 +10,9 @@ using System.Threading;
 using System.Threading.Tasks;      // Do not remove
 #pragma warning disable IDE0079    // Remove unnecessary suppression
 #pragma warning disable CA1050     // Remove declare types in namespace
-public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
+public class DefaultScript(IIrcCommands commands) : SircScript(commands)
 {
-    public override string Name => "Hello World Script"; // Required
+    public override string Name => "Default sIRC Script"; // Required
 
     private static CancellationTokenSource? _playCancellationTokenSource;
     private bool _isPlaying;
@@ -25,6 +25,20 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
     {
     }
 
+    /// <summary>
+    /// Registers script commands with the sIRC command system.
+    /// </summary>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if required command infrastructure provided by the base script is null.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// May be thrown if command registration fails due to duplicate command names
+    /// or an invalid script state.
+    /// </exception>
+    /// <exception cref="Exception">
+    /// Propagates any unexpected exceptions thrown during command registration
+    /// or delegate execution.
+    /// </exception>
     public override void Initialize()
     {
         AddCommand("rcmd", "repeat command", (p, session) =>
@@ -42,7 +56,7 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
             IrcCommandParametersInfo cmdParams = p.ExtractCommandParameters();
 
             string? path = cmdParams.GetParam<string?>(0);
-            int? delay = cmdParams.GetParam<int?>(1);
+            int delay = cmdParams.GetParam<int?>(1) ?? 1;
 
             if (path?.Equals("stop", StringComparison.OrdinalIgnoreCase) == true && _playCancellationTokenSource != null)
             {
@@ -50,10 +64,10 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
                 return;
             }
 
-            else if (!delay.HasValue || delay <= 0 || string.IsNullOrWhiteSpace(path))
+            if (delay < 0 || string.IsNullOrWhiteSpace(path))
                 return;
 
-            else if (_isPlaying)
+            if (_isPlaying)
             {
                 session.WindowService.Echo(session.ActiveWindow, $"* Another file is already playing. Type `/play stop` to halt it.");
                 return;
@@ -61,12 +75,27 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
 
             _isPlaying = true;
             _playCancellationTokenSource = new();
-            await PlayAsync(session, path, _playCancellationTokenSource.Token, delay.Value);
+            await PlayAsync(session, path, _playCancellationTokenSource.Token, delay);
             _isPlaying = false;
         });
     }
 
-    private async Task RepeatCmdAsync(IIrcSession session, string command, int times = 20)
+    /// <summary>
+    /// Executes an sIRC command repeatedly.
+    /// </summary>
+    /// <param name="session">The active IRC session.</param>
+    /// <param name="command">The command string to execute.</param>
+    /// <param name="times">The number of repetitions.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if <paramref name="command"/> is null.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// May be thrown if command parsing fails or the command cannot be executed.
+    /// </exception>
+    /// <exception cref="Exception">
+    /// Propagates any exceptions thrown by the command execution pipeline.
+    /// </exception>
+    private async Task RepeatCmdAsync(IIrcSession session, string command, int times = 5)
     {
         ArgumentNullException.ThrowIfNull(command, nameof(command));
 
@@ -81,7 +110,30 @@ public class HelloWorldScript(IIrcCommands commands) : SircScript(commands)
         }
     }
 
-    private async Task PlayAsync(IIrcSession session, string filePath, CancellationToken cancellationToken, int delay = 5)
+    /// <summary>
+    /// Plays a text file line-by-line, sending each line as a message with an optional delay.
+    /// </summary>
+    /// <param name="session">The active IRC session.</param>
+    /// <param name="filePath">The path to the text file.</param>
+    /// <param name="cancellationToken">Token used to cancel playback.</param>
+    /// <param name="delay">Delay in seconds between lines.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if <paramref name="filePath"/> is null.
+    /// </exception>
+    /// <exception cref="IOException">
+    /// May be thrown when reading the file fails.
+    /// </exception>
+    /// <exception cref="UnauthorizedAccessException">
+    /// May be thrown if the file cannot be accessed due to permissions.
+    /// </exception>
+    /// <exception cref="Exception">
+    /// Propagates any unexpected exceptions during command execution.
+    /// </exception>
+    /// <remarks>
+    /// Task cancellation exceptions raised during delays are caught internally
+    /// and terminate playback gracefully.
+    /// </remarks>
+    private async Task PlayAsync(IIrcSession session, string filePath, CancellationToken cancellationToken, int delay = 1)
     {
         ArgumentNullException.ThrowIfNull(filePath, nameof(filePath));
 

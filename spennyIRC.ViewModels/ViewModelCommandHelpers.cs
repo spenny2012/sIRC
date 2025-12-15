@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using spennyIRC.Core.IRC;
+using spennyIRC.Core.IRC.Helpers;
 using spennyIRC.Scripting.Attributes;
 using spennyIRC.ViewModels.Messages.Window;
 
@@ -18,7 +19,10 @@ public class ViewModelCommandHelpers
     [IrcCommand("Opens a new query")]
     public static Task QueryAsync(string parameters, IIrcSession session)
     {
-        string? name = parameters.Split(' ').FirstOrDefault();
+        IrcCommandParametersInfo parameterInfo = parameters.ExtractCommandParameters();
+        if (!parameterInfo.HasParameters) return Task.CompletedTask;
+
+        string? name = parameterInfo.GetParam<string?>(0);
         if (name == null) return Task.CompletedTask;
 
         // TODO: strip invalid chars or don't allow

@@ -143,9 +143,9 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
     {
         string[] refs =
         [
-            typeof(object).Assembly.Location,               // System.Private.CoreLib
-            typeof(ICSharpScript).Assembly.Location,        // Script interface
-            typeof(IIrcSession).Assembly.Location,          // IRC types
+            typeof(object).Assembly.Location,                  // System.Private.CoreLib
+            typeof(ICSharpScript).Assembly.Location,           // Basic script interface
+            typeof(IIrcSession).Assembly.Location,             // IRC types
             Assembly.Load("System").Location,
             Assembly.Load("System.Runtime").Location,
             Assembly.Load("System.Collections").Location,
@@ -345,6 +345,7 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
         try
         {
             string cachePath = GetCachePath(hash);
+
             File.WriteAllBytes(cachePath, assemblyBytes);
         }
         finally
@@ -367,10 +368,12 @@ public sealed class CSharpScriptManager : ICSharpScriptManager
             }
 
             assembly = LoadFromMemoryMappedFile(cached);
+
             return assembly != null;
         }
 
         string cachePath = GetCachePath(hash);
+
         if (File.Exists(cachePath))
         {
             assembly = LoadFromDiskCache(cachePath, hash);
