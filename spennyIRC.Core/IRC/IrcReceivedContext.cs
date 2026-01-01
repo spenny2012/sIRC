@@ -6,7 +6,9 @@ public record struct IrcReceivedContext : IIrcReceivedContext
     public string Line { get; set; }
     public string[] LineParts { get; set; }
     public string Event { get; set; }
-    public string Recipient { get; set; }
+    public string Location { get; set; }
     public string? Trailing { get; set; }
     public string? Nick { get; set; }
+
+    // ContainsTrailing
 }

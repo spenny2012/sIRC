@@ -15,7 +15,7 @@ public static class IrcReceivedContextFactory
             Line = line,
             LineParts = { },
             Event = DISCONNECT,
-            Recipient = string.Empty
+            Location = string.Empty
         };
         return ctx;
     }
@@ -29,7 +29,7 @@ public static class IrcReceivedContextFactory
             Line = line,
             LineParts = lineParts,
             Event = lineParts.Length > 1 ? lineParts[1] : "UNKNOWN",
-            Recipient = lineParts.Length > 2 ? lineParts[2] : string.Empty
+            Location = lineParts.Length > 2 ? lineParts[2] : string.Empty
         };
 
         // check for disconnect

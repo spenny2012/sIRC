@@ -49,7 +49,7 @@ public class IalRuntimeBinder(IIrcEvents events, IIrcInternalAddressList ial) : 
         });
         events.AddEvent("PART", (ctx) =>
         {
-            ial.RemoveChannel(ctx.Nick!, ctx.Recipient);
+            ial.RemoveChannel(ctx.Nick!, ctx.Location);
             return Task.CompletedTask;
         });
         events.AddEvent("NICK", (ctx) =>
@@ -59,7 +59,7 @@ public class IalRuntimeBinder(IIrcEvents events, IIrcInternalAddressList ial) : 
         });
         events.AddEvent("KICK", (ctx) =>
         {
-            ial.RemoveChannel(ctx.Nick!, ctx.Recipient);
+            ial.RemoveChannel(ctx.Nick!, ctx.Location);
             return Task.CompletedTask;
         });
         events.AddEvent("MODE", (ctx) => // TODO: finish this, make this less awful

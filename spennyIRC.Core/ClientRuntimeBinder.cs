@@ -65,7 +65,7 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
         {
             if (ctx.Nick == localUser.Nick)
             {
-                string channelName = ctx.Recipient.TrimStart(':');
+                string channelName = ctx.Location.TrimStart(':');
                 IrcChannel channel = new() { Name = channelName };
                 localUser.Channels.Add(channelName, channel);
             }
@@ -75,14 +75,14 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
         events.AddEvent("PART", (ctx) =>
         {
             if (ctx.Nick == localUser.Nick)
-                localUser.Channels.Remove(ctx.Recipient.TrimStart(':'));
+                localUser.Channels.Remove(ctx.Location.TrimStart(':'));
             return Task.CompletedTask;
         });
         events.AddEvent("KICK", (ctx) =>
         {
             bool localUserKicked = ctx.LineParts[3] == localUser.Nick;
             if (localUserKicked)
-                localUser.Channels.Remove(ctx.Recipient.TrimStart(':'));
+                localUser.Channels.Remove(ctx.Location.TrimStart(':'));
             return Task.CompletedTask;
         });
         events.AddEvent("MODE", (ctx) =>
@@ -93,6 +93,15 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
         events.AddEvent("DISCONNECT", (ctx) =>
         {
             localUser.Away = false;
+            localUser.Channels.Clear();
+            server.Clear();
+
+            return Task.CompletedTask;
+        });
+        events.AddEvent("QUIT", (ctx) =>
+        {
+            localUser.Away = false;
+            localUser.Channels.Clear();
             server.Clear();
 
             return Task.CompletedTask;

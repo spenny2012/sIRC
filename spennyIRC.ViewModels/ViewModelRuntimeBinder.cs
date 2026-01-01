@@ -31,7 +31,7 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
         });
         _events.AddEvent("TOPIC", (ctx) =>
         {
-            WeakReferenceMessenger.Default.Send(new ChannelTopicChangeMessage(session) { Channel = ctx.Recipient, Topic = ctx.Trailing! });
+            WeakReferenceMessenger.Default.Send(new ChannelTopicChangeMessage(session) { Channel = ctx.Location, Topic = ctx.Trailing! });
             _echoSvc.Echo(ctx.LineParts[2], $"{ctx.Nick} changed the subject to: {ctx.Trailing}");
             return Task.CompletedTask;
         });
@@ -59,7 +59,7 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
         });
         _events.AddEvent("PART", (ctx) =>
         {
-            string channel = ctx.Recipient!;
+            string channel = ctx.Location!;
             WeakReferenceMessenger.Default.Send(new ChannelPartMessage(session)
             {
                 Nick = ctx.Nick!,
@@ -73,21 +73,30 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
         _events.AddEvent("KICK", (ctx) =>
         {
             var kickedNick = ctx.LineParts[3];
-            
+
             WeakReferenceMessenger.Default.Send(new ChannelKickMessage(session)
             {
                 Nick = ctx.Nick!,
                 KickedNick = kickedNick,
-                Channel = ctx.Recipient,
+                Channel = ctx.Location,
                 Message = ctx.Trailing!
             });
             string text = kickedNick == _user.Nick ? "You were" : $"{kickedNick} was";
-            _echoSvc.Echo(ctx.Recipient, $"»» {text} kicked from {ctx.Recipient} by {ctx.Nick} ({ctx.Trailing})");
+            _echoSvc.Echo(ctx.Location, $"»» {text} kicked from {ctx.Location} by {ctx.Nick} ({ctx.Trailing})");
             return Task.CompletedTask;
         });
-        _events.AddEvent("MODE", (ctx) =>
+        _events.AddEvent("MODE", (ctx) => // TODO: finish implementing this
         {
-            string channel = ctx.LineParts[2];
+            if (ctx.Location == _user.Nick)
+            {
+                _echoSvc.Echo("Status", $"* {_user.Nick} set user modes: {ctx.Trailing}");
+                return Task.CompletedTask;
+            }
+            else if (ctx.Location.IsChannel())
+            {
+                _echoSvc.Echo(ctx.Location, "");
+            }
+
             string? modes = ctx.Trailing;
             return Task.CompletedTask;
         });
@@ -98,7 +107,7 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
         });
         _events.AddEvent("PRIVMSG", (ctx) =>
         {
-            bool isDm = ctx.Recipient == _user.Nick;
+            bool isDm = ctx.Location == _user.Nick;
             if (isDm) // handle query
             {
                 WeakReferenceMessenger.Default.Send(new ServerOpenedQueryMessage(session)
@@ -107,7 +116,7 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
                     Message = ctx.Trailing!
                 });
             }
-            _echoSvc.Echo(isDm ? ctx.Nick! : ctx.Recipient, $"[{ctx.Nick}] {ctx.Trailing}");
+            _echoSvc.Echo(isDm ? ctx.Nick! : ctx.Location, $"[{ctx.Nick}] {ctx.Trailing}");
             return Task.CompletedTask;
         });
         _events.AddEvent("NICK", (ctx) =>
