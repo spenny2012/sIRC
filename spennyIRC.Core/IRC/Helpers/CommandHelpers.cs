@@ -2,23 +2,9 @@
 
 public static class CommandHelpers
 {
-    public static IrcCommandInfo CreateCommand(this string command) => IrcCommandInfo.Create(command);
-
-    public static IrcCommandParametersInfo CreateParameters(this string? parameters)
+    public static IrcCommandInfo CreateCommand(this string command)
     {
-        return new IrcCommandParametersInfo(parameters, parameters?.Split(' ', StringSplitOptions.RemoveEmptyEntries));
-    }
-}
-
-public readonly record struct IrcCommandInfo(string Command, string? Parameters)
-{
-    public bool HasParameters => !string.IsNullOrWhiteSpace(Parameters);
-
-    public IrcCommandParametersInfo CreateParameters() => Parameters.CreateParameters();
-
-    public static IrcCommandInfo Create(string command)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(command, nameof(command)); 
+        ArgumentException.ThrowIfNullOrWhiteSpace(command, nameof(command));
 
         ReadOnlySpan<char> commandSpan = command.AsSpan();
         int spaceIndex = commandSpan.IndexOf(' ');
@@ -37,38 +23,17 @@ public readonly record struct IrcCommandInfo(string Command, string? Parameters)
             cmd,
             parameters);
     }
-}
 
-public readonly record struct IrcCommandParametersInfo(string? Parameters, string[]? LineParts)
-{
-    public bool HasParameters => !string.IsNullOrWhiteSpace(Parameters) && LineParts?.Length > 0;
-
-    public T? GetParam<T>(int arg)
+    public static IrcCommandParametersInfo CreateParameters(this string? parameters)
     {
-        if (LineParts == null ||
-            arg < 0 ||
-            arg > LineParts.Length - 1)
-            return default;
+        string[]? lineParts = parameters?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        bool hasParameters = !string.IsNullOrWhiteSpace(parameters) && lineParts?.Length > 0;
 
-        string raw = LineParts[arg];
-
-        if (string.IsNullOrWhiteSpace(raw))
-            return default;
-
-        try
-        {
-            Type mainType = typeof(T);
-            Type u = Nullable.GetUnderlyingType(mainType) ?? mainType;
-            return (T?) Convert.ChangeType(raw, u);
-        }
-        catch
-        {
-            return default;
-        }
+        return new IrcCommandParametersInfo(parameters, lineParts, hasParameters);
     }
 
-    public string? GetParams(int startArg)
+    public static IrcCommandParametersInfo CreateParameters(this IrcCommandInfo command)
     {
-        return Parameters?.GetTokenFrom(startArg);
+        return command.Parameters.CreateParameters();
     }
 }

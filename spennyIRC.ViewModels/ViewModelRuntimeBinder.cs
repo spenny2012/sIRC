@@ -72,23 +72,25 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
         });
         _events.AddEvent("KICK", (ctx) =>
         {
+            var kickedNick = ctx.LineParts[3];
+            
             WeakReferenceMessenger.Default.Send(new ChannelKickMessage(session)
             {
                 Nick = ctx.Nick!,
-                KickedNick = ctx.LineParts[3],
+                KickedNick = kickedNick,
                 Channel = ctx.Recipient,
                 Message = ctx.Trailing!
             });
-            string text = ctx.LineParts[3] == _user.Nick ? "You were" : $"{ctx.Nick} was";
+            string text = kickedNick == _user.Nick ? "You were" : $"{kickedNick} was";
             _echoSvc.Echo(ctx.Recipient, $"»» {text} kicked from {ctx.Recipient} by {ctx.Nick} ({ctx.Trailing})");
             return Task.CompletedTask;
         });
-        //_events.AddEvent("MODE", (ctx) =>
-        //{
-        //    var channel = ctx.LineParts[2];
-        //    _echoSvc.Echo(StatusWindow, $"-{ctx.Nick}- {ctx.Trailing}");
-        //    return Task.CompletedTask;
-        //});
+        _events.AddEvent("MODE", (ctx) =>
+        {
+            string channel = ctx.LineParts[2];
+            string? modes = ctx.Trailing;
+            return Task.CompletedTask;
+        });
         _events.AddEvent("NOTICE", (ctx) =>
         {
             _echoSvc.Echo(StatusWindow, $"-{ctx.Nick}- {ctx.Trailing}");

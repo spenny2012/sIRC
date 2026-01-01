@@ -76,7 +76,9 @@ public class ChannelViewModel : WindowViewModelBase
             if (m.KickedNick == _session.LocalUser.Nick)
             {
                 ThreadSafeInvoker.Invoke(() => NickList.Clear());
+                return;
             }
+            ThreadSafeInvoker.Invoke(() => NickList.Remove(m.KickedNick));
         });
 
         WeakReferenceMessenger.Default.Register<ChannelJoinMessage>(this, (r, m) =>
@@ -141,9 +143,9 @@ public class ChannelViewModel : WindowViewModelBase
         WeakReferenceMessenger.Default.Register<NickChangedMessage>(this, (r, m) =>
         {
             if (m.Session != _session || FindNick(m.Nick) == null) return;
+            m.Session.WindowService.Echo(Channel, $"* {m.Nick} is now known as {m.NewNick}");
             ThreadSafeInvoker.Invoke(() =>
             {
-                m.Session.WindowService.Echo(Channel, $"* {m.Nick} is now known as {m.NewNick}");
                 ChangeNick(m.Nick, m.NewNick);
             });
         });

@@ -288,12 +288,12 @@ public static class BuiltInIrcCommandsHelper
     {
         if (!IsConnected(session)) return;
 
-        var prms = parameters.CreateParameters();
+        IrcCommandParametersInfo prms = parameters.CreateParameters();
         string channel = session.ActiveWindow;
         string message = parameters.GetTokenFrom(0);
-        if (prms.HasParameters && prms.LineParts![0]?.StartsWith('#') == true)
+        if (prms.HasParameters && prms.ParemeterParts![0]?.StartsWith('#') == true)
         {
-            channel = prms.LineParts[0];
+            channel = prms.ParemeterParts[0];
             message = parameters.GetTokenFrom(1);
         }
 
