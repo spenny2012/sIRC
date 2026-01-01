@@ -288,8 +288,17 @@ public static class BuiltInIrcCommandsHelper
     {
         if (!IsConnected(session)) return;
 
-        session.WindowService.Echo(session.ActiveWindow, $"Rejoining {session.ActiveWindow}...");
-        await session.Client.SendMessageAsync($"PART {session.ActiveWindow}\r\nJOIN {session.ActiveWindow}");
+        var prms = parameters.CreateParameters();
+        string channel = session.ActiveWindow;
+        string message = parameters.GetTokenFrom(0);
+        if (prms.HasParameters && prms.LineParts![0]?.StartsWith('#') == true)
+        {
+            channel = prms.LineParts[0];
+            message = parameters.GetTokenFrom(1);
+        }
+
+        session.WindowService.Echo(session.ActiveWindow, $"Rejoining {channel}...");
+        await session.Client.SendMessageAsync($"PART {channel} :{message}\r\nJOIN {channel}");
     }
 
     [IrcCommand("generates new user information")]

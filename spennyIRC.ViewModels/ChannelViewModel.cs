@@ -58,6 +58,12 @@ public class ChannelViewModel : WindowViewModelBase
 
     protected override void RegisterUISubscriptions()
     {
+        WeakReferenceMessenger.Default.Register<ChannelAddMessage>(this, (r, m) =>
+        {
+            if (m.Session != _session || m.Channel != Channel) return;
+            ThreadSafeInvoker.Invoke(() => IsSelected = true);
+        });
+
         WeakReferenceMessenger.Default.Register<ServerDisconnectedMessage>(this, (r, m) =>
         {
             if (m.Session != _session) return;
@@ -135,7 +141,11 @@ public class ChannelViewModel : WindowViewModelBase
         WeakReferenceMessenger.Default.Register<NickChangedMessage>(this, (r, m) =>
         {
             if (m.Session != _session || FindNick(m.Nick) == null) return;
-            ThreadSafeInvoker.Invoke(() => ChangeNick(m.Nick, m.NewNick));
+            ThreadSafeInvoker.Invoke(() =>
+            {
+                m.Session.WindowService.Echo(Channel, $"* {m.Nick} is now known as {m.NewNick}");
+                ChangeNick(m.Nick, m.NewNick);
+            });
         });
     }
 

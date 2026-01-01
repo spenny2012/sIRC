@@ -39,7 +39,7 @@ public class DefaultScript(IIrcCommands commands) : SircScript(commands)
     {
         AddCommand("rcmd", "repeat command", (p, session) =>
         {
-            IrcCommandParametersInfo cmdParams = p.CreateCommandParameters();
+            IrcCommandParametersInfo cmdParams = p.CreateParameters();
 
             int? times = cmdParams.GetParam<int?>(0);
             if (!times.HasValue || times <= 0) return Task.CompletedTask;
@@ -49,7 +49,7 @@ public class DefaultScript(IIrcCommands commands) : SircScript(commands)
 
         AddCommand("play", "play a .txt file", async (p, session) =>
         {
-            IrcCommandParametersInfo cmdParams = p.CreateCommandParameters();
+            IrcCommandParametersInfo cmdParams = p.CreateParameters();
 
             string? path = cmdParams.GetParam<string?>(0);
             int delay = cmdParams.GetParam<int?>(1) ?? 1;
@@ -91,11 +91,11 @@ public class DefaultScript(IIrcCommands commands) : SircScript(commands)
     /// <exception cref="Exception">
     /// Propagates any exceptions thrown by the command execution pipeline.
     /// </exception>
-    private async Task RepeatCmdAsync(IIrcSession session, string command, int times = 5)
+    private async Task RepeatCmdAsync(IIrcSession session, string command, int times = 1)
     {
         ArgumentNullException.ThrowIfNull(command, nameof(command));
 
-        IrcCommandInfo cmdParams = command.CreateCommandInfo();
+        IrcCommandInfo cmdParams = command.CreateCommand();
 
         for (int i = 0; i < times; i++)
         {
@@ -106,29 +106,6 @@ public class DefaultScript(IIrcCommands commands) : SircScript(commands)
         }
     }
 
-    /// <summary>
-    /// Plays a text file line-by-line, sending each line as a message with an optional delay.
-    /// </summary>
-    /// <param name="session">The active IRC session.</param>
-    /// <param name="filePath">The path to the text file.</param>
-    /// <param name="cancellationToken">Token used to cancel playback.</param>
-    /// <param name="delay">Delay in seconds between lines.</param>
-    /// <exception cref="ArgumentNullException">
-    /// Thrown if <paramref name="filePath"/> is null.
-    /// </exception>
-    /// <exception cref="IOException">
-    /// May be thrown when reading the file fails.
-    /// </exception>
-    /// <exception cref="UnauthorizedAccessException">
-    /// May be thrown if the file cannot be accessed due to permissions.
-    /// </exception>
-    /// <exception cref="Exception">
-    /// Propagates any unexpected exceptions during command execution.
-    /// </exception>
-    /// <remarks>
-    /// Task cancellation exceptions raised during delays are caught internally
-    /// and terminate playback gracefully.
-    /// </remarks>
     private async Task PlayAsync(IIrcSession session, string filePath, CancellationToken cancellationToken, int delay = 1)
     {
         ArgumentNullException.ThrowIfNull(filePath, nameof(filePath));

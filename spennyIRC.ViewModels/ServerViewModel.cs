@@ -46,12 +46,7 @@ public class ServerViewModel : WindowViewModelBase
 
         WeakReferenceMessenger.Default.Register<ChannelAddMessage>(this, (r, m) =>
         {
-            if (m.Session != _session) return;
-            if (FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) // TODO: remove potential useless functionality
-            {
-                channel.IsSelected = true;
-                return;
-            }
+            if (m.Session != _session || FindWindowByName(Channels, m.Channel, out ChannelViewModel channel)) return;
 
             ThreadSafeInvoker.Invoke(() =>
             {

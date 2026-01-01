@@ -2,9 +2,9 @@
 
 public static class CommandHelpers
 {
-    public static IrcCommandInfo CreateCommandInfo(this string command) => IrcCommandInfo.Create(command);
+    public static IrcCommandInfo CreateCommand(this string command) => IrcCommandInfo.Create(command);
 
-    public static IrcCommandParametersInfo CreateCommandParameters(this string? parameters)
+    public static IrcCommandParametersInfo CreateParameters(this string? parameters)
     {
         return new IrcCommandParametersInfo(parameters, parameters?.Split(' ', StringSplitOptions.RemoveEmptyEntries));
     }
@@ -14,7 +14,7 @@ public readonly record struct IrcCommandInfo(string Command, string? Parameters)
 {
     public bool HasParameters => !string.IsNullOrWhiteSpace(Parameters);
 
-    public IrcCommandParametersInfo CreateParameters() => Parameters.CreateCommandParameters();
+    public IrcCommandParametersInfo CreateParameters() => Parameters.CreateParameters();
 
     public static IrcCommandInfo Create(string command)
     {
@@ -72,15 +72,3 @@ public readonly record struct IrcCommandParametersInfo(string? Parameters, strin
         return Parameters?.GetTokenFrom(startArg);
     }
 }
-//public bool TryExtractCommandParameters(out IrcCommandParametersInfo? commandParamatersInfo)
-//{
-//    commandParamatersInfo = null;
-
-//    if (string.IsNullOrWhiteSpace(Parameters)) return false;
-
-//    var parameters = Parameters.ExtractCommandParameters();
-//    if (!parameters.HasParameters) return false;
-
-//    commandParamatersInfo = parameters; 
-//    return true;
-//}

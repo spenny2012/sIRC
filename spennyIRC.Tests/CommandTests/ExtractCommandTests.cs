@@ -12,7 +12,7 @@ public class ExtractCommandTests
     [TestMethod]
     public void ExtractCommandWithDateTest()
     {
-        IrcCommandInfo cmd = DATE_COMMAND.AsSpan(1).ToString().CreateCommandInfo();
+        IrcCommandInfo cmd = DATE_COMMAND.AsSpan(1).ToString().CreateCommand();
         Assert.IsNotNull(cmd.Parameters);
 
         IrcCommandParametersInfo prms = cmd.CreateParameters();
@@ -30,14 +30,14 @@ public class ExtractCommandTests
     [TestMethod]
     public void ExtractCommandTest()
     {
-        IrcCommandInfo cmd = WORKING_COMMAND.AsSpan(1).ToString().CreateCommandInfo();
+        IrcCommandInfo cmd = WORKING_COMMAND.AsSpan(1).ToString().CreateCommand();
         Assert.IsNotNull(cmd.Parameters);
     }
 
     [TestMethod]
     public void ExtractWorkingParametersTest()
     {
-        IrcCommandInfo cmd = WORKING_COMMAND.AsSpan(1).ToString().CreateCommandInfo();
+        IrcCommandInfo cmd = WORKING_COMMAND.AsSpan(1).ToString().CreateCommand();
         Assert.IsNotNull(cmd.Parameters);
 
         IrcCommandParametersInfo prms = cmd.CreateParameters();
@@ -59,7 +59,7 @@ public class ExtractCommandTests
     [TestMethod]
     public void ExtractBrokenParametersTest()
     {
-        IrcCommandInfo brokenCmd = BROKEN_COMMAND.AsSpan(1).ToString().CreateCommandInfo();
+        IrcCommandInfo brokenCmd = BROKEN_COMMAND.AsSpan(1).ToString().CreateCommand();
         Assert.IsNotNull(brokenCmd.Parameters);
 
         IrcCommandParametersInfo prms = brokenCmd.CreateParameters();

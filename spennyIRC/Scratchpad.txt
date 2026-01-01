@@ -3,6 +3,7 @@
     * Events
     * Aliases (to keep track of and remove from global aliases when script is unloaded)
     * Popups
+    * 
 
 2) The ScriptManager has:
     * Scripts

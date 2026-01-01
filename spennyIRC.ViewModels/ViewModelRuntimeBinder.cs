@@ -83,6 +83,12 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
             _echoSvc.Echo(ctx.Recipient, $"»» {text} kicked from {ctx.Recipient} by {ctx.Nick} ({ctx.Trailing})");
             return Task.CompletedTask;
         });
+        //_events.AddEvent("MODE", (ctx) =>
+        //{
+        //    var channel = ctx.LineParts[2];
+        //    _echoSvc.Echo(StatusWindow, $"-{ctx.Nick}- {ctx.Trailing}");
+        //    return Task.CompletedTask;
+        //});
         _events.AddEvent("NOTICE", (ctx) =>
         {
             _echoSvc.Echo(StatusWindow, $"-{ctx.Nick}- {ctx.Trailing}");

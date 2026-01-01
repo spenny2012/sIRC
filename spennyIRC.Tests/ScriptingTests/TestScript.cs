@@ -21,10 +21,6 @@ public class DefaultScript(IIrcCommands commands) : SircScript(commands)
     //public override string Author => "SK";
     //public override string Description => "A simple test script.";
 
-    public override void Execute()
-    {
-    }
-
     /// <summary>
     /// Registers script commands with the sIRC command system.
     /// </summary>
@@ -43,7 +39,7 @@ public class DefaultScript(IIrcCommands commands) : SircScript(commands)
     {
         AddCommand("rcmd", "repeat command", (p, session) =>
         {
-            IrcCommandParametersInfo cmdParams = p.CreateCommandParameters();
+            IrcCommandParametersInfo cmdParams = p.CreateParameters();
 
             int? times = cmdParams.GetParam<int?>(0);
             if (!times.HasValue || times <= 0) return Task.CompletedTask;
@@ -53,7 +49,7 @@ public class DefaultScript(IIrcCommands commands) : SircScript(commands)
 
         AddCommand("play", "play a .txt file", async (p, session) =>
         {
-            IrcCommandParametersInfo cmdParams = p.CreateCommandParameters();
+            IrcCommandParametersInfo cmdParams = p.CreateParameters();
 
             string? path = cmdParams.GetParam<string?>(0);
             int delay = cmdParams.GetParam<int?>(1) ?? 1;
@@ -99,7 +95,7 @@ public class DefaultScript(IIrcCommands commands) : SircScript(commands)
     {
         ArgumentNullException.ThrowIfNull(command, nameof(command));
 
-        IrcCommandInfo cmdParams = command.CreateCommandInfo();
+        IrcCommandInfo cmdParams = command.CreateCommand();
 
         for (int i = 0; i < times; i++)
         {

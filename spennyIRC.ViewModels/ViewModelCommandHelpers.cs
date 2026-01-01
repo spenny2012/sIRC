@@ -19,7 +19,7 @@ public class ViewModelCommandHelpers
     [IrcCommand("Opens a new query")]
     public static Task QueryAsync(string parameters, IIrcSession session)
     {
-        IrcCommandParametersInfo parameterInfo = parameters.CreateCommandParameters();
+        IrcCommandParametersInfo parameterInfo = parameters.CreateParameters();
         if (!parameterInfo.HasParameters) return Task.CompletedTask;
 
         string? name = parameterInfo.GetParam<string?>(0);

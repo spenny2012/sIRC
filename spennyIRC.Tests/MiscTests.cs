@@ -8,7 +8,7 @@ public class MiscTests
     [TestMethod]
     public void TestMethod1()
     {
-        IrcCommandInfo extractedInfo = CommandHelpers.CreateCommandInfo("/msg test HELLO");
+        IrcCommandInfo extractedInfo = CommandHelpers.CreateCommand("/msg test HELLO");
         string fromToken = "/msg test HELLO".GetTokenFrom(2);
     }
 }
