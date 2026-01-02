@@ -14,10 +14,6 @@ public class IrcServer : IIrcServer
     {
         Connected = false;
         IsTls = false;
-        Host = string.Empty;
-        Port = string.Empty;
-        Network = string.Empty;
-        NetworkId = string.Empty;
         Settings.Clear();
     }
 }
