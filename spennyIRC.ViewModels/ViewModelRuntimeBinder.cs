@@ -94,7 +94,8 @@ public class ViewModelRuntimeBinder(IIrcSession session) : IIrcRuntimeBinder
             }
             else if (ctx.Location.IsChannel())
             {
-                _echoSvc.Echo(ctx.Location, "");
+                _echoSvc.Echo(ctx.Location, $"* {ctx.Nick} sets mode: {ctx.Line.GetTokenFrom(3)}");
+                return Task.CompletedTask;
             }
 
             string? modes = ctx.Trailing;

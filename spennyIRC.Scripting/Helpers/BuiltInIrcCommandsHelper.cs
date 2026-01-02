@@ -91,7 +91,7 @@ public static class BuiltInIrcCommandsHelper
 #if RELEASE
             session.WindowService.Echo("Status", $"ERROR: {e.Message}");
 #endif
-            session.Server.Clear();
+            session.Server.Reset();
         }
     }
 

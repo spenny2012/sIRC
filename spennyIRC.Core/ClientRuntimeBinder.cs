@@ -94,15 +94,18 @@ public class ClientRuntimeBinder(IIrcEvents events, IIrcServer server, IIrcLocal
         {
             localUser.Away = false;
             localUser.Channels.Clear();
-            server.Clear();
+            server.Reset();
 
             return Task.CompletedTask;
         });
         events.AddEvent("QUIT", (ctx) =>
         {
-            localUser.Away = false;
-            localUser.Channels.Clear();
-            server.Clear();
+            if (ctx.Nick == localUser.Nick)
+            {
+                localUser.Away = false;
+                localUser.Channels.Clear();
+                server.Reset();
+            }
 
             return Task.CompletedTask;
         });

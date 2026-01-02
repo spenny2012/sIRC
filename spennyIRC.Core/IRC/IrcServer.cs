@@ -10,7 +10,7 @@ public class IrcServer : IIrcServer
     public string Port { get; set; } = string.Empty;
     public Dictionary<string, string> Settings { get; set; } = [];
 
-    public void Clear()
+    public void Reset()
     {
         Connected = false;
         IsTls = false;

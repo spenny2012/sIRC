@@ -10,5 +10,5 @@ public interface IIrcServer
     string Port { get; set; }
     Dictionary<string, string> Settings { get; set; }
 
-    void Clear();
+    void Reset();
 }
